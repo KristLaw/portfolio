@@ -3,674 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Prakit Law — Filmmaker</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Playfair+Display:ital,wght@1,400;1,500;1,700&display=swap');
-
-    :root {
-      --bg:         #030c05;
-      --surface:    #071008;
-      --surface2:   #0c1c0e;
-      --surface3:   #122016;
-      --green-px:   #39ff6e;    /* neon Kinich green */
-      --green-mid:  #1ecc55;
-      --green-deep: #0a4a20;
-      --green-glow: rgba(57,255,110,0.14);
-      --gold:       #f5d200;    /* Kinich yellow-gold */
-      --gold-light: #ffe84a;
-      --teal:       #00d4b8;    /* Kinich energy teal */
-      --text:       #d8f5e0;
-      --muted:      #5a9a72;
-      --font-px:    'Press Start 2P', monospace;
-      --font-body:  'Cormorant Garamond', serif;
-      --font-acc:   'Playfair Display', serif;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-body);
-      font-size: 18px;
-      line-height: 1.7;
-      cursor: none;
-      overflow-x: hidden;
-    }
-    a { color: inherit; text-decoration: none; }
-
-    /* 32px pixel grid (Kinich matrix floor) */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      pointer-events: none;
-      z-index: 9990;
-      background-image:
-        linear-gradient(rgba(57,255,110,0.028) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(57,255,110,0.028) 1px, transparent 1px);
-      background-size: 32px 32px;
-    }
-    body::after {
-      content: '';
-      position: fixed; inset: 0;
-      pointer-events: none; z-index: 9999;
-      opacity: 0.025;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 128px 128px;
-    }
-
-    /* ══ CURSOR ══ */
-    #cursor {
-      position: fixed; top: 0; left: 0;
-      width: 28px; height: 28px;
-      pointer-events: none; z-index: 99999;
-      transform: translate(-50%,-50%);
-    }
-    #cursor svg { width: 100%; height: 100%; }
-
-    /* ══ COUNTDOWN ══ */
-    #countdown {
-      position: fixed; inset: 0;
-      background: #000;
-      z-index: 99998;
-      display: flex; align-items: center; justify-content: center; flex-direction: column;
-      transition: opacity 0.6s ease;
-    }
-    #countdown.fade-out { opacity: 0; pointer-events: none; }
-    .countdown-number {
-      font-family: var(--font-px);
-      font-size: clamp(4rem, 12vw, 9rem);
-      color: var(--green-px);
-      position: absolute; opacity: 0; transform: scale(1.3);
-      transition: opacity 0.15s, transform 0.15s;
-      text-shadow: 0 0 40px rgba(57,255,110,0.8), 0 0 80px rgba(57,255,110,0.4);
-    }
-    .countdown-number.active { opacity: 1; transform: scale(1); }
-    .countdown-ring { position: absolute; width: clamp(180px,35vw,320px); height: clamp(180px,35vw,320px); }
-    .countdown-ring circle {
-      fill: none; stroke: var(--green-px); stroke-width: 2;
-      stroke-dasharray: 880; stroke-dashoffset: 880; stroke-linecap: square;
-      transform-origin: center; transform: rotate(-90deg);
-      transition: stroke-dashoffset 0.9s linear;
-      filter: drop-shadow(0 0 8px rgba(57,255,110,0.9));
-    }
-    .countdown-ring circle.go { stroke: var(--gold); transition: stroke-dashoffset 0.3s linear; }
-    .countdown-label { font-family: var(--font-px); font-size: 0.4rem; letter-spacing: 0.3em; color: var(--muted); margin-top: clamp(120px,22vw,200px); }
-
-    /* ══ NAV ══ */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1rem 3rem;
-      background: rgba(3,12,5,0.85);
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(57,255,110,0.2);
-      box-shadow: 0 2px 40px rgba(57,255,110,0.06);
-    }
-    .nav-name {
-      font-family: var(--font-px); font-size: 0.5rem;
-      color: var(--green-px); line-height: 1.8;
-      text-shadow: 0 0 12px rgba(57,255,110,0.7);
-    }
-    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-    .nav-links a {
-      font-family: var(--font-body); font-size: 0.95rem; font-weight: 500;
-      letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--muted); position: relative; padding-bottom: 3px; transition: color 0.2s;
-    }
-    .nav-links a::after {
-      content: ''; position: absolute; bottom: 0; left: 0;
-      width: 0; height: 2px;
-      background: var(--green-px); box-shadow: 0 0 8px var(--green-px);
-      transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-links a:hover::after { width: 100%; }
-
-    /* ══ HERO ══ */
-    #hero {
-      position: relative; height: 100vh; min-height: 600px;
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden;
-    }
-    .hero-bg {
-      position: absolute; inset: 0;
-      background:
-        radial-gradient(ellipse 65% 55% at 20% 70%, rgba(10,74,32,0.6) 0%, transparent 65%),
-        radial-gradient(ellipse 45% 40% at 80% 20%, rgba(57,255,110,0.08) 0%, transparent 60%),
-        radial-gradient(ellipse 80% 70% at 50% 50%, rgba(7,16,8,0.85) 0%, transparent 100%),
-        #030c05;
-      animation: heroPulse 8s ease-in-out infinite alternate;
-    }
-    @keyframes heroPulse {
-      0%   { filter: brightness(0.8) saturate(0.9); }
-      50%  { filter: brightness(1.1) saturate(1.3); }
-      100% { filter: brightness(0.9) saturate(1.0); }
-    }
-    .hero-bg::before {
-      content: ''; position: absolute; inset: 0;
-      background: repeating-linear-gradient(
-        0deg, transparent, transparent 3px,
-        rgba(57,255,110,0.015) 3px, rgba(57,255,110,0.015) 4px
-      );
-      animation: scanlines 3s linear infinite;
-    }
-    @keyframes scanlines { to { background-position: 0 80px; } }
-    .hero-bg::after {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse 85% 85% at center, transparent 30%, rgba(0,0,0,0.9) 100%);
-    }
-
-    /* diagonal beam (Kinich style) */
-    .hero-beam {
-      position: absolute; top: 0; right: 8%;
-      width: 180px; height: 100%;
-      background: linear-gradient(to bottom,
-        transparent 0%, rgba(57,255,110,0.06) 30%,
-        rgba(57,255,110,0.04) 60%, transparent 100%);
-      transform: skewX(-15deg);
-      pointer-events: none; z-index: 1;
-      animation: beamPulse 5s ease-in-out infinite alternate;
-    }
-    .hero-beam2 {
-      position: absolute; top: 0; right: 22%;
-      width: 80px; height: 100%;
-      background: linear-gradient(to bottom,
-        transparent 0%, rgba(245,210,0,0.04) 40%,
-        rgba(245,210,0,0.03) 70%, transparent 100%);
-      transform: skewX(-15deg);
-      pointer-events: none; z-index: 1;
-      animation: beamPulse 7s ease-in-out infinite alternate-reverse;
-    }
-    @keyframes beamPulse {
-      from { opacity: 0.4; }
-      to   { opacity: 1; }
-    }
-
-    /* floating pixel cubes */
-    .cube {
-      position: absolute;
-      border-style: solid;
-      image-rendering: pixelated;
-      animation: cubeFloat linear infinite;
-      pointer-events: none; z-index: 1;
-    }
-    @keyframes cubeFloat {
-      0%   { transform: translateY(60px) rotate(0deg); opacity: 0; }
-      8%   { opacity: 1; }
-      92%  { opacity: 1; }
-      100% { transform: translateY(-120px) rotate(180deg); opacity: 0; }
-    }
-
-    .hero-content {
-      position: relative; z-index: 2;
-      text-align: center; padding: 0 1.5rem;
-    }
-    .hero-eyebrow {
-      font-family: var(--font-px); font-size: 0.42rem;
-      letter-spacing: 0.4em; text-transform: uppercase;
-      color: var(--green-px);
-      opacity: 0; transform: translateY(10px);
-      animation: fadeUp 0.6s ease forwards 0.3s;
-      margin-bottom: 1.8rem;
-      text-shadow: 0 0 16px rgba(57,255,110,0.8);
-    }
-    .hero-name {
-      font-family: var(--font-px);
-      font-size: clamp(1rem, 3.5vw, 2.6rem);
-      line-height: 1.8; color: var(--text);
-      margin-bottom: 1.8rem;
-      display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35em;
-    }
-    .hero-name .word { display: inline-flex; overflow: hidden; }
-    .hero-name .letter {
-      display: inline-block; opacity: 0; transform: translateY(110%);
-      animation: letterUp 0.45s cubic-bezier(0.22,1,0.36,1) forwards;
-    }
-    .hero-tagline {
-      font-family: var(--font-acc); font-style: italic;
-      font-size: clamp(1.1rem, 2.2vw, 1.65rem);
-      color: var(--muted);
-      opacity: 0; transform: translateY(12px);
-      animation: fadeUp 0.7s ease forwards 1.9s;
-      max-width: 580px; margin: 0 auto 3rem;
-    }
-    @keyframes fadeUp   { to { opacity: 1; transform: translateY(0); } }
-    @keyframes letterUp { to { opacity: 1; transform: translateY(0); } }
-
-    .scroll-hint {
-      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
-      z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-      opacity: 0; animation: fadeUp 0.6s ease forwards 2.5s;
-    }
-    .scroll-hint span { font-family: var(--font-px); font-size: 0.35rem; letter-spacing: 0.3em; color: var(--muted); }
-    .scroll-arrow {
-      width: 1px; height: 44px;
-      background: linear-gradient(to bottom, var(--green-px), transparent);
-      box-shadow: 0 0 6px var(--green-px);
-      animation: scrollPulse 2s ease-in-out infinite;
-    }
-    @keyframes scrollPulse {
-      0%,100% { opacity: 0.3; transform: scaleY(0.65); transform-origin: top; }
-      50%     { opacity: 1;   transform: scaleY(1);    transform-origin: top; }
-    }
-
-    /* ══ SECTIONS SHARED ══ */
-    section { padding: 7rem 3rem; }
-    .section-label {
-      font-family: var(--font-px); font-size: 0.4rem;
-      letter-spacing: 0.35em; text-transform: uppercase;
-      color: var(--green-px); margin-bottom: 0.9rem;
-      text-shadow: 0 0 12px rgba(57,255,110,0.6);
-    }
-    .section-title {
-      font-family: var(--font-px);
-      font-size: clamp(0.65rem, 2vw, 1.05rem);
-      line-height: 2.2; color: var(--text); margin-bottom: 4rem;
-    }
-
-    /* ══ WORK ══ */
-    #work { max-width: 1300px; margin: 0 auto; }
-    .projects-grid { display: grid; grid-template-columns: repeat(12,1fr); gap: 1.5rem; }
-
-    .project-card {
-      position: relative; overflow: hidden;
-      border: 1px solid rgba(57,255,110,0.12);
-      background: var(--surface);
-      cursor: none; opacity: 0; transform: translateY(40px);
-      transition: opacity 0.7s ease, transform 0.7s ease, border-color 0.3s, box-shadow 0.3s;
-    }
-    .project-card.visible { opacity: 1; transform: translateY(0); }
-    .project-card:hover {
-      border-color: rgba(57,255,110,0.5);
-      box-shadow: 0 0 30px rgba(57,255,110,0.1), inset 0 0 40px rgba(57,255,110,0.03);
-    }
-    .project-card:nth-child(1) { grid-column:1/8;  min-height:420px; transition-delay:0s; }
-    .project-card:nth-child(2) { grid-column:8/13; min-height:420px; transition-delay:0.12s; }
-    .project-card:nth-child(3) { grid-column:1/5;  min-height:360px; transition-delay:0.24s; }
-    .project-card:nth-child(4) { grid-column:5/13; min-height:360px; transition-delay:0.36s; }
-    .project-card:nth-child(1) .card-bg { background: linear-gradient(135deg,#030e06 0%,#0a2c10 45%,#030f06 100%); }
-    .project-card:nth-child(2) .card-bg { background: linear-gradient(160deg,#0e0c03 0%,#281e00 55%,#0e0c00 100%); }
-    .project-card:nth-child(3) .card-bg { background: linear-gradient(120deg,#03060e 0%,#0c1430 60%,#03060e 100%); }
-    .project-card:nth-child(4) .card-bg { background: linear-gradient(145deg,#030e06 0%,#0a2c10 45%,#030c06 100%); }
-    .card-bg { position: absolute; inset: 0; transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94); }
-    .project-card:hover .card-bg { transform: scale(1.04); }
-    .card-grain {
-      position: absolute; inset: 0; opacity: 0; pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 80px 80px; mix-blend-mode: overlay; transition: opacity 0.2s;
-    }
-    .project-card:hover .card-grain { opacity: 0.15; animation: grainFlicker 0.15s steps(2) infinite; }
-    @keyframes grainFlicker {
-      0%{background-position:0 0} 25%{background-position:-20px 10px}
-      50%{background-position:10px -15px} 75%{background-position:-5px 20px} 100%{background-position:15px -5px}
-    }
-    .card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.15) 60%, transparent 100%); }
-    .card-body { position: absolute; bottom: 0; left: 0; right: 0; padding: 2rem 1.8rem; z-index: 2; }
-    .card-tag {
-      display: inline-block; font-family: var(--font-px); font-size: 0.35rem;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      color: var(--green-px); border: 1px solid rgba(57,255,110,0.4);
-      padding: 0.25rem 0.6rem; margin-bottom: 0.9rem;
-    }
-    .card-title { font-family: var(--font-px); font-size: clamp(0.5rem,1.3vw,0.78rem); line-height: 1.9; color: var(--text); margin-bottom: 0.6rem; }
-    .card-desc  { font-family: var(--font-body); font-size: 1rem; color: var(--muted); line-height: 1.5; margin-bottom: 1.2rem; }
-    .card-btn {
-      display: inline-block; font-family: var(--font-px); font-size: 0.36rem;
-      letter-spacing: 0.15em; color: var(--green-px);
-      border: 1px solid var(--green-px); padding: 0.6rem 1.2rem;
-      opacity: 0; transform: translateY(8px);
-      transition: opacity 0.3s, transform 0.3s, background 0.2s, color 0.2s, box-shadow 0.2s;
-    }
-    .project-card:hover .card-btn { opacity: 1; transform: translateY(0); }
-    .card-btn:hover { background: var(--green-px); color: var(--bg); box-shadow: 0 0 20px rgba(57,255,110,0.6); }
-    .card-corner { position: absolute; width: 14px; height: 14px; border-color: rgba(57,255,110,0.22); border-style: solid; z-index: 3; transition: border-color 0.3s, width 0.3s, height 0.3s; }
-    .project-card:hover .card-corner { border-color: rgba(57,255,110,0.75); width: 18px; height: 18px; }
-    .card-corner.tl { top:10px; left:10px;   border-width:2px 0 0 2px; }
-    .card-corner.tr { top:10px; right:10px;  border-width:2px 2px 0 0; }
-    .card-corner.bl { bottom:10px; left:10px;  border-width:0 0 2px 2px; }
-    .card-corner.br { bottom:10px; right:10px; border-width:0 2px 2px 0; }
-
-    /* ══════════════════════════════════════════════
-       MILESTONE — RUN TO MILESTONE (Dragonica style)
-    ══════════════════════════════════════════════ */
-    #milestones {
-      background: var(--surface);
-      border-top: 1px solid rgba(57,255,110,0.12);
-      border-bottom: 1px solid rgba(57,255,110,0.12);
-      overflow: hidden;
-      position: relative;
-    }
-
-    /* hex pattern background */
-    #milestones::before {
-      content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='52'%3E%3Cpolygon points='30,2 58,17 58,35 30,50 2,35 2,17' fill='none' stroke='rgba(57,255,110,0.055)' stroke-width='1'/%3E%3C/svg%3E");
-      background-size: 60px 52px;
-    }
-
-    .milestone-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
-
-    /* ── track scene ── */
-    .track-scene {
-      position: relative; height: 260px;
-      background: #020804;
-      border: 2px solid rgba(57,255,110,0.35);
-      box-shadow: 0 0 40px rgba(57,255,110,0.1), inset 0 0 60px rgba(0,0,0,0.6);
-      overflow: hidden;
-      image-rendering: pixelated;
-    }
-
-    /* sky gradient */
-    .track-sky {
-      position: absolute; inset: 0 0 36% 0;
-      background: linear-gradient(to bottom, #020c14 0%, #030e08 60%, #041208 100%);
-    }
-
-    /* floating cubes inside track */
-    .track-cube {
-      position: absolute;
-      border-style: solid;
-      image-rendering: pixelated;
-      animation: trackCubeFloat linear infinite;
-    }
-    @keyframes trackCubeFloat {
-      0%   { transform: translateY(20px) rotate(0deg); opacity: 0; }
-      10%  { opacity: 0.7; }
-      90%  { opacity: 0.7; }
-      100% { transform: translateY(-100px) rotate(90deg); opacity: 0; }
-    }
-
-    /* pixel tree (Dragonica fantasy) */
-    .px-tree {
-      position: absolute;
-      bottom: 36%;
-      width: 24px; height: 40px;
-      image-rendering: pixelated;
-    }
-
-    /* pixel stars */
-    .track-stars { position: absolute; inset: 0 0 36% 0; }
-    .px-star {
-      position: absolute; width: 2px; height: 2px;
-      background: #dff5ea;
-      animation: twinkle 2s ease-in-out infinite;
-    }
-    .px-star.gold { background: var(--gold-light); width: 3px; height: 3px; }
-    @keyframes twinkle { 0%,100%{opacity:0.2} 50%{opacity:1} }
-
-    /* sparkle cross shape for dreamy cards */
-    .sparkle {
-      position: absolute; pointer-events: none;
-      animation: sparkleAnim ease-in-out infinite;
-    }
-    .sparkle::before, .sparkle::after {
-      content: ''; position: absolute; background: inherit;
-    }
-    .sparkle::before { width: 10px; height: 1px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
-    .sparkle::after  { width: 1px; height: 10px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
-    @keyframes sparkleAnim {
-      0%,100% { opacity: 0; transform: scale(0) rotate(0deg); }
-      50%     { opacity: 1; transform: scale(1) rotate(45deg); }
-    }
-
-    /* ground */
-    .track-ground {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      height: 36%;
-      background: linear-gradient(to bottom, #0a3014 0%, #061c0a 100%);
-      border-top: 4px solid var(--green-px);
-      box-shadow: 0 -4px 20px rgba(57,255,110,0.4);
-    }
-    .track-ground::after {
-      content: ''; position: absolute; top: 35%; left: 0; right: 0; height: 2px;
-      background: repeating-linear-gradient(90deg,
-        rgba(255,255,255,0.35) 0px, rgba(255,255,255,0.35) 16px,
-        transparent 16px, transparent 36px);
-    }
-
-    /* flag poles */
-    .ms-pole-group {
-      position: absolute; bottom: 36%;
-      transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center;
-    }
-    .ms-pole-shaft {
-      width: 3px; height: 80px;
-      background: linear-gradient(to bottom, var(--gold), #a07800);
-      box-shadow: 0 0 6px rgba(245,210,0,0.5);
-    }
-    .ms-pole-flag {
-      position: absolute; top: 0; left: 3px;
-      width: 28px; height: 16px;
-      clip-path: polygon(0 0, 100% 20%, 100% 80%, 0 100%);
-      opacity: 0.25; transition: opacity 0.4s, background 0.4s;
-      animation: flagWave 1.4s ease-in-out infinite alternate;
-      transform-origin: left center;
-      background: var(--green-mid);
-    }
-    .ms-pole-flag.reached  { opacity: 1; background: var(--gold); animation: flagWave 0.5s ease-in-out infinite alternate; }
-    .ms-pole-flag.current  { opacity: 1; background: var(--green-px); box-shadow: 0 0 10px var(--green-px); animation: flagWave 0.4s ease-in-out infinite alternate; }
-    @keyframes flagWave {
-      from { transform: skewY(-5deg) scaleX(0.88); }
-      to   { transform: skewY(5deg)  scaleX(1.12); }
-    }
-
-    /* Dragonica chibi runner */
-    .pixel-runner {
-      position: absolute; bottom: calc(36% + 4px);
-      left: 2%;
-      transition: left 2.4s cubic-bezier(0.35, 0, 0.2, 1);
-      z-index: 5;
-      image-rendering: pixelated;
-      filter: drop-shadow(0 0 6px rgba(57,255,110,0.5));
-    }
-    .pixel-runner svg { image-rendering: pixelated; display: block; }
-    .run-A { animation: frameA 0.25s steps(1) infinite; }
-    .run-B { animation: frameB 0.25s steps(1) infinite; }
-    @keyframes frameA { 0%,49%{opacity:1} 50%,100%{opacity:0} }
-    @keyframes frameB { 0%,49%{opacity:0} 50%,100%{opacity:1} }
-
-    /* finish line */
-    .finish-line {
-      position: absolute; bottom: 36%; width: 4px; height: 64%;
-      background: repeating-linear-gradient(
-        to bottom,
-        var(--gold) 0px, var(--gold) 6px,
-        var(--bg)   6px, var(--bg)  12px
-      );
-      box-shadow: 0 0 10px rgba(245,210,0,0.6);
-    }
-
-    /* ── Milestone cards ── */
-    .milestone-cards {
-      display: grid; grid-template-columns: repeat(4,1fr);
-      border: 2px solid rgba(57,255,110,0.15); border-top: none;
-    }
-
-    .ms-card {
-      padding: 1.8rem 1.4rem;
-      border-right: 1px solid rgba(57,255,110,0.1);
-      position: relative; overflow: hidden;
-      opacity: 0; transform: translateY(16px);
-      transition: opacity 0.5s ease, transform 0.5s ease, background 0.25s;
-    }
-    .ms-card:last-child { border-right: none; }
-    .ms-card.visible { opacity: 1; transform: translateY(0); }
-    .ms-card:nth-child(2) { transition-delay: 0.1s; }
-    .ms-card:nth-child(3) { transition-delay: 0.2s; }
-    .ms-card:nth-child(4) { transition-delay: 0.3s; }
-    .ms-card:hover { background: rgba(57,255,110,0.04); }
-
-    /* connector dot */
-    .ms-card::before {
-      content: ''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
-      width: 8px; height: 8px;
-      background: var(--bg); border: 2px solid var(--green-px);
-      box-shadow: 0 0 8px var(--green-px);
-    }
-
-    /* dreamy card — Saint Mary's */
-    .ms-card.dreamy {
-      background: linear-gradient(135deg, rgba(160,80,255,0.06) 0%, rgba(57,255,110,0.02) 100%);
-      border-right: 1px solid rgba(160,80,255,0.15);
-    }
-    .ms-card.dreamy::before { border-color: #c880ff; box-shadow: 0 0 8px #c880ff; }
-    .ms-card.dreamy .ms-year  { color: #c880ff; text-shadow: 0 0 8px rgba(200,128,255,0.7); }
-    .ms-card.dreamy .ms-badge { color: #c880ff; border-color: rgba(200,128,255,0.4); }
-
-    /* school card — Surawiwat */
-    .ms-card.warm::before { border-color: var(--gold); box-shadow: 0 0 8px var(--gold); }
-    .ms-card.warm .ms-year  { color: var(--gold); }
-    .ms-card.warm .ms-badge { color: var(--gold); border-color: rgba(245,210,0,0.4); }
-
-    /* school card — Vancouver */
-    .ms-card.cool::before { border-color: var(--teal); box-shadow: 0 0 8px var(--teal); }
-    .ms-card.cool .ms-year  { color: var(--teal); }
-    .ms-card.cool .ms-badge { color: var(--teal); border-color: rgba(0,212,184,0.4); }
-
-    .ms-year {
-      font-family: var(--font-px); font-size: 0.4rem;
-      color: var(--green-px); margin-bottom: 0.5rem; letter-spacing: 0.1em;
-    }
-    .ms-title { font-family: var(--font-px); font-size: 0.48rem; color: var(--text); line-height: 2; margin-bottom: 0.5rem; }
-    .ms-school { font-family: var(--font-body); font-style: italic; font-size: 0.9rem; color: var(--muted); margin-bottom: 0.5rem; }
-    .ms-desc { font-family: var(--font-body); font-size: 0.9rem; color: var(--muted); line-height: 1.5; }
-    .ms-badge {
-      display: inline-block; margin-top: 0.8rem;
-      font-family: var(--font-px); font-size: 0.32rem;
-      letter-spacing: 0.12em; padding: 0.3rem 0.6rem; border: 1px solid;
-    }
-    .ms-badge.done   { color: var(--green-px); border-color: rgba(57,255,110,0.4); }
-    .ms-badge.active { color: var(--gold-light); border-color: rgba(245,210,0,0.5); animation: badgePulse 1.5s ease-in-out infinite; }
-    @keyframes badgePulse { 0%,100%{box-shadow:none} 50%{box-shadow:0 0 12px rgba(245,210,0,0.5)} }
-
-    /* ══ ABOUT ══ */
-    #about { border-top: 1px solid rgba(57,255,110,0.08); }
-    .about-inner { max-width: 1200px; margin: 0 auto; }
-    .about-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 5rem; align-items: start; }
-
-    .about-quote {
-      font-family: var(--font-acc); font-style: italic;
-      font-size: clamp(1.5rem,2.8vw,2.2rem); line-height: 1.45;
-      color: var(--gold); position: relative; padding-left: 2rem;
-    }
-    .about-quote::before {
-      content: '\201C'; position: absolute; left: -0.2rem; top: -0.5rem;
-      font-size: 5rem; line-height: 1;
-      color: var(--green-mid); opacity: 0.5; font-family: var(--font-acc);
-    }
-
-    .pixel-deco {
-      margin-top: 3rem;
-      display: grid; grid-template-columns: repeat(16,8px); grid-template-rows: repeat(10,8px); gap: 1px;
-      image-rendering: pixelated;
-    }
-    .px { width: 8px; height: 8px; }
-    .px.G { background: var(--green-px); }
-    .px.g { background: var(--green-mid); }
-    .px.d { background: var(--green-deep); }
-    .px.O { background: var(--gold); }
-    .px.W { background: var(--text); }
-    .px.b { background: transparent; }
-    .px.s { background: var(--surface2); }
-
-    .about-bio { font-size: 1.15rem; color: var(--text); line-height: 1.9; margin-bottom: 2rem; }
-    .craft-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem 2rem; }
-    .craft-list li { font-family: var(--font-body); font-size: 0.95rem; color: var(--muted); display: flex; align-items: center; gap: 0.6rem; }
-    .craft-list li::before { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--green-px); box-shadow: 0 0 4px var(--green-px); flex-shrink: 0; }
-    .craft-list li strong { color: var(--text); font-weight: 500; }
-
-    /* ══ CONTACT ══ */
-    #contact { max-width: 780px; margin: 0 auto; }
-    .contact-intro { font-family: var(--font-acc); font-style: italic; font-size: 1.3rem; color: var(--muted); margin-bottom: 3.5rem; line-height: 1.7; }
-    .contact-form { display: flex; flex-direction: column; gap: 1.5rem; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    .field { display: flex; flex-direction: column; gap: 0.4rem; }
-    .field label { font-family: var(--font-px); font-size: 0.36rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--green-px); }
-    .field input, .field select, .field textarea {
-      background: var(--surface2); border: 1px solid rgba(57,255,110,0.15);
-      color: var(--text); font-family: var(--font-body); font-size: 1rem;
-      padding: 0.9rem 1rem; outline: none;
-      transition: border-color 0.25s, box-shadow 0.25s;
-      -webkit-appearance: none; cursor: none;
-    }
-    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--green-px); box-shadow: 0 0 14px rgba(57,255,110,0.14); }
-    .field select {
-      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2339ff6e'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem;
-    }
-    .field select option { background: var(--surface2); }
-    .field textarea { resize: vertical; min-height: 130px; }
-    .submit-btn {
-      align-self: flex-start;
-      font-family: var(--font-px); font-size: 0.48rem; letter-spacing: 0.1em; line-height: 2.2;
-      color: var(--green-px); background: transparent;
-      border: 2px solid var(--green-px); padding: 0.9rem 2rem;
-      cursor: none; position: relative; overflow: hidden; transition: color 0.3s;
-    }
-    .submit-btn::before {
-      content: ''; position: absolute; inset: 0;
-      background: var(--green-px); transform: translateX(-101%);
-      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-    }
-    .submit-btn:hover::before { transform: translateX(0); }
-    .submit-btn:hover { color: var(--bg); box-shadow: 0 0 24px rgba(57,255,110,0.5); }
-    .submit-btn span { position: relative; z-index: 1; }
-
-    /* ══ FOOTER ══ */
-    footer {
-      padding: 2.5rem 3rem;
-      border-top: 1px solid rgba(57,255,110,0.1);
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
-    }
-    .footer-name { font-family: var(--font-px); font-size: 0.46rem; color: var(--muted); line-height: 2; }
-    .footer-right { font-family: var(--font-body); font-size: 0.85rem; color: var(--muted); letter-spacing: 0.15em; }
-    .footer-easter { display: none; font-family: var(--font-px); font-size: 0.4rem; color: var(--green-px); line-height: 2; margin-top: 0.3rem; text-shadow: 0 0 8px var(--green-px); }
-    .footer-easter.revealed { display: block; }
-
-    /* ══ DIVIDER ══ */
-    .divider { max-width: 1300px; margin: 0 auto; height: 1px; background: linear-gradient(to right, transparent, rgba(57,255,110,0.2), transparent); }
-
-    /* ══ RESPONSIVE ══ */
-    @media (max-width: 900px) {
-      nav { padding: 1rem 1.5rem; } .nav-links { gap: 1.5rem; } section { padding: 5rem 1.5rem; }
-      .projects-grid { grid-template-columns: 1fr 1fr; }
-      .project-card:nth-child(1),.project-card:nth-child(2),.project-card:nth-child(3),.project-card:nth-child(4) { grid-column: auto; min-height: 300px; }
-      .milestone-cards { grid-template-columns: 1fr 1fr; }
-      .ms-card:nth-child(2) { border-right: none; }
-      .ms-card:nth-child(3) { border-top: 1px solid rgba(57,255,110,0.1); }
-      .ms-card:nth-child(4) { border-top: 1px solid rgba(57,255,110,0.1); }
-      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
-      .form-row { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 600px) {
-      .nav-links { display: none; }
-      .projects-grid { grid-template-columns: 1fr; }
-      .milestone-cards { grid-template-columns: 1fr; }
-      .ms-card { border-right: none; border-top: 1px solid rgba(57,255,110,0.08); }
-      .ms-card:first-child { border-top: none; }
-      .craft-list { grid-template-columns: 1fr; }
-      footer { flex-direction: column; text-align: center; }
-      .track-scene { height: 160px; }
-    }
-  </style>
+  <link rel="stylesheet" href="css/style.css?v=4" />
 </head>
 <body>
-
-  <!-- ── Cursor ── -->
-  <div id="cursor">
-    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="3" y="10" width="22" height="16" rx="1" fill="#030c05" stroke="#39ff6e" stroke-width="1.5"/>
-      <rect x="3" y="6" width="22" height="5" rx="1" fill="#39ff6e"/>
-      <line x1="9"  y1="6"  x2="7"  y2="11" stroke="#030c05" stroke-width="1.5"/>
-      <line x1="14" y1="6"  x2="12" y2="11" stroke="#030c05" stroke-width="1.5"/>
-      <line x1="19" y1="6"  x2="17" y2="11" stroke="#030c05" stroke-width="1.5"/>
-      <circle cx="5.5" cy="8.5" r="1.2" fill="#030c05"/>
-      <circle cx="14" cy="18" r="4" stroke="#1ecc55" stroke-width="1.2"/>
-      <circle cx="14" cy="18" r="2" fill="#1ecc55" opacity="0.5"/>
-    </svg>
-  </div>
 
   <!-- ── Countdown ── -->
   <div id="countdown">
@@ -696,12 +33,14 @@
     </ul>
   </nav>
 
-  <!-- ── Hero ── -->
+  <!-- ══ HERO ══ -->
   <section id="hero">
     <div class="hero-bg"></div>
     <div class="hero-beam"></div>
     <div class="hero-beam2"></div>
+    <div class="hero-beam3"></div>
     <div id="hero-cubes"></div>
+
     <div class="hero-content">
       <p class="hero-eyebrow">Filmmaker &amp; Visual Storyteller</p>
       <h1 class="hero-name" aria-label="Prakit Law">
@@ -710,21 +49,25 @@
       </h1>
       <p class="hero-tagline">Documentary &middot; Travel &middot; Track &amp; Field &middot; Life&rsquo;s Milestones</p>
     </div>
+
     <div class="scroll-hint">
       <span>Scroll</span>
       <div class="scroll-arrow"></div>
     </div>
   </section>
 
-  <!-- ── Work ── -->
+  <!-- ══ WORK ══ -->
   <section id="work-section" style="padding:7rem 3rem;">
     <div id="work">
       <p class="section-label">Selected Work</p>
       <h2 class="section-title">Films &amp; Projects</h2>
+
       <div class="projects-grid">
+
         <article class="project-card">
           <div class="card-bg"></div><div class="card-grain"></div><div class="card-overlay"></div>
-          <div class="card-corner tl"></div><div class="card-corner tr"></div><div class="card-corner bl"></div><div class="card-corner br"></div>
+          <div class="card-corner tl"></div><div class="card-corner tr"></div>
+          <div class="card-corner bl"></div><div class="card-corner br"></div>
           <div class="card-body">
             <span class="card-tag">Abstract Documentary</span>
             <h3 class="card-title">Dust &amp; Distance</h3>
@@ -732,9 +75,11 @@
             <a href="#" class="card-btn">Watch Film</a>
           </div>
         </article>
+
         <article class="project-card">
           <div class="card-bg"></div><div class="card-grain"></div><div class="card-overlay"></div>
-          <div class="card-corner tl"></div><div class="card-corner tr"></div><div class="card-corner bl"></div><div class="card-corner br"></div>
+          <div class="card-corner tl"></div><div class="card-corner tr"></div>
+          <div class="card-corner bl"></div><div class="card-corner br"></div>
           <div class="card-body">
             <span class="card-tag">Travel Journal</span>
             <h3 class="card-title">43°N Somewhere</h3>
@@ -742,9 +87,11 @@
             <a href="#" class="card-btn">View Journal</a>
           </div>
         </article>
+
         <article class="project-card">
           <div class="card-bg"></div><div class="card-grain"></div><div class="card-overlay"></div>
-          <div class="card-corner tl"></div><div class="card-corner tr"></div><div class="card-corner bl"></div><div class="card-corner br"></div>
+          <div class="card-corner tl"></div><div class="card-corner tr"></div>
+          <div class="card-corner bl"></div><div class="card-corner br"></div>
           <div class="card-body">
             <span class="card-tag">Sports Film</span>
             <h3 class="card-title">Starting Blocks</h3>
@@ -752,9 +99,11 @@
             <a href="#" class="card-btn">Watch Film</a>
           </div>
         </article>
+
         <article class="project-card">
           <div class="card-bg"></div><div class="card-grain"></div><div class="card-overlay"></div>
-          <div class="card-corner tl"></div><div class="card-corner tr"></div><div class="card-corner bl"></div><div class="card-corner br"></div>
+          <div class="card-corner tl"></div><div class="card-corner tr"></div>
+          <div class="card-corner bl"></div><div class="card-corner br"></div>
           <div class="card-body">
             <span class="card-tag">Milestone Journey</span>
             <h3 class="card-title">Year One</h3>
@@ -762,6 +111,7 @@
             <a href="#" class="card-btn">Watch Film</a>
           </div>
         </article>
+
       </div>
     </div>
   </section>
@@ -774,30 +124,30 @@
       <p class="section-label">The Journey So Far</p>
       <h2 class="section-title">Run to Milestone</h2>
 
-      <!-- Track scene -->
+      <!-- ── Track Scene ── -->
       <div class="track-scene" id="track-scene">
         <div class="track-sky"></div>
         <div class="track-stars" id="track-stars"></div>
         <div id="track-cubes"></div>
 
-        <!-- pixel trees (Dragonica fantasy feel) -->
-        <svg class="px-tree" style="left:5%" viewBox="0 0 24 40" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <!-- pixel trees -->
+        <svg class="px-tree" style="left:4%;width:24px;height:42px;" viewBox="0 0 24 42" xmlns="http://www.w3.org/2000/svg">
           <rect x="10" y="0"  width="4"  height="4"  fill="#1ecc55"/>
           <rect x="8"  y="4"  width="8"  height="4"  fill="#1ecc55"/>
           <rect x="6"  y="8"  width="12" height="4"  fill="#39ff6e"/>
           <rect x="4"  y="12" width="16" height="4"  fill="#1ecc55"/>
           <rect x="2"  y="16" width="20" height="4"  fill="#39ff6e"/>
-          <rect x="10" y="20" width="4"  height="16" fill="#0a3014"/>
+          <rect x="10" y="20" width="4"  height="18" fill="#0a3014"/>
           <rect x="10" y="24" width="4"  height="2"  fill="#f5d200" opacity="0.4"/>
         </svg>
-        <svg class="px-tree" style="left:48%;height:32px;width:18px;" viewBox="0 0 18 32" xmlns="http://www.w3.org/2000/svg">
+        <svg class="px-tree" style="left:47%;width:18px;height:32px;" viewBox="0 0 18 32" xmlns="http://www.w3.org/2000/svg">
           <rect x="7"  y="0"  width="4"  height="4"  fill="#1ecc55"/>
           <rect x="5"  y="4"  width="8"  height="3"  fill="#39ff6e"/>
-          <rect x="3"  y="7"  width="12" height="3"  fill="#1ecc55"/>
-          <rect x="1"  y="10" width="16" height="4"  fill="#39ff6e"/>
-          <rect x="7"  y="14" width="4"  height="14" fill="#0a3014"/>
+          <rect x="3"  y="7"  width="12" height="4"  fill="#1ecc55"/>
+          <rect x="1"  y="11" width="16" height="4"  fill="#39ff6e"/>
+          <rect x="7"  y="15" width="4"  height="14" fill="#0a3014"/>
         </svg>
-        <svg class="px-tree" style="right:6%;height:28px;width:16px;" viewBox="0 0 16 28" xmlns="http://www.w3.org/2000/svg">
+        <svg class="px-tree" style="right:5%;width:16px;height:28px;" viewBox="0 0 16 28" xmlns="http://www.w3.org/2000/svg">
           <rect x="6"  y="0"  width="4"  height="3"  fill="#39ff6e"/>
           <rect x="4"  y="3"  width="8"  height="3"  fill="#1ecc55"/>
           <rect x="1"  y="6"  width="14" height="4"  fill="#39ff6e"/>
@@ -807,158 +157,262 @@
         <!-- ground -->
         <div class="track-ground"></div>
 
-        <!-- flags at 17%, 40%, 63%, 86% -->
-        <div class="ms-pole-group" style="left:17%">
+        <!-- lasso rope -->
+        <div id="runner-rope"></div>
+
+        <!-- flag 1: Saint Mary's — 17% -->
+        <div class="ms-pole-group" style="left:17%" data-ms="0">
           <div class="ms-pole-flag" id="flag0"></div>
           <div class="ms-pole-shaft"></div>
         </div>
-        <div class="ms-pole-group" style="left:40%">
+
+        <!-- flag 2: Surawiwat — 40% -->
+        <div class="ms-pole-group" style="left:40%" data-ms="1">
           <div class="ms-pole-flag" id="flag1"></div>
           <div class="ms-pole-shaft"></div>
         </div>
-        <div class="ms-pole-group" style="left:63%">
+
+        <!-- flag 3: Vancouver — 63% -->
+        <div class="ms-pole-group" style="left:63%" data-ms="2">
           <div class="ms-pole-flag" id="flag2"></div>
           <div class="ms-pole-shaft"></div>
         </div>
-        <div class="ms-pole-group" style="left:86%">
+
+        <!-- flag 4: BBTech Chula — 86% (finish) -->
+        <div class="ms-pole-group" style="left:86%" data-ms="3">
           <div class="ms-pole-flag" id="flag3"></div>
           <div class="ms-pole-shaft"></div>
         </div>
 
-        <!-- finish line at 86% -->
+        <!-- finish line -->
         <div class="finish-line" style="left:calc(86% + 2px)"></div>
 
-        <!-- Dragonica chibi runner -->
+        <!--
+          ── KINICH CHIBI RUNNER ──
+          Redesigned: dark navy hair + teal ribbon, purple forehead gem,
+          dark jacket with gold V-chest, teal pants, gold shoes.
+          One arm extends forward (lasso-throw pose in frame A).
+          22×30 viewBox @ 3px/unit display.
+        -->
         <div class="pixel-runner" id="pixel-runner">
-          <!--
-            Chibi character: 20×28 viewBox @ 3px/unit = 60×84px
-            Dark blue hair, peach skin, dark outfit with gold chest,
-            teal pants, gold shoes — Dragonica fantasy aesthetic
-          -->
-          <svg viewBox="0 0 20 28" width="60" height="84" xmlns="http://www.w3.org/2000/svg">
-            <!-- HAIR (dark navy-teal) -->
-            <rect x="5"  y="0" width="10" height="1" fill="#1a2f48"/>
-            <rect x="4"  y="1" width="12" height="3" fill="#1a2f48"/>
-            <rect x="3"  y="2" width="3"  height="3" fill="#1a2f48"/><!-- left tuft -->
-            <rect x="14" y="1" width="3"  height="4" fill="#1a2f48"/><!-- right tuft -->
-            <!-- hair highlight -->
-            <rect x="5"  y="2" width="4"  height="1" fill="#2a5070"/>
+          <div class="runner-hint" id="runner-hint">CLICK ME</div>
+          <svg viewBox="0 0 22 30" width="66" height="90" xmlns="http://www.w3.org/2000/svg">
 
-            <!-- FACE (peach skin) -->
-            <rect x="4"  y="4"  width="12" height="9" fill="#f5c8a0"/>
+            <!-- ── HAIR (dark navy) ── -->
+            <rect x="5"  y="0"  width="12" height="1" fill="#12243a"/>
+            <rect x="4"  y="1"  width="14" height="3" fill="#12243a"/>
+            <!-- left hair spike -->
+            <rect x="2"  y="2"  width="3"  height="4" fill="#12243a"/>
+            <!-- hair highlight stripe -->
+            <rect x="6"  y="2"  width="4"  height="1" fill="#1e3d5c"/>
+            <!-- teal ribbon blowing right -->
+            <rect x="17" y="1"  width="3"  height="1" fill="#00d4b8"/>
+            <rect x="18" y="2"  width="3"  height="2" fill="#00d4b8"/>
+            <rect x="19" y="4"  width="2"  height="3" fill="#00d4b8" opacity="0.7"/>
+            <rect x="20" y="7"  width="1"  height="2" fill="#00d4b8" opacity="0.4"/>
+
+            <!-- ── FACE (peach) ── -->
+            <rect x="4"  y="4"  width="13" height="10" fill="#f0c8a0"/>
+
+            <!-- forehead gem (purple diamond — Kinich mark) -->
+            <rect x="9"  y="4"  width="3"  height="1" fill="#c880ff"/>
+            <rect x="8"  y="5"  width="5"  height="2" fill="#c880ff"/>
+            <rect x="9"  y="7"  width="3"  height="1" fill="#9840cc"/>
+            <rect x="9"  y="5"  width="1"  height="1" fill="#ffffff" opacity="0.7"/>
 
             <!-- LEFT EYE -->
-            <rect x="5"  y="6"  width="4" height="4" fill="#ffffff"/>
-            <rect x="6"  y="6"  width="3" height="4" fill="#39ff6e"/>
-            <rect x="6"  y="6"  width="3" height="3" fill="#0a1a0a"/>
-            <rect x="6"  y="6"  width="1" height="1" fill="#ffffff"/><!-- shine -->
+            <rect x="5"  y="7"  width="4" height="4" fill="#ffffff"/>
+            <rect x="5"  y="7"  width="3" height="4" fill="#39ff6e"/>
+            <rect x="5"  y="7"  width="3" height="3" fill="#081008"/>
+            <rect x="5"  y="7"  width="1" height="1" fill="#ffffff"/>
+
             <!-- RIGHT EYE -->
-            <rect x="11" y="6"  width="4" height="4" fill="#ffffff"/>
-            <rect x="11" y="6"  width="3" height="4" fill="#39ff6e"/>
-            <rect x="11" y="6"  width="3" height="3" fill="#0a1a0a"/>
-            <rect x="11" y="6"  width="1" height="1" fill="#ffffff"/>
-            <!-- blush -->
-            <rect x="5"  y="10" width="2" height="1" fill="#ffaabf" opacity="0.7"/>
-            <rect x="13" y="10" width="2" height="1" fill="#ffaabf" opacity="0.7"/>
-            <!-- mouth (tiny smile) -->
-            <rect x="9"  y="11" width="2" height="1" fill="#c88888"/>
+            <rect x="12" y="7"  width="4" height="4" fill="#ffffff"/>
+            <rect x="12" y="7"  width="3" height="4" fill="#39ff6e"/>
+            <rect x="12" y="7"  width="3" height="3" fill="#081008"/>
+            <rect x="12" y="7"  width="1" height="1" fill="#ffffff"/>
+
+            <!-- nose / mouth -->
+            <rect x="10" y="12" width="2" height="1" fill="#c89080"/>
+            <rect x="9"  y="14" width="3" height="1" fill="#b87878"/>
 
             <!-- NECK -->
-            <rect x="8"  y="13" width="4" height="2" fill="#f5c8a0"/>
+            <rect x="8"  y="14" width="5"  height="2" fill="#f0c8a0"/>
 
-            <!-- BODY / OUTFIT (dark jacket) -->
-            <rect x="5"  y="15" width="10" height="6" fill="#151f1a"/>
-            <!-- gold chest detail -->
-            <rect x="7"  y="16" width="6"  height="2" fill="#f5d200"/>
-            <!-- collar -->
-            <rect x="6"  y="15" width="8"  height="1" fill="#2a3828"/>
-            <!-- arms (shared) -->
-            <rect x="3"  y="15" width="2" height="4" fill="#151f1a"/>
-            <rect x="15" y="15" width="2" height="4" fill="#151f1a"/>
-            <!-- hands -->
-            <rect x="3"  y="19" width="2" height="2" fill="#f5c8a0"/>
-            <rect x="15" y="19" width="2" height="2" fill="#f5c8a0"/>
+            <!-- BODY — dark jacket -->
+            <rect x="5"  y="16" width="12" height="7" fill="#111d14"/>
+            <rect x="7"  y="16" width="8"  height="1" fill="#1e3025"/>
+            <!-- gold V chest plate -->
+            <rect x="9"  y="17" width="3"  height="1" fill="#f5d200"/>
+            <rect x="10" y="18" width="2"  height="2" fill="#f5d200"/>
+            <!-- jacket texture -->
+            <rect x="6"  y="19" width="2"  height="2" fill="#1a2e1c"/>
+            <rect x="14" y="19" width="2"  height="2" fill="#1a2e1c"/>
 
-            <!-- PANTS (teal) -->
-            <rect x="5"  y="21" width="10" height="3" fill="#1a4a6a"/>
+            <!-- PANTS (teal-blue) -->
+            <rect x="5"  y="23" width="12" height="3" fill="#162a3a"/>
 
-            <!-- LEGS FRAME A: left leg forward -->
+            <!-- FRAME A: right arm forward (lasso throw), left arm back -->
             <g class="run-A">
-              <!-- left leg (forward) -->
-              <rect x="5"  y="24" width="4" height="3" fill="#1a4a6a"/>
-              <rect x="3"  y="27" width="6" height="1" fill="#c89040"/><!-- left shoe -->
-              <!-- right leg (back) -->
-              <rect x="11" y="24" width="4" height="2" fill="#1a4a6a"/>
-              <rect x="12" y="26" width="5" height="1" fill="#c89040"/><!-- right shoe -->
+              <!-- upper arms -->
+              <rect x="3"  y="16" width="2" height="2" fill="#111d14"/>
+              <rect x="17" y="16" width="2" height="2" fill="#111d14"/>
+              <!-- left arm (back/down) -->
+              <rect x="3"  y="18" width="2" height="4" fill="#111d14"/>
+              <rect x="3"  y="22" width="2" height="2" fill="#f0c8a0"/>
+              <!-- right arm (forward/extended — lasso) -->
+              <rect x="17" y="18" width="2" height="2" fill="#111d14"/>
+              <rect x="18" y="19" width="3" height="2" fill="#f0c8a0"/>
+              <!-- gold wristband -->
+              <rect x="17" y="19" width="2" height="1" fill="#f5d200"/>
+              <!-- lasso dot -->
+              <rect x="21" y="20" width="1" height="1" fill="#39ff6e" opacity="0.9"/>
+
+              <!-- LEGS A: left leg forward, right back -->
+              <rect x="5"  y="26" width="4" height="4" fill="#162a3a"/>
+              <rect x="3"  y="30" width="6" height="1" fill="#c89040"/><!-- left shoe -->
+              <rect x="12" y="26" width="4" height="3" fill="#162a3a"/>
+              <rect x="13" y="29" width="5" height="1" fill="#c89040"/><!-- right shoe back -->
             </g>
-            <!-- LEGS FRAME B: right leg forward -->
+
+            <!-- FRAME B: left arm forward, right arm back -->
             <g class="run-B">
-              <!-- left leg (back) -->
-              <rect x="5"  y="24" width="4" height="2" fill="#1a4a6a"/>
-              <rect x="3"  y="26" width="6" height="1" fill="#c89040"/><!-- left shoe -->
-              <!-- right leg (forward) -->
-              <rect x="11" y="24" width="4" height="3" fill="#1a4a6a"/>
-              <rect x="10" y="27" width="6" height="1" fill="#c89040"/><!-- right shoe -->
+              <!-- upper arms -->
+              <rect x="3"  y="16" width="2" height="2" fill="#111d14"/>
+              <rect x="17" y="16" width="2" height="2" fill="#111d14"/>
+              <!-- left arm (forward) -->
+              <rect x="3"  y="18" width="2" height="2" fill="#111d14"/>
+              <rect x="0"  y="19" width="4" height="2" fill="#f0c8a0"/>
+              <!-- gold wristband left -->
+              <rect x="2"  y="19" width="2" height="1" fill="#f5d200"/>
+              <!-- right arm (back/down) -->
+              <rect x="17" y="18" width="2" height="4" fill="#111d14"/>
+              <rect x="17" y="22" width="2" height="2" fill="#f0c8a0"/>
+
+              <!-- LEGS B: right leg forward, left back -->
+              <rect x="5"  y="26" width="4" height="3" fill="#162a3a"/>
+              <rect x="4"  y="29" width="5" height="1" fill="#c89040"/><!-- left shoe back -->
+              <rect x="12" y="26" width="4" height="4" fill="#162a3a"/>
+              <rect x="11" y="30" width="6" height="1" fill="#c89040"/><!-- right shoe forward -->
             </g>
+
           </svg>
         </div>
       </div><!-- /track-scene -->
 
-      <!-- Milestone cards -->
+      <!-- ── Milestone Cards ── -->
       <div class="milestone-cards">
 
-        <!-- 1: Saint Mary's — dreamy -->
+        <!-- 1: Saint Mary's — dreamy purple -->
         <div class="ms-card dreamy" id="ms0">
           <div class="ms-year">2016 — 18</div>
           <h3 class="ms-title">Saint Mary's<br>College</h3>
-          <p class="ms-school">Primary &amp; Early Education</p>
-          <p class="ms-desc">Where curiosity began — a school that felt like the start of an adventure in a world full of possibility.</p>
+          <p class="ms-school">Primary Education &middot; Thailand</p>
+          <p class="ms-hint">&#9654; Click to explore</p>
+
+          <div class="ms-expand">
+            <div class="ms-expand-inner">
+              <p class="ms-desc">Where curiosity became a quiet adventure. A childhood school that felt like the opening chapter of a very long story — full of colour, wonder, and the first sparks of creative thinking.</p>
+              <ul class="ms-achievements">
+                <li>Arts &amp; science foundations</li>
+                <li>English immersion program</li>
+                <li>First storytelling experiments</li>
+                <li>Performing arts &amp; theatre</li>
+              </ul>
+              <div class="ms-location">&#128205; Thailand</div>
+            </div>
+          </div>
+
           <span class="ms-badge done">Completed</span>
         </div>
 
-        <!-- 2: Surawiwat — warm -->
+        <!-- 2: Surawiwat — warm gold -->
         <div class="ms-card warm" id="ms1">
           <div class="ms-year">2018 — 20</div>
           <h3 class="ms-title">Surawiwat<br>School</h3>
-          <p class="ms-school">High School &mdash; Thailand</p>
-          <p class="ms-desc">Thai roots, sharp focus. The years that built discipline and love for storytelling in motion.</p>
+          <p class="ms-school">High School &middot; Thailand</p>
+          <p class="ms-hint">&#9654; Click to explore</p>
+
+          <div class="ms-expand">
+            <div class="ms-expand-inner">
+              <p class="ms-desc">Thai roots, sharp discipline. The years that built a methodical eye and a love for observing life carefully — science class rigor meeting an emerging creative instinct.</p>
+              <ul class="ms-achievements">
+                <li>Science &amp; mathematics track</li>
+                <li>First camera experiments</li>
+                <li>Track &amp; field participation</li>
+                <li>Art club &amp; visual projects</li>
+              </ul>
+              <div class="ms-location">&#128205; Bangkok, Thailand</div>
+            </div>
+          </div>
+
           <span class="ms-badge done">Completed</span>
         </div>
 
-        <!-- 3: Vancouver — cool -->
+        <!-- 3: Vancouver — cool teal -->
         <div class="ms-card cool" id="ms2">
           <div class="ms-year">2021 — 23</div>
           <h3 class="ms-title">Vancouver<br>Technical Sec.</h3>
-          <p class="ms-school">High School &mdash; Canada</p>
-          <p class="ms-desc">Pacific Northwest light. Discovering film, cameras, and a city that taught me to see differently.</p>
+          <p class="ms-school">High School &middot; Canada</p>
+          <p class="ms-hint">&#9654; Click to explore</p>
+
+          <div class="ms-expand">
+            <div class="ms-expand-inner">
+              <p class="ms-desc">Pacific Northwest light changed how I see. The city taught me to slow down, look harder, and love the in-between moments. First serious camera. First real film.</p>
+              <ul class="ms-achievements">
+                <li>Film &amp; photography electives</li>
+                <li>First short documentary</li>
+                <li>Cross-cultural storytelling</li>
+                <li>Media arts program</li>
+              </ul>
+              <div class="ms-location">&#128205; Vancouver, BC, Canada</div>
+            </div>
+          </div>
+
           <span class="ms-badge done">Completed</span>
         </div>
 
-        <!-- 4: BBTech Chula — active/green -->
+        <!-- 4: BBTech Chula — active green -->
         <div class="ms-card" id="ms3">
           <div class="ms-year">2024 — 26</div>
           <h3 class="ms-title">BBTech<br>Chula</h3>
-          <p class="ms-school">B.Sc Biotechnology — Chulalongkorn</p>
-          <p class="ms-desc">Science meets art. Studying biotechnology while building a freelance filmmaking career — still running.</p>
+          <p class="ms-school">B.Sc Biotechnology &middot; Chulalongkorn</p>
+          <p class="ms-hint">&#9654; Click to explore</p>
+
+          <div class="ms-expand">
+            <div class="ms-expand-inner">
+              <p class="ms-desc">Science meets storytelling. A B.Sc in Biotechnology at Chulalongkorn University — while simultaneously building a freelance filmmaking career. Turns out a scientific eye makes a sharper lens.</p>
+              <ul class="ms-achievements">
+                <li>B.Sc Biotechnology (in progress)</li>
+                <li>Freelance filmmaker active</li>
+                <li>60+ races &amp; sports events filmed</li>
+                <li>Travel documentary ongoing</li>
+              </ul>
+              <div class="ms-location">&#128205; Bangkok, Thailand</div>
+            </div>
+          </div>
+
           <span class="ms-badge active">In Progress</span>
         </div>
 
-      </div>
+      </div><!-- /milestone-cards -->
     </div>
   </section>
 
   <div class="divider"></div>
 
-  <!-- ── About ── -->
+  <!-- ══ ABOUT ══ -->
   <section id="about">
     <div class="about-inner">
       <p class="section-label">The Filmmaker</p>
       <h2 class="section-title">About Me</h2>
+
       <div class="about-grid">
         <div>
           <blockquote class="about-quote">
             I don&rsquo;t just record moments &mdash; I run alongside them until they trust me enough to stay still.
           </blockquote>
+
           <!-- 16×10 pixel art running figure -->
           <div class="pixel-deco" aria-hidden="true">
             <div class="px b"></div><div class="px b"></div><div class="px b"></div><div class="px b"></div><div class="px b"></div><div class="px b"></div><div class="px G"></div><div class="px G"></div><div class="px G"></div><div class="px G"></div><div class="px b"></div><div class="px b"></div><div class="px b"></div><div class="px b"></div><div class="px b"></div><div class="px b"></div>
@@ -973,6 +427,7 @@
             <div class="px d"></div><div class="px G"></div><div class="px G"></div><div class="px G"></div><div class="px d"></div><div class="px b"></div><div class="px b"></div><div class="px b"></div><div class="px b"></div><div class="px b"></div><div class="px d"></div><div class="px G"></div><div class="px G"></div><div class="px G"></div><div class="px d"></div><div class="px b"></div>
           </div>
         </div>
+
         <div>
           <p class="about-bio">
             I&rsquo;m a filmmaker and biotechnology student drawn to the in-between moments — the exhale before a race,
@@ -998,7 +453,7 @@
 
   <div class="divider"></div>
 
-  <!-- ── Contact ── -->
+  <!-- ══ CONTACT ══ -->
   <section id="contact">
     <p class="section-label">Let&rsquo;s Collaborate</p>
     <h2 class="section-title">Hire Me</h2>
@@ -1006,15 +461,16 @@
       Got a story worth telling? A race worth capturing? A journey that deserves more than a camera roll?
       Let&rsquo;s make something unforgettable.
     </p>
+
     <form class="contact-form" onsubmit="handleSubmit(event)">
       <div class="form-row">
         <div class="field">
-          <label for="name">Your Name</label>
-          <input type="text" id="name" name="name" placeholder="Full name" required/>
+          <label for="fname">Your Name</label>
+          <input type="text" id="fname" name="name" placeholder="Full name" required />
         </div>
         <div class="field">
           <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="you@example.com" required/>
+          <input type="email" id="email" name="email" placeholder="you@example.com" required />
         </div>
       </div>
       <div class="field">
@@ -1037,7 +493,7 @@
     </form>
   </section>
 
-  <!-- ── Footer ── -->
+  <!-- ══ FOOTER ══ -->
   <footer id="footer">
     <div>
       <div class="footer-name">Prakit Law &copy; 2026</div>
@@ -1046,208 +502,6 @@
     <div class="footer-right">Filmmaker &mdash; Always Rolling</div>
   </footer>
 
-  <script>
-    /* ── Cursor ── */
-    const cursor = document.getElementById('cursor');
-    document.addEventListener('mousemove', e => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top  = e.clientY + 'px';
-    });
-
-    /* ── Countdown ── */
-    (function(){
-      const overlay = document.getElementById('countdown');
-      const circle  = document.getElementById('ring-circle');
-      const nums    = [5,4,3,2,1].map(n => document.getElementById('n'+n));
-      const circ    = 2 * Math.PI * 140;
-      circle.style.strokeDasharray  = circ;
-      circle.style.strokeDashoffset = circ;
-      let step = 0;
-      function tick(){
-        if(step>0) nums[step-1].classList.remove('active');
-        if(step<5){
-          nums[step].classList.add('active');
-          circle.style.strokeDashoffset = circ*(1-(step+1)/5);
-          step++; setTimeout(tick,380);
-        } else {
-          circle.classList.add('go');
-          circle.style.strokeDashoffset = 0;
-          setTimeout(()=>{
-            overlay.classList.add('fade-out');
-            setTimeout(()=>overlay.remove(),700);
-          },250);
-        }
-      }
-      setTimeout(tick,200);
-    })();
-
-    /* ── Hero name reveal ── */
-    (function(){
-      const names=['PRAKIT','LAW'], ids=['word1','word2'];
-      let gi=0;
-      names.forEach((word,wi)=>{
-        const el=document.getElementById(ids[wi]);
-        [...word].forEach(ch=>{
-          const s=document.createElement('span');
-          s.className='letter'; s.textContent=ch;
-          s.style.animationDelay=(700+gi*70)+'ms';
-          el.appendChild(s); gi++;
-        }); gi++;
-      });
-    })();
-
-    /* ── Floating pixel cubes (hero — Kinich style) ── */
-    (function(){
-      const container = document.getElementById('hero-cubes');
-      const configs = [
-        {size:24,x:72,dur:6,delay:0,   color:'rgba(57,255,110,0.18)',border:'rgba(57,255,110,0.7)'},
-        {size:16,x:82,dur:8,delay:1.5, color:'rgba(57,255,110,0.12)',border:'rgba(57,255,110,0.5)'},
-        {size:32,x:88,dur:10,delay:3,  color:'rgba(57,255,110,0.10)',border:'rgba(57,255,110,0.4)'},
-        {size:20,x:65,dur:7,delay:4,   color:'rgba(245,210,0,0.12)', border:'rgba(245,210,0,0.5)'},
-        {size:28,x:55,dur:9,delay:2,   color:'rgba(57,255,110,0.08)',border:'rgba(57,255,110,0.3)'},
-        {size:16,x:78,dur:5,delay:0.5, color:'rgba(245,210,0,0.08)', border:'rgba(245,210,0,0.4)'},
-        {size:12,x:92,dur:6,delay:2.5, color:'rgba(0,212,184,0.10)', border:'rgba(0,212,184,0.5)'},
-        {size:20,x:20,dur:11,delay:1,  color:'rgba(57,255,110,0.07)',border:'rgba(57,255,110,0.25)'},
-      ];
-      configs.forEach(cfg=>{
-        const el = document.createElement('div');
-        el.className = 'cube';
-        el.style.cssText = `
-          width:${cfg.size}px; height:${cfg.size}px;
-          left:${cfg.x}%; bottom:${10+Math.random()*40}%;
-          background:${cfg.color}; border:2px solid ${cfg.border};
-          box-shadow:0 0 ${cfg.size/2}px ${cfg.border};
-          animation-duration:${cfg.dur}s; animation-delay:${cfg.delay}s;
-        `;
-        container.appendChild(el);
-      });
-    })();
-
-    /* ── Stars in track ── */
-    (function(){
-      const c = document.getElementById('track-stars');
-      const pts = [
-        [8,18],[18,35],[30,12],[45,28],[58,8],[72,22],[83,38],[92,12],
-        [15,42],[38,6],[55,40],[68,18],[80,30],[95,45],[5,55],[25,52],
-        [50,55],[75,48],[88,58],[12,65],[40,62],[65,60],[90,66],[35,20],[60,30]
-      ];
-      pts.forEach(([l,t],i)=>{
-        const s=document.createElement('div');
-        s.className='px-star' + (i%4===0?' gold':'');
-        s.style.left=l+'%'; s.style.top=t+'%';
-        s.style.animationDelay=(Math.random()*2)+'s';
-        s.style.animationDuration=(1.5+Math.random()*1.5)+'s';
-        c.appendChild(s);
-      });
-    })();
-
-    /* ── Floating cubes inside track ── */
-    (function(){
-      const c = document.getElementById('track-cubes');
-      const cfgs = [
-        {size:14,x:25,dur:4,delay:0},
-        {size:10,x:55,dur:5,delay:1},
-        {size:18,x:75,dur:6,delay:2},
-        {size:10,x:90,dur:4,delay:0.5},
-        {size:12,x:10,dur:7,delay:1.5},
-      ];
-      cfgs.forEach(cfg=>{
-        const el=document.createElement('div');
-        el.className='track-cube';
-        el.style.cssText=`
-          width:${cfg.size}px; height:${cfg.size}px;
-          left:${cfg.x}%; bottom:${36+Math.random()*30}%;
-          background:rgba(57,255,110,0.10); border:2px solid rgba(57,255,110,0.5);
-          box-shadow:0 0 8px rgba(57,255,110,0.4);
-          animation-duration:${cfg.dur}s; animation-delay:${cfg.delay}s;
-        `;
-        c.appendChild(el);
-      });
-    })();
-
-    /* ── Sparkles on dreamy card ── */
-    (function(){
-      const card = document.getElementById('ms0');
-      if(!card) return;
-      const sparkColors = ['#c880ff','#e0b0ff','#b860ff','#ddd8ff'];
-      for(let i=0;i<10;i++){
-        const s = document.createElement('div');
-        s.className = 'sparkle';
-        s.style.cssText = `
-          width:3px; height:3px;
-          left:${5+Math.random()*90}%; top:${5+Math.random()*85}%;
-          background:${sparkColors[i%sparkColors.length]};
-          animation-duration:${2+Math.random()*2}s;
-          animation-delay:${Math.random()*3}s;
-        `;
-        card.appendChild(s);
-      }
-      /* fewer sparkles on warm card too */
-      const warm = document.getElementById('ms1');
-      for(let i=0;i<5;i++){
-        const s=document.createElement('div');
-        s.className='sparkle';
-        s.style.cssText=`width:2px;height:2px;left:${10+Math.random()*80}%;top:${10+Math.random()*80}%;background:#f5d200;animation-duration:${2.5+Math.random()}s;animation-delay:${Math.random()*3}s;`;
-        warm.appendChild(s);
-      }
-    })();
-
-    /* ── Scroll reveals ── */
-    const io = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }
-      });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.project-card, .ms-card').forEach(c => io.observe(c));
-
-    /* ── Milestone runner ── */
-    const flagPcts  = [17, 40, 63, 86];
-    const runner    = document.getElementById('pixel-runner');
-    const flags     = flagPcts.map((_,i) => document.getElementById('flag'+i));
-    let runnerFired = false;
-
-    const ioTrack = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if(e.isIntersecting && !runnerFired){
-          runnerFired = true;
-          animateRunner();
-          ioTrack.unobserve(e.target);
-        }
-      });
-    }, { threshold: 0.4 });
-    const trackScene = document.getElementById('track-scene');
-    if(trackScene) ioTrack.observe(trackScene);
-
-    function animateRunner(){
-      const sceneW  = trackScene.offsetWidth || 1100;
-      const target  = flagPcts[flagPcts.length-1];
-      const destPx  = (target/100)*sceneW - 30; /* 30 = half runner width */
-      runner.style.left = destPx + 'px';
-
-      flagPcts.forEach((pct,i) => {
-        const delay = (pct/target) * 2400;
-        setTimeout(() => {
-          flags[i].classList.add(i===flags.length-1 ? 'current' : 'reached');
-        }, delay);
-      });
-    }
-
-    /* ── Footer easter egg ── */
-    let clicks=0, timer;
-    document.getElementById('footer').addEventListener('click', ()=>{
-      clicks++; clearTimeout(timer);
-      timer = setTimeout(()=>clicks=0, 500);
-      if(clicks>=3){ document.getElementById('easter').classList.add('revealed'); clicks=0; }
-    });
-
-    /* ── Contact form ── */
-    function handleSubmit(e){
-      e.preventDefault();
-      const s=e.target.querySelector('.submit-btn span'), o=s.textContent;
-      s.textContent='Message Sent ✓'; e.target.reset();
-      setTimeout(()=>s.textContent=o,3000);
-    }
-  </script>
-
+  <script src="js/main.js?v=4"></script>
 </body>
 </html>
