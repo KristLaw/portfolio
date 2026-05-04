@@ -603,6 +603,71 @@ section { padding: 7rem 3rem; }
 }
 
 /* ══════════════════════════════════════
+   CRAFT
+══════════════════════════════════════ */
+#craft { border-top: 1px solid rgba(57,255,110,0.08); }
+.craft-inner { max-width: 1200px; margin: 0 auto; }
+.craft-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  margin-top: 3.5rem;
+}
+.craft-card {
+  position: relative;
+  padding: 2.4rem 2rem;
+  background: var(--surface);
+  border: 1px solid rgba(57,255,110,0.1);
+  clip-path: polygon(8px 0%, calc(100% - 8px) 0%, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0% calc(100% - 8px), 0% 8px);
+  transition: background 0.3s, transform 0.3s;
+}
+.craft-card:hover { transform: translateY(-4px); }
+.craft-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  border: 1px solid transparent;
+  clip-path: inherit;
+  transition: border-color 0.3s;
+  pointer-events: none;
+}
+.craft-green::before  { border-color: rgba(57,255,110,0.35); }
+.craft-teal::before   { border-color: rgba(0,212,184,0.35); }
+.craft-gold::before   { border-color: rgba(245,210,0,0.35); }
+.craft-card:hover.craft-green  { background: rgba(57,255,110,0.04); }
+.craft-card:hover.craft-teal   { background: rgba(0,212,184,0.04); }
+.craft-card:hover.craft-gold   { background: rgba(245,210,0,0.04); }
+.craft-icon {
+  margin-bottom: 1.4rem;
+  opacity: 0.85;
+}
+.craft-title {
+  font-family: var(--font-px);
+  font-size: 0.42rem;
+  line-height: 1.9;
+  margin-bottom: 1.2rem;
+  letter-spacing: 0.03em;
+}
+.craft-green .craft-title  { color: var(--green-px); text-shadow: 0 0 10px rgba(57,255,110,0.4); }
+.craft-teal  .craft-title  { color: var(--teal);     text-shadow: 0 0 10px rgba(0,212,184,0.4); }
+.craft-gold  .craft-title  { color: var(--gold);     text-shadow: 0 0 10px rgba(245,210,0,0.4); }
+.craft-body {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--muted);
+  margin-bottom: 1.6rem;
+}
+.craft-tag {
+  font-family: var(--font-px);
+  font-size: 0.28rem;
+  opacity: 0.45;
+  letter-spacing: 0.05em;
+}
+@media (max-width: 900px) {
+  .craft-grid { grid-template-columns: 1fr; gap: 1rem; }
+}
+
+/* ══════════════════════════════════════
    ABOUT
 ══════════════════════════════════════ */
 #about { border-top: 1px solid rgba(57,255,110,0.08); }

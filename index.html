@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>Prakit Law — Filmmaker</title>
-  <link rel="stylesheet" href="css/style.css?v=4" />
+  <link rel="stylesheet" href="css/style.css?v=5" />
 </head>
 <body>
 
@@ -28,6 +28,7 @@
     <ul class="nav-links">
       <li><a href="#work-section">Work</a></li>
       <li><a href="#milestones">Milestones</a></li>
+      <li><a href="#craft">Craft</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#contact">Hire Me</a></li>
     </ul>
@@ -188,114 +189,147 @@
         <div class="finish-line" style="left:calc(86% + 2px)"></div>
 
         <!--
-          ── KINICH CHIBI RUNNER ──
-          Redesigned: dark navy hair + teal ribbon, purple forehead gem,
-          dark jacket with gold V-chest, teal pants, gold shoes.
-          One arm extends forward (lasso-throw pose in frame A).
-          22×30 viewBox @ 3px/unit display.
+          ── KINICH RUNNER ──
+          Natlan-inspired pixel art: white outline via feMorphology,
+          teal cape trailing left (overflow visible), purple forehead gem,
+          pink Natlan marks under eyes, teal neck scarf, white sash,
+          dark jacket with teal zigzag, gold belt, teal arm bracers.
+          26×36 viewBox @ 3px/unit = 78×108px display.
         -->
         <div class="pixel-runner" id="pixel-runner">
           <div class="runner-hint" id="runner-hint">CLICK ME</div>
-          <svg viewBox="0 0 22 30" width="66" height="90" xmlns="http://www.w3.org/2000/svg">
+          <svg viewBox="0 0 26 36" width="78" height="108" xmlns="http://www.w3.org/2000/svg" overflow="visible">
+            <defs>
+              <filter id="px-outline" x="-60%" y="-15%" width="220%" height="130%" color-interpolation-filters="sRGB">
+                <feMorphology operator="dilate" radius="0.8" in="SourceAlpha" result="dilated"/>
+                <feFlood flood-color="#c8ffe8" flood-opacity="0.85" result="white"/>
+                <feComposite in="white" in2="dilated" operator="in" result="outline"/>
+                <feMerge><feMergeNode in="outline"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
 
-            <!-- ── HAIR (dark navy) ── -->
-            <rect x="5"  y="0"  width="12" height="1" fill="#12243a"/>
-            <rect x="4"  y="1"  width="14" height="3" fill="#12243a"/>
-            <!-- left hair spike -->
-            <rect x="2"  y="2"  width="3"  height="4" fill="#12243a"/>
-            <!-- hair highlight stripe -->
-            <rect x="6"  y="2"  width="4"  height="1" fill="#1e3d5c"/>
-            <!-- teal ribbon blowing right -->
-            <rect x="17" y="1"  width="3"  height="1" fill="#00d4b8"/>
-            <rect x="18" y="2"  width="3"  height="2" fill="#00d4b8"/>
-            <rect x="19" y="4"  width="2"  height="3" fill="#00d4b8" opacity="0.7"/>
-            <rect x="20" y="7"  width="1"  height="2" fill="#00d4b8" opacity="0.4"/>
+            <g filter="url(#px-outline)">
 
-            <!-- ── FACE (peach) ── -->
-            <rect x="4"  y="4"  width="13" height="10" fill="#f0c8a0"/>
+              <!-- ── CAPE (teal, overflows left via negative x) ── -->
+              <g class="run-A">
+                <rect x="-1" y="14" width="4" height="1" fill="#00d4b8"/>
+                <rect x="-5" y="15" width="6" height="2" fill="#00d4b8"/>
+                <rect x="-6" y="17" width="6" height="2" fill="#007a6a"/>
+                <rect x="-5" y="19" width="4" height="3" fill="#007a6a"/>
+                <rect x="-4" y="22" width="3" height="2" fill="#005a52"/>
+              </g>
+              <g class="run-B">
+                <rect x="-2" y="13" width="4" height="1" fill="#00d4b8"/>
+                <rect x="-4" y="14" width="5" height="2" fill="#00d4b8"/>
+                <rect x="-6" y="16" width="6" height="2" fill="#007a6a"/>
+                <rect x="-5" y="18" width="5" height="3" fill="#007a6a"/>
+                <rect x="-4" y="21" width="3" height="3" fill="#005a52"/>
+              </g>
 
-            <!-- forehead gem (purple diamond — Kinich mark) -->
-            <rect x="9"  y="4"  width="3"  height="1" fill="#c880ff"/>
-            <rect x="8"  y="5"  width="5"  height="2" fill="#c880ff"/>
-            <rect x="9"  y="7"  width="3"  height="1" fill="#9840cc"/>
-            <rect x="9"  y="5"  width="1"  height="1" fill="#ffffff" opacity="0.7"/>
+              <!-- ── HAIR (dark navy #0c1428) ── -->
+              <rect x="5"  y="0"  width="12" height="1" fill="#0c1428"/>
+              <rect x="4"  y="1"  width="14" height="3" fill="#0c1428"/>
+              <rect x="2"  y="2"  width="4"  height="5" fill="#0c1428"/>
+              <rect x="6"  y="1"  width="5"  height="1" fill="#1a2a48"/>
 
-            <!-- LEFT EYE -->
-            <rect x="5"  y="7"  width="4" height="4" fill="#ffffff"/>
-            <rect x="5"  y="7"  width="3" height="4" fill="#39ff6e"/>
-            <rect x="5"  y="7"  width="3" height="3" fill="#081008"/>
-            <rect x="5"  y="7"  width="1" height="1" fill="#ffffff"/>
+              <!-- ── FACE ── -->
+              <rect x="4"  y="5"  width="14" height="10" fill="#f0c8a0"/>
 
-            <!-- RIGHT EYE -->
-            <rect x="12" y="7"  width="4" height="4" fill="#ffffff"/>
-            <rect x="12" y="7"  width="3" height="4" fill="#39ff6e"/>
-            <rect x="12" y="7"  width="3" height="3" fill="#081008"/>
-            <rect x="12" y="7"  width="1" height="1" fill="#ffffff"/>
+              <!-- ── PURPLE FOREHEAD GEM ── -->
+              <rect x="9"  y="4"  width="4"  height="1" fill="#c880ff"/>
+              <rect x="8"  y="5"  width="6"  height="2" fill="#c880ff"/>
+              <rect x="9"  y="7"  width="4"  height="1" fill="#9840cc"/>
+              <rect x="9"  y="5"  width="1"  height="1" fill="#ffffff" opacity="0.8"/>
 
-            <!-- nose / mouth -->
-            <rect x="10" y="12" width="2" height="1" fill="#c89080"/>
-            <rect x="9"  y="14" width="3" height="1" fill="#b87878"/>
+              <!-- ── LEFT EYE ── -->
+              <rect x="5"  y="8"  width="4"  height="4" fill="#ffffff"/>
+              <rect x="5"  y="8"  width="3"  height="4" fill="#39ff6e"/>
+              <rect x="5"  y="8"  width="3"  height="2" fill="#081008"/>
+              <rect x="5"  y="8"  width="1"  height="1" fill="#ffffff"/>
+              <!-- Natlan mark (pink) -->
+              <rect x="5"  y="12" width="2"  height="1" fill="#ff4466"/>
+              <rect x="4"  y="13" width="3"  height="1" fill="#cc2244" opacity="0.7"/>
 
-            <!-- NECK -->
-            <rect x="8"  y="14" width="5"  height="2" fill="#f0c8a0"/>
+              <!-- ── RIGHT EYE ── -->
+              <rect x="14" y="8"  width="4"  height="4" fill="#ffffff"/>
+              <rect x="14" y="8"  width="3"  height="4" fill="#39ff6e"/>
+              <rect x="14" y="8"  width="3"  height="2" fill="#081008"/>
+              <rect x="14" y="8"  width="1"  height="1" fill="#ffffff"/>
+              <!-- Natlan mark (pink) -->
+              <rect x="16" y="12" width="2"  height="1" fill="#ff4466"/>
+              <rect x="15" y="13" width="3"  height="1" fill="#cc2244" opacity="0.7"/>
 
-            <!-- BODY — dark jacket -->
-            <rect x="5"  y="16" width="12" height="7" fill="#111d14"/>
-            <rect x="7"  y="16" width="8"  height="1" fill="#1e3025"/>
-            <!-- gold V chest plate -->
-            <rect x="9"  y="17" width="3"  height="1" fill="#f5d200"/>
-            <rect x="10" y="18" width="2"  height="2" fill="#f5d200"/>
-            <!-- jacket texture -->
-            <rect x="6"  y="19" width="2"  height="2" fill="#1a2e1c"/>
-            <rect x="14" y="19" width="2"  height="2" fill="#1a2e1c"/>
+              <!-- nose / mouth -->
+              <rect x="10" y="13" width="2"  height="1" fill="#c89080"/>
+              <rect x="9"  y="14" width="4"  height="1" fill="#b87878"/>
 
-            <!-- PANTS (teal-blue) -->
-            <rect x="5"  y="23" width="12" height="3" fill="#162a3a"/>
+              <!-- ── TEAL NECK SCARF ── -->
+              <rect x="8"  y="15" width="6"  height="1" fill="#f0c8a0"/>
+              <rect x="5"  y="16" width="12" height="2" fill="#00d4b8"/>
+              <rect x="6"  y="18" width="10" height="1" fill="#007a6a"/>
 
-            <!-- FRAME A: right arm forward (lasso throw), left arm back -->
-            <g class="run-A">
-              <!-- upper arms -->
-              <rect x="3"  y="16" width="2" height="2" fill="#111d14"/>
-              <rect x="17" y="16" width="2" height="2" fill="#111d14"/>
-              <!-- left arm (back/down) -->
-              <rect x="3"  y="18" width="2" height="4" fill="#111d14"/>
-              <rect x="3"  y="22" width="2" height="2" fill="#f0c8a0"/>
-              <!-- right arm (forward/extended — lasso) -->
-              <rect x="17" y="18" width="2" height="2" fill="#111d14"/>
-              <rect x="18" y="19" width="3" height="2" fill="#f0c8a0"/>
-              <!-- gold wristband -->
-              <rect x="17" y="19" width="2" height="1" fill="#f5d200"/>
-              <!-- lasso dot -->
-              <rect x="21" y="20" width="1" height="1" fill="#39ff6e" opacity="0.9"/>
+              <!-- ── JACKET (dark #111820, teal zigzag) ── -->
+              <rect x="4"  y="17" width="14" height="8" fill="#111820"/>
+              <rect x="5"  y="18" width="2"  height="1" fill="#1a4a6a"/>
+              <rect x="4"  y="19" width="2"  height="1" fill="#1a4a6a"/>
+              <rect x="5"  y="20" width="2"  height="1" fill="#1a4a6a"/>
+              <rect x="4"  y="21" width="2"  height="1" fill="#1a4a6a"/>
+              <rect x="16" y="18" width="2"  height="1" fill="#1a4a6a"/>
+              <rect x="17" y="19" width="1"  height="1" fill="#1a4a6a"/>
+              <rect x="16" y="20" width="2"  height="1" fill="#1a4a6a"/>
+              <rect x="17" y="21" width="1"  height="1" fill="#1a4a6a"/>
+              <!-- white sash (center chest) -->
+              <rect x="10" y="18" width="2"  height="6" fill="#e8e4d0"/>
+              <rect x="10" y="24" width="2"  height="2" fill="#e8e4d0" opacity="0.7"/>
 
-              <!-- LEGS A: left leg forward, right back -->
-              <rect x="5"  y="26" width="4" height="4" fill="#162a3a"/>
-              <rect x="3"  y="30" width="6" height="1" fill="#c89040"/><!-- left shoe -->
-              <rect x="12" y="26" width="4" height="3" fill="#162a3a"/>
-              <rect x="13" y="29" width="5" height="1" fill="#c89040"/><!-- right shoe back -->
+              <!-- ── GOLD BELT ── -->
+              <rect x="4"  y="25" width="14" height="2" fill="#f5d200"/>
+              <rect x="10" y="25" width="2"  height="2" fill="#c89a00"/>
+              <rect x="10" y="25" width="1"  height="1" fill="#ffffff" opacity="0.5"/>
+
+              <!-- ── PANTS (dark navy, teal accent) ── -->
+              <rect x="4"  y="27" width="14" height="4" fill="#1a2a3a"/>
+              <rect x="4"  y="27" width="14" height="1" fill="#00d4b8" opacity="0.35"/>
+
+              <!-- ── FRAME A: right arm forward, left arm back ── -->
+              <g class="run-A">
+                <rect x="2"  y="17" width="3"  height="2" fill="#111820"/>
+                <rect x="2"  y="19" width="2"  height="3" fill="#111820"/>
+                <rect x="2"  y="22" width="2"  height="2" fill="#00d4b8"/>
+                <rect x="2"  y="24" width="2"  height="2" fill="#f0c8a0"/>
+                <rect x="18" y="17" width="3"  height="2" fill="#111820"/>
+                <rect x="19" y="19" width="2"  height="2" fill="#111820"/>
+                <rect x="19" y="21" width="2"  height="2" fill="#00d4b8"/>
+                <rect x="19" y="23" width="3"  height="2" fill="#f0c8a0"/>
+                <!-- LEGS A -->
+                <rect x="4"  y="31" width="5"  height="3" fill="#1a2a3a"/>
+                <rect x="3"  y="34" width="6"  height="2" fill="#0a0a18"/>
+                <rect x="3"  y="34" width="6"  height="1" fill="#007a6a" opacity="0.65"/>
+                <rect x="13" y="31" width="5"  height="2" fill="#1a2a3a"/>
+                <rect x="13" y="33" width="6"  height="2" fill="#0a0a18"/>
+                <rect x="13" y="33" width="6"  height="1" fill="#007a6a" opacity="0.65"/>
+              </g>
+
+              <!-- ── FRAME B: left arm forward, right arm back ── -->
+              <g class="run-B">
+                <rect x="18" y="17" width="3"  height="2" fill="#111820"/>
+                <rect x="18" y="19" width="2"  height="3" fill="#111820"/>
+                <rect x="18" y="22" width="2"  height="2" fill="#00d4b8"/>
+                <rect x="18" y="24" width="2"  height="2" fill="#f0c8a0"/>
+                <rect x="2"  y="17" width="3"  height="2" fill="#111820"/>
+                <rect x="1"  y="19" width="2"  height="2" fill="#111820"/>
+                <rect x="1"  y="21" width="2"  height="2" fill="#00d4b8"/>
+                <rect x="-1" y="23" width="3"  height="2" fill="#f0c8a0"/>
+                <!-- LEGS B -->
+                <rect x="13" y="31" width="5"  height="3" fill="#1a2a3a"/>
+                <rect x="12" y="34" width="6"  height="2" fill="#0a0a18"/>
+                <rect x="12" y="34" width="6"  height="1" fill="#007a6a" opacity="0.65"/>
+                <rect x="4"  y="31" width="5"  height="2" fill="#1a2a3a"/>
+                <rect x="4"  y="33" width="6"  height="2" fill="#0a0a18"/>
+                <rect x="4"  y="33" width="6"  height="1" fill="#007a6a" opacity="0.65"/>
+              </g>
+
             </g>
-
-            <!-- FRAME B: left arm forward, right arm back -->
-            <g class="run-B">
-              <!-- upper arms -->
-              <rect x="3"  y="16" width="2" height="2" fill="#111d14"/>
-              <rect x="17" y="16" width="2" height="2" fill="#111d14"/>
-              <!-- left arm (forward) -->
-              <rect x="3"  y="18" width="2" height="2" fill="#111d14"/>
-              <rect x="0"  y="19" width="4" height="2" fill="#f0c8a0"/>
-              <!-- gold wristband left -->
-              <rect x="2"  y="19" width="2" height="1" fill="#f5d200"/>
-              <!-- right arm (back/down) -->
-              <rect x="17" y="18" width="2" height="4" fill="#111d14"/>
-              <rect x="17" y="22" width="2" height="2" fill="#f0c8a0"/>
-
-              <!-- LEGS B: right leg forward, left back -->
-              <rect x="5"  y="26" width="4" height="3" fill="#162a3a"/>
-              <rect x="4"  y="29" width="5" height="1" fill="#c89040"/><!-- left shoe back -->
-              <rect x="12" y="26" width="4" height="4" fill="#162a3a"/>
-              <rect x="11" y="30" width="6" height="1" fill="#c89040"/><!-- right shoe forward -->
-            </g>
-
           </svg>
         </div>
       </div><!-- /track-scene -->
@@ -396,6 +430,70 @@
         </div>
 
       </div><!-- /milestone-cards -->
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ══ CRAFT ══ -->
+  <section id="craft">
+    <div class="craft-inner">
+      <p class="section-label">What I Bring</p>
+      <h2 class="section-title">The Craft</h2>
+
+      <div class="craft-grid">
+
+        <div class="craft-card craft-green">
+          <div class="craft-icon">
+            <svg viewBox="0 0 16 16" width="32" height="32" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+              <rect x="7" y="0" width="2" height="2" fill="#39ff6e"/>
+              <rect x="5" y="2" width="6" height="2" fill="#39ff6e"/>
+              <rect x="3" y="4" width="10" height="2" fill="#39ff6e"/>
+              <rect x="1" y="6" width="14" height="2" fill="#1ecc55"/>
+              <rect x="3" y="8" width="10" height="2" fill="#1ecc55"/>
+              <rect x="5" y="10" width="6" height="2" fill="#39ff6e"/>
+              <rect x="6" y="12" width="4" height="4" fill="#0a3014"/>
+            </svg>
+          </div>
+          <h3 class="craft-title">Purpose-Driven<br>Visual Work</h3>
+          <p class="craft-body">Every frame serves a function. Whether you're a recruiter reading a brand, a client wanting your event documented with heart, or a collaborator looking for someone who listens before they shoot — my work is built around your audience's specific need. Not just footage. A story with a destination.</p>
+          <div class="craft-tag">For recruiters &middot; clients &middot; collaborators</div>
+        </div>
+
+        <div class="craft-card craft-teal">
+          <div class="craft-icon">
+            <svg viewBox="0 0 16 16" width="32" height="32" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+              <rect x="0" y="2" width="16" height="2" fill="#00d4b8"/>
+              <rect x="0" y="6" width="10" height="2" fill="#00d4b8"/>
+              <rect x="0" y="10" width="13" height="2" fill="#007a6a"/>
+              <rect x="2" y="4" width="2" height="2" fill="#007a6a"/>
+              <rect x="12" y="8" width="2" height="2" fill="#00d4b8"/>
+              <rect x="14" y="14" width="2" height="2" fill="#007a6a"/>
+              <rect x="0" y="14" width="12" height="2" fill="#00d4b8"/>
+            </svg>
+          </div>
+          <h3 class="craft-title">Production-Grade<br>Delivery</h3>
+          <p class="craft-body">From clean file management and colour-graded exports to reliable timelines and clear communication — every project is treated as a professional production. Not rough cuts. Work you can actually ship. The kind that arrives before deadline, labelled correctly, ready to publish.</p>
+          <div class="craft-tag">Functional &middot; Reliable &middot; Shippable</div>
+        </div>
+
+        <div class="craft-card craft-gold">
+          <div class="craft-icon">
+            <svg viewBox="0 0 16 16" width="32" height="32" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+              <rect x="0" y="0" width="16" height="3" fill="#f5d200"/>
+              <rect x="0" y="5" width="10" height="2" fill="#f5d200"/>
+              <rect x="0" y="9" width="7"  height="2" fill="#c89a00"/>
+              <rect x="0" y="13" width="12" height="2" fill="#f5d200"/>
+              <rect x="14" y="1" width="2" height="2" fill="#ffe84a"/>
+              <rect x="12" y="6" width="2" height="2" fill="#ffe84a"/>
+            </svg>
+          </div>
+          <h3 class="craft-title">Cinematic<br>Typography</h3>
+          <p class="craft-body">The typefaces in a title card, the weight of a caption, the breathing room around a credit — these choices are as deliberate as the focal length I pick. Typography in film should feel invisible and inevitable. When it's right, you don't notice it. You just feel the film land differently.</p>
+          <div class="craft-tag">Invisible &middot; Intentional &middot; Inevitable</div>
+        </div>
+
+      </div>
     </div>
   </section>
 
@@ -502,6 +600,6 @@
     <div class="footer-right">Filmmaker &mdash; Always Rolling</div>
   </footer>
 
-  <script src="js/main.js?v=4"></script>
+  <script src="js/main.js?v=5"></script>
 </body>
 </html>
