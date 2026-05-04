@@ -462,10 +462,32 @@ section { padding: 7rem 3rem; }
   position: absolute; bottom: calc(36% + 4px); left: 2%;
   transition: left 2.4s cubic-bezier(0.35, 0, 0.2, 1);
   z-index: 5; image-rendering: pixelated;
-  filter: drop-shadow(0 0 8px rgba(57,255,110,0.6));
+  animation: natlanAura 2.8s ease-in-out infinite;
   cursor: pointer;
 }
+@keyframes natlanAura {
+  0%,100% {
+    filter: drop-shadow(0 0 5px #39ff6e)
+            drop-shadow(0 0 10px rgba(0,212,184,0.45));
+  }
+  50% {
+    filter: drop-shadow(0 0 10px #39ff6e)
+            drop-shadow(0 0 18px rgba(0,212,184,0.7))
+            drop-shadow(0 0 28px rgba(245,210,0,0.35));
+  }
+}
 .pixel-runner svg { image-rendering: pixelated; display: block; }
+
+/* ── Natlan sky sun ── */
+.natlan-sun-px {
+  z-index: 2; pointer-events: none;
+  animation: sunPulse 3.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px #f5d200) drop-shadow(0 0 16px rgba(0,212,184,0.5));
+}
+@keyframes sunPulse {
+  0%,100% { opacity: 0.75; transform: scale(1) rotate(0deg); }
+  50%     { opacity: 1;    transform: scale(1.06) rotate(22.5deg); filter: drop-shadow(0 0 14px #f5d200) drop-shadow(0 0 26px rgba(0,212,184,0.75)); }
+}
 
 /* runner frame animation */
 .run-A { animation: frameA 0.22s steps(1) infinite; }
