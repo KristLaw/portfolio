@@ -235,8 +235,8 @@ function selectMilestone(index) {
 
   const sceneW   = trackScene.offsetWidth || 1100;
   const destPct  = flagPcts[index];
-  const destPx   = (destPct / 100) * sceneW - 42;
-  const fromPx   = parseInt(runner.style.left) || 42;
+  const destPx   = (destPct / 100) * sceneW - 48;
+  const fromPx   = parseInt(runner.style.left) || 48;
 
   /* rope */
   animateRope(fromPx + 60, destPx);
