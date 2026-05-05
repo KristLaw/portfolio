@@ -235,11 +235,11 @@ function selectMilestone(index) {
 
   const sceneW   = trackScene.offsetWidth || 1100;
   const destPct  = flagPcts[index];
-  const destPx   = (destPct / 100) * sceneW - 48;
-  const fromPx   = parseInt(runner.style.left) || 48;
+  const destPx   = (destPct / 100) * sceneW - 64;
+  const fromPx   = parseInt(runner.style.left) || 64;
 
   /* rope */
-  animateRope(fromPx + 60, destPx);
+  animateRope(fromPx + 100, destPx);
 
   /* move runner */
   runner.style.left = destPx + 'px';
@@ -257,9 +257,12 @@ function selectMilestone(index) {
     if (i === index) c.classList.add('active');
   });
 
-  /* sun burst on arrival */
+  /* sun burst + pose switch on arrival */
   setTimeout(() => {
     sunBurst(destPct);
+    document.querySelectorAll('.kinich-pose').forEach((p, i) => {
+      p.classList.toggle('active', i === index);
+    });
     isAnimating = false;
   }, 2500);
 

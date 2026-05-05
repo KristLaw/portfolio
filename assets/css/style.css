@@ -489,11 +489,13 @@ section { padding: 7rem 3rem; }
   50%     { opacity: 1;    transform: scale(1.06) rotate(22.5deg); filter: drop-shadow(0 0 14px #f5d200) drop-shadow(0 0 26px rgba(0,212,184,0.75)); }
 }
 
-/* runner frame animation */
-.run-A { animation: frameA 0.22s steps(1) infinite; }
-.run-B { animation: frameB 0.22s steps(1) infinite; }
-@keyframes frameA { 0%,49%{opacity:1} 50%,100%{opacity:0} }
-@keyframes frameB { 0%,49%{opacity:0} 50%,100%{opacity:1} }
+/* pose groups — only active one is visible */
+.kinich-pose { display: none; }
+.kinich-pose.active { display: block; animation: poseIn 0.35s cubic-bezier(0.22,1,0.36,1) forwards; }
+@keyframes poseIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
 /* click hint above runner */
 .runner-hint {
