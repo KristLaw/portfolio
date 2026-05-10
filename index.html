@@ -9,15 +9,16 @@
 
     /* ── Variables ── */
     :root {
-      --bg:        #0a0a0a;
-      --surface:   #111111;
-      --surface2:  #1a1a1a;
-      --green-deep:#1a4a2e;
-      --green-mid: #2d7a4f;
-      --gold:      #c9a84c;
-      --gold-light:#e8c97a;
-      --text:      #f0ece0;
-      --muted:     #a09880;
+      --bg:        #264653;
+      --surface:   #1d3a47;
+      --surface2:  #162f3c;
+      --green-deep:#1a5e56;
+      --green-mid: #2a9d8f;
+      --gold:      #e9c46a;
+      --gold-light:#f4a261;
+      --coral:     #e76f51;
+      --text:      #fdf6ec;
+      --muted:     #8fbcb8;
       --font-px:   'Press Start 2P', monospace;
       --font-body: 'Cormorant Garamond', serif;
       --font-acc:  'Playfair Display', serif;
@@ -118,6 +119,26 @@
     }
     .nav-links a:hover { color: var(--text); }
     .nav-links a:hover::after { width: 100%; }
+
+    /* music toggle */
+    #music-toggle {
+      font-family: var(--font-px);
+      font-size: 0.5rem;
+      color: var(--gold);
+      background: rgba(38,70,83,0.6);
+      border: 1px solid rgba(233,196,106,0.35);
+      padding: 0.45rem 0.8rem;
+      cursor: none;
+      letter-spacing: 0.1em;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    #music-toggle.playing {
+      background: rgba(42,157,143,0.25);
+      border-color: var(--green-mid);
+      color: var(--green-mid);
+    }
+    #music-toggle:hover { border-color: var(--gold); }
 
     /* ══════════════════════════════════════
        ISO WORLD HERO
@@ -695,6 +716,7 @@
       <li><a href="#about">About</a></li>
       <li><a href="#contact">Hire Me</a></li>
     </ul>
+    <button id="music-toggle" aria-label="Toggle music">&#9835;</button>
   </nav>
 
   <!-- ── ISO World Hero ── -->
@@ -1410,43 +1432,56 @@
     });
 
     /* ── ISO WORLD ENGINE ── */
+    /* ── ISO WORLD ENGINE ── */
     (function IsoWorld() {
       const canvas = document.getElementById('iso-canvas');
       const ctx    = canvas.getContext('2d');
 
-      const TW = 64, TH = 32;
-      const WW = 72, WH = 72;
-      const GRASS_END = 22, CITY_END = 46;
+      // Tile + world constants
+      const TW = 96, TH = 48;          // wider isometric tiles
+      const WW = 60, WH = 60;
+      const GRASS_END = 18, CITY_END = 38;
 
+      // ── Warm retro palette (ref: #2a9d8f #264653 #e76f51 #f4a261 #e9c46a) ──
       const P = {
-        skyTop:'#07041a', skyHorizon:'#0f0a28',
-        gA:'#3a7d3a', gB:'#2e6a2e', gC:'#4a9a4a', gD:'#5db85d',
-        dirt:'#8b6a20', dirtL:'#a07c30',
-        water:'#1a4466', waterL:'#2266aa', waterS:'#3388cc',
-        trunk:'#5a3a10', trunkD:'#3a2208',
-        leafA:'#2a6a20', leafB:'#3a8030', leafC:'#1a5010',
-        flowerR:'#dd3333', flowerY:'#ddcc11',
-        road:'#2a2a2e', roadL:'#3a3a3e', roadM:'#cccc00',
-        walk:'#444450', walkL:'#555560',
-        bldTp:'#2a3545', bldL:'#1c2535', bldR:'#141a28',
-        win:'#c9a84c', winD:'#44330a',
-        lamp:'#aaaaaa', lampG:'#ffe0a0',
-        hFloor:'#ccd9e8', hLine:'#9ab0c4',
-        cross:'#dd2222',
-        bed:'#f0f0f8', bedF:'#dde8ff', pillow:'#ffffff',
-        desk:'#c0c8d8', deskT:'#d8e0ee',
-        plant:'#226622', plantL:'#338833', pot:'#885533',
-        hair:'#12122e', hairH:'#00ccaa',
-        skin:'#efc4a0',
-        eye:'#00ffaa', eyeD:'#001a12',
-        jkt:'#1e2e3e', shirt:'#e8e8ff',
-        belt:'#181828', buckle:'#c9a84c',
-        pants:'#162040', pantsD:'#0e1830',
-        boot:'#221a08',
-        teal:'#00aa88',
+        skyTop:'#0d1f28', skyHorizon:'#1a3a42',
+        // Grass
+        gA:'#3a8a55', gB:'#2e7244', gC:'#4aaa66', gD:'#5ac870',
+        dirt:'#a07840', dirtL:'#c09050',
+        water:'#1a7a8f', waterL:'#2a9d8f', waterS:'#4abec8',
+        trunk:'#6a4020', trunkD:'#4a2c10',
+        leafA:'#2a7a40', leafB:'#3a9a55', leafC:'#1a5a30',
+        flowerR:'#e76f51', flowerY:'#e9c46a',
+        // City
+        road:'#2a3540', roadL:'#3a4550', roadM:'#e9c46a',
+        walk:'#3a4a55', walkL:'#4a5a66',
+        bldTp:'#c25540', bldL:'#9a3f2e', bldR:'#7a3020',   // terracotta buildings!
+        bldTp2:'#2a9d8f', bldL2:'#1a7a6a', bldR2:'#125a50', // teal variant
+        win:'#e9c46a', winD:'#5a3010',
+        lamp:'#c8b080', lampG:'#f4a261',
+        // Medical
+        hFloor:'#e8dcc8', hLine:'#c8b8a0',
+        hWallT:'#fdf6ec', hWallL:'#e8dcc8', hWallR:'#d0c4b0',
+        cross:'#e76f51',
+        bed:'#fdf6ec', bedF:'#e8f4f0', pillow:'#ffffff',
+        desk:'#d0c4b0', deskT:'#e8dcc8',
+        plant:'#2a7a40', plantL:'#3a9a55', pot:'#c25540',
+        // Chibi character – coral/teal outfit
+        hair:'#1a2a40', hairH:'#2a9d8f',
+        hairC:'#e76f51',                  // coral highlight streak
+        skin:'#f4c89a', skinD:'#daa870',
+        eye:'#2a9d8f', eyeD:'#0d1f28',
+        jkt:'#264653', jktL:'#2a5a6a',
+        shirt:'#fdf6ec',
+        belt:'#1a2a40', buckle:'#e9c46a',
+        pants:'#1a3a4a', pantsD:'#102530',
+        boot:'#1a2a20', bootD:'#0d1a12',
+        teal:'#2a9d8f', coral:'#e76f51',
+        acc:'#e9c46a',
       };
 
-      let _seed = 1337;
+      // World generation (seeded)
+      let _seed = 2847;
       function rng() { _seed = (_seed * 1664525 + 1013904223) & 0x7fffffff; return _seed / 0x7fffffff; }
 
       const worldMap = [], objMap = [];
@@ -1455,24 +1490,24 @@
         for (let c = 0; c < WW; c++) {
           const rv = rng();
           if (r < GRASS_END) {
-            const path = (c === 12 || c === 13);
-            if (path)                                                           { worldMap[r][c]='dirt';  objMap[r][c]=null; }
-            else if (rv < 0.055)                                                { worldMap[r][c]='grass'; objMap[r][c]='tree'; }
-            else if (rv < 0.09)                                                 { worldMap[r][c]='grass'; objMap[r][c]='flower_r'; }
-            else if (rv < 0.115)                                                { worldMap[r][c]='grass'; objMap[r][c]='flower_y'; }
-            else if (rv < 0.135 && r > 4 && r < GRASS_END-3 && c > 18 && c < 30) { worldMap[r][c]='water'; objMap[r][c]=null; }
-            else                                                                { worldMap[r][c]='grass'; objMap[r][c]=null; }
+            const path = (c === 10 || c === 11);
+            if (path)                                                                { worldMap[r][c]='dirt';  objMap[r][c]=null; }
+            else if (rv < 0.05)                                                      { worldMap[r][c]='grass'; objMap[r][c]='tree'; }
+            else if (rv < 0.08)                                                      { worldMap[r][c]='grass'; objMap[r][c]='flower_r'; }
+            else if (rv < 0.11)                                                      { worldMap[r][c]='grass'; objMap[r][c]='flower_y'; }
+            else if (rv < 0.13 && r>3 && r<GRASS_END-2 && c>14 && c<26)            { worldMap[r][c]='water'; objMap[r][c]=null; }
+            else                                                                     { worldMap[r][c]='grass'; objMap[r][c]=null; }
           } else if (r < CITY_END) {
-            const roadR = ((r - GRASS_END) % 6 === 0);
-            const roadC = (c % 8 === 0);
-            if (roadR || roadC)  { worldMap[r][c]='road'; objMap[r][c]=(roadC && !roadR && rv < 0.4) ? 'lamp' : null; }
-            else if (rv < 0.55)  { worldMap[r][c]='walk'; objMap[r][c]='bldA'; }
-            else                 { worldMap[r][c]='walk'; objMap[r][c]='bldB'; }
+            const roadR = ((r - GRASS_END) % 5 === 0);
+            const roadC = (c % 7 === 0);
+            if (roadR || roadC) { worldMap[r][c]='road'; objMap[r][c]=(roadC&&!roadR&&rv<0.45)?'lamp':null; }
+            else if (rv < 0.50) { worldMap[r][c]='walk'; objMap[r][c]='bldA'; }
+            else                { worldMap[r][c]='walk'; objMap[r][c]='bldB'; }
           } else {
-            if      (rv < 0.18) { worldMap[r][c]='hf'; objMap[r][c]='bed'; }
-            else if (rv < 0.26) { worldMap[r][c]='hf'; objMap[r][c]='cross_obj'; }
-            else if (rv < 0.30) { worldMap[r][c]='hf'; objMap[r][c]='desk'; }
-            else if (rv < 0.34) { worldMap[r][c]='hf'; objMap[r][c]='plant'; }
+            if      (rv < 0.16) { worldMap[r][c]='hf'; objMap[r][c]='bed'; }
+            else if (rv < 0.24) { worldMap[r][c]='hf'; objMap[r][c]='cross_obj'; }
+            else if (rv < 0.28) { worldMap[r][c]='hf'; objMap[r][c]='desk'; }
+            else if (rv < 0.32) { worldMap[r][c]='hf'; objMap[r][c]='plant'; }
             else                { worldMap[r][c]='hf'; objMap[r][c]=null; }
           }
         }
@@ -1491,19 +1526,20 @@
 
       function toScreen(gx, gy) {
         return { x: (gx - gy) * (TW / 2) - cam.x + vw / 2,
-                 y: (gx + gy) * (TH / 2) - cam.y + vh / 3 };
+                 y: (gx + gy) * (TH / 2) - cam.y + vh / 2.8 };
       }
       function inView(sx, sy) {
-        return sx > -TW * 5 && sx < vw + TW * 5 && sy > -TH * 14 && sy < vh + TH * 6;
+        return sx > -TW * 4 && sx < vw + TW * 4 && sy > -TH * 16 && sy < vh + TH * 4;
       }
 
+      // ── Draw helpers ──
       function diamond(x, y, fill, stroke) {
         ctx.fillStyle = fill;
         ctx.beginPath();
         ctx.moveTo(x, y); ctx.lineTo(x + TW/2, y + TH/2);
         ctx.lineTo(x, y + TH); ctx.lineTo(x - TW/2, y + TH/2);
         ctx.closePath(); ctx.fill();
-        if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 0.5; ctx.stroke(); }
+        if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 0.6; ctx.stroke(); }
       }
       function block(x, y, h, topC, leftC, rightC) {
         diamond(x, y, topC);
@@ -1515,113 +1551,208 @@
         ctx.closePath(); ctx.fill();
       }
 
-      function drawGrass(x, y, v) { diamond(x, y, v===1 ? P.gB : v===2 ? P.gC : P.gA, 'rgba(0,0,0,0.05)'); }
-      function drawDirt(x, y) { diamond(x, y, P.dirt, 'rgba(0,0,0,0.08)'); ctx.fillStyle=P.dirtL; ctx.fillRect(x-3, y+TH*0.44, 6, TH*0.38); }
+      // ── Tile drawers ──
+      function drawGrass(x, y, v) {
+        diamond(x, y, v===1 ? P.gB : v===2 ? P.gC : P.gA, 'rgba(0,0,0,0.05)');
+        if (v===2) { ctx.fillStyle=P.gD; ctx.fillRect(x-2,y+TH*0.6,4,3); ctx.fillRect(x+8,y+TH*0.5,3,4); }
+      }
+      function drawDirt(x, y) {
+        diamond(x, y, P.dirt, 'rgba(0,0,0,0.08)');
+        ctx.fillStyle = P.dirtL; ctx.fillRect(x-4, y+TH*0.42, 8, TH*0.36);
+      }
       function drawWater(x, y, t) {
         diamond(x, y, P.water);
-        const off = Math.sin(t * 0.04 + x * 0.08) * 4;
-        ctx.fillStyle = P.waterL; ctx.fillRect(x-16+off, y+TH*0.4,  14, 2);
-        ctx.fillStyle = P.waterS; ctx.fillRect(x-6+off,  y+TH*0.56, 18, 1.5);
+        const off = Math.sin(t * 0.035 + x * 0.06) * 5;
+        ctx.fillStyle = P.waterL; ctx.fillRect(x-20+off, y+TH*0.38, 18, 2.5);
+        ctx.fillStyle = P.waterS; ctx.fillRect(x-8+off,  y+TH*0.54, 24, 1.5);
       }
       function drawRoad(x, y) {
         diamond(x, y, P.road);
         ctx.fillStyle = P.roadM;
-        ctx.fillRect(x-1.5, y+TH*0.44, 3, 2);
-        ctx.fillRect(x+7,   y+TH*0.52, 3, 2);
-        ctx.fillRect(x-10,  y+TH*0.37, 3, 2);
+        ctx.fillRect(x-2, y+TH*0.44, 4, 2.5);
+        ctx.fillRect(x+10, y+TH*0.52, 4, 2.5);
+        ctx.fillRect(x-14, y+TH*0.36, 4, 2.5);
       }
-      function drawWalk(x, y)  { diamond(x, y, P.walk, 'rgba(0,0,0,0.07)'); }
+      function drawWalk(x, y) { diamond(x, y, P.walk, 'rgba(0,0,0,0.07)'); }
       function drawHF(x, y) {
-        diamond(x, y, P.hFloor, 'rgba(0,0,0,0.05)');
-        ctx.strokeStyle = P.hLine; ctx.lineWidth = 0.5;
+        diamond(x, y, P.hFloor, 'rgba(0,0,0,0.04)');
+        ctx.strokeStyle = P.hLine; ctx.lineWidth = 0.6;
         ctx.beginPath();
-        ctx.moveTo(x-TW*0.28, y+TH*0.33); ctx.lineTo(x+TW*0.28, y+TH*0.67);
+        ctx.moveTo(x-TW*0.3, y+TH*0.32); ctx.lineTo(x+TW*0.3, y+TH*0.68);
         ctx.stroke();
       }
 
+      // ── Object drawers ──
       function drawTree(x, y) {
-        block(x, y-28, 10, P.trunk, P.trunkD, P.trunkD);
-        ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.beginPath();
-        ctx.ellipse(x, y+TH*0.7, 14, 5, 0, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = P.leafC; ctx.beginPath(); ctx.arc(x, y-46, 18, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = P.leafA; ctx.beginPath(); ctx.arc(x-7, y-52, 14, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = P.leafB; ctx.beginPath(); ctx.arc(x+6, y-50, 13, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = P.leafA; ctx.beginPath(); ctx.arc(x, y-58, 11, 0, Math.PI*2); ctx.fill();
+        block(x, y-38, 12, P.trunk, P.trunkD, P.trunkD);
+        ctx.fillStyle = 'rgba(0,0,0,0.14)'; ctx.beginPath();
+        ctx.ellipse(x, y+TH*0.72, 18, 6, 0, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = P.leafC; ctx.beginPath(); ctx.arc(x, y-58, 22, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = P.leafA; ctx.beginPath(); ctx.arc(x-9, y-66, 17, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = P.leafB; ctx.beginPath(); ctx.arc(x+8, y-64, 16, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = P.leafA; ctx.beginPath(); ctx.arc(x, y-74, 14, 0, Math.PI*2); ctx.fill();
       }
       function drawFlower(x, y, col) {
-        ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y+TH*0.28, 3.5, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#ffff66'; ctx.beginPath(); ctx.arc(x, y+TH*0.28, 1.4, 0, Math.PI*2); ctx.fill();
-        ctx.strokeStyle = P.leafB; ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(x, y+TH*0.28); ctx.lineTo(x, y+TH*0.62); ctx.stroke();
+        ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y+TH*0.26, 4.5, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#fff8e8'; ctx.beginPath(); ctx.arc(x, y+TH*0.26, 1.8, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = P.leafB; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(x, y+TH*0.26); ctx.lineTo(x, y+TH*0.65); ctx.stroke();
       }
-      function drawBuilding(x, y, tall) {
-        const h = tall ? 66 : 44;
-        block(x, y-h, h, P.bldTp, P.bldL, P.bldR);
-        const rows = tall ? 4 : 3;
+      function drawBuilding(x, y, teal) {
+        const h = teal ? 70 : 52;
+        if (teal) block(x, y-h, h, P.bldTp2, P.bldL2, P.bldR2);
+        else      block(x, y-h, h, P.bldTp,  P.bldL,  P.bldR);
+        const rows = teal ? 4 : 3;
         for (let r = 0; r < rows; r++) {
-          const wy = y - h + 10 + r * 14;
-          ctx.fillStyle = Math.sin(x+y+r) > 0 ? P.win : P.winD;   ctx.fillRect(x-28, wy,   8, 5);
-          ctx.fillStyle = Math.sin(x+y+r*2) > 0 ? P.win : P.winD; ctx.fillRect(x-16, wy+3, 8, 5);
-          ctx.fillStyle = Math.sin(x-y+r) > 0 ? P.win : P.winD;   ctx.fillRect(x+8,  wy,   8, 5);
-          ctx.fillStyle = Math.sin(x-y+r*3) > 0 ? P.win : P.winD; ctx.fillRect(x+20, wy+3, 8, 5);
+          const wy = y - h + 12 + r * 16;
+          const wc = teal ? (Math.sin(x+r)>0 ? P.win : '#aaeedd') : (Math.sin(x+y+r)>0 ? P.win : P.winD);
+          ctx.fillStyle = wc; ctx.fillRect(x-36, wy, 10, 7);
+          ctx.fillStyle = wc; ctx.fillRect(x-22, wy+4, 10, 7);
+          ctx.fillStyle = wc; ctx.fillRect(x+10, wy,   10, 7);
+          ctx.fillStyle = wc; ctx.fillRect(x+24, wy+4, 10, 7);
         }
       }
       function drawLamp(x, y) {
-        ctx.strokeStyle = P.lamp; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(x, y+TH*0.5); ctx.lineTo(x, y-22); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x, y-22); ctx.lineTo(x+11, y-27); ctx.stroke();
-        ctx.shadowColor = P.lampG; ctx.shadowBlur = 10;
-        ctx.fillStyle = P.lampG; ctx.beginPath(); ctx.arc(x+11, y-27, 3, 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = P.lamp; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(x, y+TH*0.5); ctx.lineTo(x, y-28); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x, y-28); ctx.lineTo(x+14, y-34); ctx.stroke();
+        ctx.shadowColor = P.lampG; ctx.shadowBlur = 14;
+        ctx.fillStyle = P.lampG; ctx.beginPath(); ctx.arc(x+14, y-34, 4, 0, Math.PI*2); ctx.fill();
         ctx.shadowBlur = 0;
       }
       function drawBed(x, y) {
-        block(x, y-8, 8, P.bed, '#c8d0e0', '#b0b8cc');
-        ctx.fillStyle = P.bedF;   ctx.fillRect(x-22, y-13, 16, 6);
-        ctx.fillStyle = P.pillow; ctx.fillRect(x-20, y-15, 10, 5);
+        block(x, y-10, 10, P.bed, '#d8ccb8', '#c0b0a0');
+        ctx.fillStyle = P.bedF;   ctx.fillRect(x-28, y-17, 20, 8);
+        ctx.fillStyle = P.pillow; ctx.fillRect(x-26, y-19, 12, 7);
       }
       function drawCrossObj(x, y) {
         ctx.fillStyle = P.cross;
-        ctx.fillRect(x-2, y-18, 4, 14); ctx.fillRect(x-7, y-14, 14, 4);
+        ctx.fillRect(x-2.5, y-22, 5, 18); ctx.fillRect(x-9, y-18, 18, 5);
       }
       function drawDesk(x, y) {
-        block(x, y-10, 10, P.deskT, P.desk, '#a0a8b8');
-        ctx.fillStyle = '#ffffff'; ctx.fillRect(x-12, y-15, 8, 4);
+        block(x, y-12, 12, P.deskT, P.desk, '#b8a898');
+        ctx.fillStyle = '#fdf6ec'; ctx.fillRect(x-15, y-19, 10, 5);
       }
       function drawPlant(x, y) {
-        block(x, y-6, 6, P.pot, '#663322', '#552211');
-        ctx.fillStyle = P.plant;  ctx.beginPath(); ctx.arc(x-5, y-12, 7, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = P.plantL; ctx.beginPath(); ctx.arc(x+4, y-15, 6, 0, Math.PI*2); ctx.fill();
+        block(x, y-8, 8, P.pot, '#a04030', '#803020');
+        ctx.fillStyle = P.plant;  ctx.beginPath(); ctx.arc(x-6, y-15, 9, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = P.plantL; ctx.beginPath(); ctx.arc(x+5, y-18, 8, 0, Math.PI*2); ctx.fill();
       }
 
-      const S = 2, CHAR_W = 16, CHAR_H = 36;
+      // ── CHIBI CHARACTER – 256px tall ──
+      // Art grid: 18W x 32H pixel-art units, S=8 → 144x256 canvas pixels
+      const S = 8, CHAR_W = 18, CHAR_H = 32;
+
+      // Each rect: [x, y, w, h, colorKey]  (art-pixel coordinates)
       const FRAMES = [
-        [[3,0,10,4,'hair'],[1,1,14,2,'hair'],[5,0,5,2,'hairH'],[2,4,12,8,'skin'],[3,6,3,3,'eyeD'],[3,6,2,2,'eye'],[10,6,3,3,'eyeD'],[10,6,2,2,'eye'],[5,12,6,2,'shirt'],[1,12,14,10,'jkt'],[5,13,4,8,'teal'],[1,22,6,2,'belt'],[8,22,6,2,'belt'],[6,22,3,2,'buckle'],[1,24,6,8,'pants'],[9,24,6,8,'pants'],[0,31,7,3,'pantsD'],[9,31,7,3,'pantsD'],[0,34,7,2,'boot'],[9,34,7,2,'boot']],
-        [[3,0,10,4,'hair'],[1,1,14,2,'hair'],[5,0,5,2,'hairH'],[2,4,12,8,'skin'],[3,6,3,3,'eyeD'],[3,6,2,2,'eye'],[10,6,3,3,'eyeD'],[10,6,2,2,'eye'],[5,12,6,2,'shirt'],[1,12,14,10,'jkt'],[5,13,4,8,'teal'],[1,22,6,2,'belt'],[8,22,6,2,'belt'],[6,22,3,2,'buckle'],[2,24,5,8,'pants'],[9,24,5,8,'pants'],[2,31,6,3,'pantsD'],[9,31,6,3,'pantsD'],[2,34,6,2,'boot'],[9,34,6,2,'boot']],
-        [[3,0,10,4,'hair'],[1,1,14,2,'hair'],[4,0,5,2,'hairH'],[2,4,12,8,'skin'],[3,6,3,3,'eyeD'],[3,6,2,2,'eye'],[10,6,3,3,'eyeD'],[10,6,2,2,'eye'],[5,12,6,2,'shirt'],[1,12,14,10,'jkt'],[5,13,4,8,'teal'],[1,22,6,2,'belt'],[8,22,6,2,'belt'],[6,22,3,2,'buckle'],[1,24,6,8,'pants'],[9,24,6,8,'pants'],[1,31,7,3,'pantsD'],[8,31,7,3,'pantsD'],[1,34,7,2,'boot'],[8,34,7,2,'boot']],
-        [[3,0,10,4,'hair'],[1,1,14,2,'hair'],[5,0,5,2,'hairH'],[2,4,12,8,'skin'],[3,6,3,3,'eyeD'],[3,6,2,2,'eye'],[10,6,3,3,'eyeD'],[10,6,2,2,'eye'],[5,12,6,2,'shirt'],[1,12,14,10,'jkt'],[5,13,4,8,'teal'],[1,22,6,2,'belt'],[8,22,6,2,'belt'],[6,22,3,2,'buckle'],[3,24,5,8,'pants'],[8,24,5,8,'pants'],[3,31,6,3,'pantsD'],[8,31,6,3,'pantsD'],[3,34,6,2,'boot'],[8,34,6,2,'boot']],
+        [ // Frame 0 – stride A (left foot forward)
+          // Big chibi head (rows 0-11)
+          [3,0,12,2,'hair'],[1,1,16,3,'hair'],          // hair top mass
+          [4,0,5,3,'hairH'],[10,0,3,2,'hairC'],         // teal + coral streaks
+          [2,3,14,9,'skin'],[3,4,12,9,'skin'],           // wide round face
+          // Eyes (big chibi eyes)
+          [3,6,4,4,'eyeD'],[4,6,2,3,'eye'],             // left eye
+          [11,6,4,4,'eyeD'],[12,6,2,3,'eye'],           // right eye
+          // Blush
+          [3,9,3,2,'coral'],[12,9,3,2,'coral'],
+          // Mouth
+          [6,10,5,1,'eyeD'],
+          // Hair fringe/front
+          [2,2,4,4,'hair'],[13,2,3,3,'hair'],
+          // Chin / hair bottom
+          [2,11,14,2,'hair'],
+          // Neck
+          [7,12,4,3,'skin'],
+          // Body (rows 13-21, compact chibi torso)
+          [3,15,12,2,'shirt'],                          // collar
+          [2,15,14,8,'jkt'],                            // jacket
+          [6,15,6,8,'teal'],                            // teal chest stripe
+          [7,14,4,3,'shirt'],                           // inner shirt
+          // Belt
+          [2,22,14,2,'belt'],[7,22,5,2,'buckle'],
+          // Legs (rows 23-31, chibi wide short legs)
+          [2,24,6,8,'pants'],[10,24,6,8,'pants'],       // left forward, right back
+          [1,31,7,3,'boot'],[9,31,7,3,'boot'],          // big round boots
+        ],
+        [ // Frame 1 – plant A
+          [3,0,12,2,'hair'],[1,1,16,3,'hair'],
+          [4,0,5,3,'hairH'],[10,0,3,2,'hairC'],
+          [2,3,14,9,'skin'],[3,4,12,9,'skin'],
+          [3,6,4,4,'eyeD'],[4,6,2,3,'eye'],
+          [11,6,4,4,'eyeD'],[12,6,2,3,'eye'],
+          [3,9,3,2,'coral'],[12,9,3,2,'coral'],
+          [6,10,5,1,'eyeD'],
+          [2,2,4,4,'hair'],[13,2,3,3,'hair'],
+          [2,11,14,2,'hair'],
+          [7,12,4,3,'skin'],
+          [3,15,12,2,'shirt'],[2,15,14,8,'jkt'],[6,15,6,8,'teal'],[7,14,4,3,'shirt'],
+          [2,22,14,2,'belt'],[7,22,5,2,'buckle'],
+          // legs closer together (planted)
+          [4,24,5,8,'pants'],[9,24,5,8,'pants'],
+          [3,31,7,3,'boot'],[8,31,7,3,'boot'],
+        ],
+        [ // Frame 2 – stride B (right foot forward) – slightly different leg pos
+          [3,0,12,2,'hair'],[1,1,16,3,'hair'],
+          [3,0,5,3,'hairH'],[11,0,3,2,'hairC'],
+          [2,3,14,9,'skin'],[3,4,12,9,'skin'],
+          [3,6,4,4,'eyeD'],[4,6,2,3,'eye'],
+          [11,6,4,4,'eyeD'],[12,6,2,3,'eye'],
+          [3,9,3,2,'coral'],[12,9,3,2,'coral'],
+          [6,10,5,1,'eyeD'],
+          [2,2,4,4,'hair'],[13,2,3,3,'hair'],
+          [2,11,14,2,'hair'],
+          [7,12,4,3,'skin'],
+          [3,15,12,2,'shirt'],[2,15,14,8,'jkt'],[6,15,6,8,'teal'],[7,14,4,3,'shirt'],
+          [2,22,14,2,'belt'],[7,22,5,2,'buckle'],
+          // right leg forward now
+          [2,24,6,8,'pants'],[10,24,6,8,'pants'],
+          [1,31,7,3,'boot'],[9,31,7,3,'boot'],
+        ],
+        [ // Frame 3 – plant B
+          [3,0,12,2,'hair'],[1,1,16,3,'hair'],
+          [4,0,5,3,'hairH'],[10,0,3,2,'hairC'],
+          [2,3,14,9,'skin'],[3,4,12,9,'skin'],
+          [3,6,4,4,'eyeD'],[4,6,2,3,'eye'],
+          [11,6,4,4,'eyeD'],[12,6,2,3,'eye'],
+          [3,9,3,2,'coral'],[12,9,3,2,'coral'],
+          [6,10,5,1,'eyeD'],
+          [2,2,4,4,'hair'],[13,2,3,3,'hair'],
+          [2,11,14,2,'hair'],
+          [7,12,4,3,'skin'],
+          [3,15,12,2,'shirt'],[2,15,14,8,'jkt'],[6,15,6,8,'teal'],[7,14,4,3,'shirt'],
+          [2,22,14,2,'belt'],[7,22,5,2,'buckle'],
+          [3,24,5,8,'pants'],[9,24,5,8,'pants'],
+          [2,31,7,3,'boot'],[8,31,7,3,'boot'],
+        ],
       ];
 
       function drawChar(sx, sy, frame, flipLeft) {
         const rects = FRAMES[frame % 4];
-        ctx.fillStyle = 'rgba(0,0,0,0.22)';
-        ctx.beginPath(); ctx.ellipse(sx, sy+2, CHAR_W*S*0.44, 5, 0, 0, Math.PI*2); ctx.fill();
+        // shadow ellipse
+        ctx.fillStyle = 'rgba(0,0,0,0.20)';
+        ctx.beginPath();
+        ctx.ellipse(sx, sy + 4, CHAR_W*S*0.46, 7, 0, 0, Math.PI*2);
+        ctx.fill();
+        // pixel art
         if (flipLeft) { ctx.save(); ctx.translate(sx*2, 0); ctx.scale(-1, 1); }
         const ox = sx - CHAR_W*S/2, oy = sy - CHAR_H*S;
         for (const [rx, ry, rw, rh, ck] of rects) {
-          ctx.fillStyle = P[ck]; ctx.fillRect(ox + rx*S, oy + ry*S, rw*S, rh*S);
+          ctx.fillStyle = P[ck];
+          ctx.fillRect(ox + rx*S, oy + ry*S, rw*S, rh*S);
         }
         if (flipLeft) ctx.restore();
       }
 
-      const char = { gx: 12.5, gy: 6.0, facing: 1, wf: 0 };
-      const PSPD = 0.07, ASPD = 0.034;
+      // ── Character & movement state ──
+      const char = { gx: 10.5, gy: 5.0, facing: 1, wf: 0 };
+      const PSPD = 0.06, ASPD = 0.030;
       const WPS = [
-        {gx:12,gy:5},{gx:22,gy:5},{gx:30,gy:10},{gx:40,gy:12},{gx:50,gy:8},
-        {gx:55,gy:15},{gx:50,gy:18},{gx:38,gy:16},{gx:20,gy:18},{gx:13,gy:20},
-        {gx:13,gy:26},{gx:25,gy:30},{gx:40,gy:28},{gx:52,gy:32},{gx:55,gy:38},
-        {gx:45,gy:42},{gx:30,gy:44},{gx:15,gy:48},{gx:10,gy:55},{gx:25,gy:58},
-        {gx:40,gy:56},{gx:55,gy:52},{gx:60,gy:44},{gx:60,gy:30},{gx:58,gy:14},
-        {gx:45,gy:6},{gx:30,gy:4},{gx:12,gy:5},
+        {gx:10,gy:4},{gx:18,gy:4},{gx:26,gy:8},{gx:36,gy:10},{gx:44,gy:6},
+        {gx:50,gy:12},{gx:44,gy:15},{gx:32,gy:14},{gx:18,gy:15},{gx:10,gy:17},
+        {gx:10,gy:22},{gx:22,gy:26},{gx:36,gy:24},{gx:48,gy:28},{gx:52,gy:34},
+        {gx:42,gy:38},{gx:28,gy:40},{gx:14,gy:44},{gx:8,gy:50},{gx:22,gy:54},
+        {gx:36,gy:52},{gx:50,gy:48},{gx:55,gy:40},{gx:55,gy:28},{gx:52,gy:14},
+        {gx:40,gy:5},{gx:26,gy:3},{gx:10,gy:4},
       ];
       let wpIdx = 0, autoWalk = true, idleTimer = null;
 
@@ -1635,11 +1766,12 @@
       });
       window.addEventListener('keyup', e => keys.delete(e.key));
 
+      // ── Zone label ──
       const zoneEl = document.getElementById('zone-name');
       const ZONES = [
-        { maxRow: GRASS_END-1, name: '\u25c6  GRASS PLAINS',  col: '#2d7a4f' },
-        { maxRow: CITY_END-1,  name: '\u25c6  CITY',          col: '#c9a84c' },
-        { maxRow: WH,          name: '\u25c6  MEDICAL FIELD', col: '#4a9aaa' },
+        { maxRow: GRASS_END-1, name: '◆  GRASS PLAINS',  col: '#2a9d8f' },
+        { maxRow: CITY_END-1,  name: '◆  CITY',          col: '#e9c46a' },
+        { maxRow: WH,          name: '◆  MEDICAL FIELD', col: '#e76f51' },
       ];
       let lastZone = -1;
       function updateZone() {
@@ -1657,28 +1789,33 @@
         }
       }
 
+      // ── RAF pause ──
       let rafPaused = false, rafId = null;
       new IntersectionObserver(entries => {
         rafPaused = entries[0].intersectionRatio < 0.04;
         if (!rafPaused && !rafId) rafId = requestAnimationFrame(loop);
       }, { threshold: [0, 0.04] }).observe(document.getElementById('hero'));
 
+      // ── Sky with warm stars ──
       function drawSky(t) {
         const g = ctx.createLinearGradient(0, 0, 0, vh);
         g.addColorStop(0, P.skyTop); g.addColorStop(1, P.skyHorizon);
         ctx.fillStyle = g; ctx.fillRect(0, 0, vw, vh);
-        ctx.fillStyle = '#ffffff';
-        for (let i = 0; i < 70; i++) {
-          const sx2 = (i * 179 + 31) % vw, sy2 = (i * 97 + 13) % (vh * 0.5);
-          ctx.globalAlpha = Math.abs(Math.sin(t * 0.005 + i * 1.4)) * 0.55;
+        for (let i = 0; i < 55; i++) {
+          const sx2 = (i * 193 + 41) % vw, sy2 = (i * 107 + 19) % (vh * 0.48);
+          ctx.globalAlpha = Math.abs(Math.sin(t * 0.004 + i * 1.6)) * 0.5;
+          const warmStar = i % 5 === 0 ? '#f4a261' : i % 3 === 0 ? '#e9c46a' : '#fdf6ec';
+          ctx.fillStyle = warmStar;
           ctx.fillRect(sx2, sy2, i % 5 === 0 ? 2 : 1, i % 5 === 0 ? 2 : 1);
         }
         ctx.globalAlpha = 1;
       }
 
+      // ── Main loop ──
       let tick = 0;
       function loop() {
         if (rafPaused) { rafId = null; return; }
+
         let dx = 0, dy = 0;
         if (!autoWalk) {
           if (keys.has('ArrowUp')    || keys.has('w')) { dx -= PSPD; dy -= PSPD; }
@@ -1696,28 +1833,29 @@
           char.gx = Math.max(0, Math.min(WW-1, char.gx + dx));
           char.gy = Math.max(0, Math.min(WH-1, char.gy + dy));
           char.facing = dx >= 0 ? 1 : -1;
-          if (tick % 5 === 0) char.wf++;
+          if (tick % 6 === 0) char.wf++;
         }
 
+        // Smooth camera (biased above center so character + world below visible)
         const cs = toScreen(char.gx, char.gy);
-        cam.x += (cs.x - vw/2) * 0.09;
-        cam.y += (cs.y - vh/2) * 0.09;
+        cam.x += (cs.x - vw/2)  * 0.08;
+        cam.y += (cs.y - vh/2.2) * 0.08;
 
         ctx.clearRect(0, 0, vw, vh);
         drawSky(tick);
 
-        const cgx = Math.round(char.gx), cgy = Math.round(char.gy);
+        // Draw all tiles (painter's order)
         for (let gy2 = 0; gy2 < WH; gy2++) {
           for (let gx2 = 0; gx2 < WW; gx2++) {
             const s = toScreen(gx2, gy2);
             if (!inView(s.x, s.y)) continue;
-            const t = worldMap[gy2][gx2];
-            if      (t === 'grass') drawGrass(s.x, s.y, (gx2 + gy2) % 3);
-            else if (t === 'dirt')  drawDirt(s.x, s.y);
-            else if (t === 'water') drawWater(s.x, s.y, tick);
-            else if (t === 'road')  drawRoad(s.x, s.y);
-            else if (t === 'walk')  drawWalk(s.x, s.y);
-            else if (t === 'hf')    drawHF(s.x, s.y);
+            const t2 = worldMap[gy2][gx2];
+            if      (t2 === 'grass') drawGrass(s.x, s.y, (gx2*3+gy2*2)%3);
+            else if (t2 === 'dirt')  drawDirt(s.x, s.y);
+            else if (t2 === 'water') drawWater(s.x, s.y, tick);
+            else if (t2 === 'road')  drawRoad(s.x, s.y);
+            else if (t2 === 'walk')  drawWalk(s.x, s.y);
+            else if (t2 === 'hf')    drawHF(s.x, s.y);
             const o = objMap[gy2][gx2];
             if      (o === 'tree')      drawTree(s.x, s.y);
             else if (o === 'flower_r')  drawFlower(s.x, s.y, P.flowerR);
@@ -1729,9 +1867,13 @@
             else if (o === 'cross_obj') drawCrossObj(s.x, s.y);
             else if (o === 'desk')      drawDesk(s.x, s.y);
             else if (o === 'plant')     drawPlant(s.x, s.y);
-            if (gx2 === cgx && gy2 === cgy) drawChar(s.x, s.y + TH*0.5, char.wf, char.facing < 0);
           }
         }
+
+        // Draw character on top of all tiles (256px chibi, prominent hero)
+        const cs2 = toScreen(char.gx, char.gy);
+        drawChar(cs2.x, cs2.y + TH * 0.5, char.wf, char.facing < 0);
+
         updateZone();
         tick++;
         rafId = requestAnimationFrame(loop);
@@ -1740,8 +1882,121 @@
       window.addEventListener('resize', resizeCanvas);
       resizeCanvas();
       const init = toScreen(char.gx, char.gy);
-      cam.x = init.x - vw/2; cam.y = init.y - vh/3;
+      cam.x = init.x - vw/2; cam.y = init.y - vh/2.8;
       rafId = requestAnimationFrame(loop);
+    })();
+
+    /* ── PIANO JAZZ SOUNDTRACK ── */
+    (function PianoJazz() {
+      let actx = null, masterGain = null, isPlaying = false;
+      let schedulerTimer = null, nextNoteTime = 0, beatIdx = 0;
+
+      // ii-V-I-VI in F: Gm7 | C7 | Fmaj7 | Dm7  (two bars each)
+      const BPM = 138;
+      const BEAT = 60 / BPM;
+      // Frequencies for jazz chords (root, 3rd, 5th, 7th)
+      const CHORDS = [
+        [196.00, 233.08, 293.66, 349.23],  // Gm7
+        [261.63, 311.13, 392.00, 466.16],  // C7
+        [174.61, 220.00, 261.63, 329.63],  // Fmaj7
+        [146.83, 174.61, 220.00, 261.63],  // Dm7
+      ];
+      // Walk-bass notes (root on 1&3, fifth on 2&4)
+      const BASS = [
+        [98.00, 146.83, 98.00, 146.83],
+        [130.81, 196.00, 130.81, 196.00],
+        [87.31, 130.81, 87.31, 130.81],
+        [73.42, 110.00, 73.42, 110.00],
+      ];
+      // Melody motif (scale-degree numbers, resolved per chord)
+      const MEL_OFFSETS = [0,2,4,7, 4,2,0,2,  4,7,9,7, 4,2,0,-3];
+
+      function piano(freq, t, dur, vol) {
+        if (!actx) return;
+        const g   = actx.createGain();
+        const o1  = actx.createOscillator();
+        const o2  = actx.createOscillator();
+        const o3  = actx.createOscillator();
+        o1.type = 'triangle'; o1.frequency.value = freq;
+        o2.type = 'sine';     o2.frequency.value = freq * 2.003;
+        o3.type = 'sine';     o3.frequency.value = freq * 3.01;
+        const vols = [vol, vol*0.4, vol*0.15];
+        [o1,o2,o3].forEach((o,i)=>{
+          const og = actx.createGain();
+          og.gain.setValueAtTime(vols[i], t);
+          og.gain.exponentialRampToValueAtTime(0.0001, t+dur);
+          o.connect(og); og.connect(g);
+          o.start(t); o.stop(t+dur+0.05);
+        });
+        g.gain.value = 1;
+        g.connect(masterGain);
+      }
+
+      function schedule() {
+        while (nextNoteTime < actx.currentTime + 0.35) {
+          const bar   = Math.floor(beatIdx / 8);
+          const chord = CHORDS[bar % 4];
+          const bass  = BASS[bar % 4];
+          const beat  = beatIdx % 8;
+
+          // Chord voicing: strum on 1, light on 3
+          if (beat === 0) {
+            chord.forEach((f, i) => piano(f, nextNoteTime + i*0.018, BEAT*3.2, 0.045));
+            piano(bass[0] * 0.5, nextNoteTime, BEAT*0.9, 0.1);
+          }
+          if (beat === 2) piano(bass[1] * 0.5, nextNoteTime, BEAT*0.8, 0.08);
+          if (beat === 4) {
+            chord.slice(1).forEach((f, i) => piano(f, nextNoteTime + i*0.012, BEAT*1.6, 0.032));
+            piano(bass[2] * 0.5, nextNoteTime, BEAT*0.9, 0.09);
+          }
+          if (beat === 6) piano(bass[3] * 0.5, nextNoteTime, BEAT*0.8, 0.07);
+
+          // Melody (every other beat)
+          if (beat % 2 === 1) {
+            const root = chord[0] * 2;
+            const ratio = Math.pow(2, MEL_OFFSETS[(bar*4 + Math.floor(beat/2)) % MEL_OFFSETS.length] / 12);
+            piano(root * ratio, nextNoteTime, BEAT*0.65, 0.11);
+          }
+
+          nextNoteTime += BEAT * (beat===1||beat===5 ? 0.95 : 1.05); // swing feel
+          beatIdx++;
+        }
+        schedulerTimer = setTimeout(schedule, 150);
+      }
+
+      function start() {
+        if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+        masterGain = actx.createGain();
+        masterGain.gain.value = 0.38;
+        // Soft reverb-like filtering
+        const filter = actx.createBiquadFilter();
+        filter.type = 'lowpass'; filter.frequency.value = 4000;
+        masterGain.connect(filter); filter.connect(actx.destination);
+        nextNoteTime = actx.currentTime + 0.15;
+        beatIdx = 0;
+        schedule();
+        isPlaying = true;
+      }
+      function stop() {
+        clearTimeout(schedulerTimer);
+        if (masterGain) { masterGain.gain.setTargetAtTime(0, actx.currentTime, 0.6); }
+        setTimeout(() => { isPlaying = false; }, 700);
+      }
+
+      const btn = document.getElementById('music-toggle');
+      if (btn) btn.addEventListener('click', () => {
+        if (isPlaying) { stop(); btn.classList.remove('playing'); btn.innerHTML='&#9835;'; }
+        else { start(); btn.classList.add('playing'); btn.innerHTML='&#9835; ON'; }
+      });
+
+      // Auto-start on first page interaction
+      document.addEventListener('pointerdown', function kick() {
+        if (!isPlaying) {
+          start();
+          if (btn) { btn.classList.add('playing'); btn.innerHTML='&#9835; ON'; }
+        }
+        document.removeEventListener('pointerdown', kick);
+      }, { once: true });
     })();
 
 
