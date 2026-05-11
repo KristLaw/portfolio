@@ -3,22 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>P. Law — Filmmaker</title>
+  <title>P. Law — Filmmaker & Creative Director</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Playfair+Display:ital,wght@1,400;1,500;1,700&display=swap');
 
-    /* ── Variables ── */
+    /* ── Brand Palette ── */
     :root {
-      --bg:        #264653;
-      --surface:   #1d3a47;
-      --surface2:  #162f3c;
-      --green-deep:#1a5e56;
-      --green-mid: #2a9d8f;
-      --gold:      #e9c46a;
-      --gold-light:#f4a261;
-      --coral:     #e76f51;
-      --text:      #fdf6ec;
-      --muted:     #8fbcb8;
+      --deep:    #1a3542;
+      --bg:      #264653;
+      --teal:    #2a9d8f;
+      --coral:   #e76f51;
+      --orange:  #f4a261;
+      --gold:    #e9c46a;
+      --text:    #fdf6ec;
+      --muted:   rgba(253,246,236,0.55);
+      --surface: #1d3a47;
       --font-px:   'Press Start 2P', monospace;
       --font-body: 'Cormorant Garamond', serif;
       --font-acc:  'Playfair Display', serif;
@@ -33,13 +32,9 @@
       font-family: var(--font-body);
       font-size: 18px;
       line-height: 1.7;
-      cursor: none;
       overflow-x: hidden;
     }
     a { color: inherit; text-decoration: none; }
-
-    /* ── SVG Grain filter ── */
-    .grain-filter { position: fixed; width: 0; height: 0; }
 
     /* ── Grain overlay ── */
     body::after {
@@ -48,31 +43,14 @@
       inset: 0;
       pointer-events: none;
       z-index: 9999;
-      opacity: 0.035;
+      opacity: 0.04;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-      background-repeat: repeat;
-      background-size: 128px 128px;
+      background-size: 128px;
     }
 
-    /* ══════════════════════════════════════
-       CUSTOM CURSOR
-    ══════════════════════════════════════ */
-    #cursor {
-      position: fixed;
-      top: 0; left: 0;
-      width: 28px; height: 28px;
-      pointer-events: none;
-      z-index: 99999;
-      transform: translate(-50%, -50%);
-      transition: transform 0.08s ease;
-    }
-    #cursor svg { width: 100%; height: 100%; }
-    body:not(:hover) #cursor { opacity: 0; }
-
-
-    /* ══════════════════════════════════════
+    /* ════════════════════
        NAV
-    ══════════════════════════════════════ */
+    ════════════════════ */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -81,10 +59,10 @@
       align-items: center;
       justify-content: space-between;
       padding: 1.2rem 3rem;
-      background: rgba(10,10,10,0.7);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(201,168,76,0.08);
+      background: rgba(26,53,66,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(233,196,106,0.08);
     }
     .nav-name {
       font-family: var(--font-px);
@@ -114,13 +92,11 @@
       position: absolute;
       bottom: 0; left: 0;
       width: 0; height: 1px;
-      background: var(--gold);
+      background: var(--coral);
       transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
     }
     .nav-links a:hover { color: var(--text); }
     .nav-links a:hover::after { width: 100%; }
-
-    /* music toggle */
     #music-toggle {
       font-family: var(--font-px);
       font-size: 0.5rem;
@@ -128,21 +104,17 @@
       background: rgba(38,70,83,0.6);
       border: 1px solid rgba(233,196,106,0.35);
       padding: 0.45rem 0.8rem;
-      cursor: none;
+      cursor: pointer;
       letter-spacing: 0.1em;
       transition: background 0.2s, border-color 0.2s, color 0.2s;
       white-space: nowrap;
     }
-    #music-toggle.playing {
-      background: rgba(42,157,143,0.25);
-      border-color: var(--green-mid);
-      color: var(--green-mid);
-    }
+    #music-toggle.playing { background: rgba(42,157,143,0.25); border-color: var(--teal); color: var(--teal); }
     #music-toggle:hover { border-color: var(--gold); }
 
-    /* ══════════════════════════════════════
-       ISO WORLD HERO
-    ══════════════════════════════════════ */
+    /* ════════════════════
+       ISO HERO
+    ════════════════════ */
     #hero {
       position: relative;
       height: 100vh;
@@ -170,7 +142,7 @@
       letter-spacing: 0.14em;
       color: var(--gold);
       background: rgba(5,3,15,0.82);
-      border: 1px solid rgba(201,168,76,0.35);
+      border: 1px solid rgba(233,196,106,0.35);
       padding: 0.5rem 1rem;
       display: inline-block;
       opacity: 0;
@@ -186,7 +158,7 @@
       pointer-events: none;
       font-family: var(--font-px);
       font-size: 0.35rem;
-      color: var(--muted);
+      color: rgba(253,246,236,0.45);
       letter-spacing: 0.1em;
       opacity: 0;
       white-space: nowrap;
@@ -218,209 +190,342 @@
       background: linear-gradient(to bottom, var(--gold), transparent);
       animation: scrollPulse 2s ease-in-out infinite;
     }
-    @keyframes fadeUp {
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
     @keyframes scrollPulse {
-      0%, 100% { opacity: 0.3; transform: scaleY(0.7); transform-origin: top; }
-      50%       { opacity: 1;   transform: scaleY(1);   transform-origin: top; }
+      0%,100% { opacity: 0.3; transform: scaleY(0.7); transform-origin: top; }
+      50%      { opacity: 1;   transform: scaleY(1);   transform-origin: top; }
     }
 
-    /* ══════════════════════════════════════
-       SECTION SHARED
-    ══════════════════════════════════════ */
+    /* ════════════════════
+       SHARED SECTION
+    ════════════════════ */
     section { padding: 7rem 3rem; }
-
-    .section-label {
+    .section-eyebrow {
       font-family: var(--font-body);
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       letter-spacing: 0.5em;
       text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 0.8rem;
+      color: var(--coral);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
-    .section-title {
-      font-family: var(--font-px);
-      font-size: clamp(0.75rem, 2vw, 1.2rem);
-      line-height: 2;
+    .section-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 32px;
+      height: 1px;
+      background: var(--coral);
+    }
+    .section-headline {
+      font-family: var(--font-acc);
+      font-style: italic;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      line-height: 1.15;
       color: var(--text);
-      margin-bottom: 4rem;
+      margin-bottom: 1rem;
     }
+    .section-headline em { color: var(--coral); font-style: normal; }
+    .section-headline span { color: var(--gold); }
 
-    /* ══════════════════════════════════════
-       WORK / PROJECTS
-    ══════════════════════════════════════ */
+    /* diagonal clip transitions */
+    .clip-top    { clip-path: polygon(0 4%, 100% 0, 100% 100%, 0 100%); margin-top: -4vw; padding-top: calc(7rem + 4vw); }
+    .clip-bottom { clip-path: polygon(0 0, 100% 0, 100% 96%, 0 100%); padding-bottom: calc(7rem + 4vw); }
+    .clip-both   { clip-path: polygon(0 4%, 100% 0, 100% 96%, 0 100%); margin-top: -4vw; padding-top: calc(7rem + 4vw); padding-bottom: calc(7rem + 4vw); }
+
+    /* ════════════════════
+       THE WORK
+    ════════════════════ */
     #work {
-      max-width: 1300px;
+      background: var(--deep);
+    }
+    .work-inner {
+      max-width: 1280px;
       margin: 0 auto;
     }
+    .work-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 4rem;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+    .work-see-all {
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--teal);
+      border-bottom: 1px solid var(--teal);
+      padding-bottom: 2px;
+      white-space: nowrap;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .work-see-all:hover { color: var(--gold); border-color: var(--gold); }
 
-    .projects-grid {
+    .featured-grid {
       display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      grid-template-rows: auto;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 480px 380px;
       gap: 1.5rem;
     }
-
-    .project-card {
+    .feat-card {
       position: relative;
       overflow: hidden;
-      border: 1px solid rgba(201,168,76,0.1);
-      background: var(--surface);
-      cursor: none;
+      cursor: pointer;
       opacity: 0;
-      transform: translateY(40px);
-      transition: opacity 0.7s ease, transform 0.7s ease, border-color 0.3s;
+      transform: translateY(32px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
     }
-    .project-card.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .project-card:hover {
-      border-color: rgba(201,168,76,0.4);
-    }
+    .feat-card.visible { opacity: 1; transform: translateY(0); }
+    .feat-card:nth-child(1) { grid-column: 1; grid-row: 1 / 3; }
+    .feat-card:nth-child(2) { grid-column: 2; grid-row: 1; }
+    .feat-card:nth-child(3) { grid-column: 2; grid-row: 2; }
+    .feat-card:nth-child(1) { transition-delay: 0s; }
+    .feat-card:nth-child(2) { transition-delay: 0.12s; }
+    .feat-card:nth-child(3) { transition-delay: 0.24s; }
 
-    /* asymmetric grid placement */
-    .project-card:nth-child(1) { grid-column: 1 / 8;  min-height: 420px; }
-    .project-card:nth-child(2) { grid-column: 8 / 13; min-height: 420px; }
-    .project-card:nth-child(3) { grid-column: 1 / 5;  min-height: 360px; }
-    .project-card:nth-child(4) { grid-column: 5 / 13; min-height: 360px; }
-
-    /* stagger */
-    .project-card:nth-child(1) { transition-delay: 0s; }
-    .project-card:nth-child(2) { transition-delay: 0.12s; }
-    .project-card:nth-child(3) { transition-delay: 0.24s; }
-    .project-card:nth-child(4) { transition-delay: 0.36s; }
-
-    /* card background gradients — each unique */
-    .project-card:nth-child(1) .card-bg {
-      background: linear-gradient(135deg, #0d1f14 0%, #1a3a28 40%, #0a1a10 100%);
-    }
-    .project-card:nth-child(2) .card-bg {
-      background: linear-gradient(160deg, #1a140a 0%, #3a2800 50%, #1a1000 100%);
-    }
-    .project-card:nth-child(3) .card-bg {
-      background: linear-gradient(120deg, #0a0a14 0%, #1a1a3a 60%, #0a0d1a 100%);
-    }
-    .project-card:nth-child(4) .card-bg {
-      background: linear-gradient(145deg, #0d1410 0%, #1a2e1e 45%, #0a1408 100%);
-    }
-
-    .card-bg {
+    .feat-bg {
       position: absolute;
       inset: 0;
-      transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+      transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
     }
-    .project-card:hover .card-bg { transform: scale(1.04); }
+    .feat-card:hover .feat-bg { transform: scale(1.06); }
 
-    /* grain flicker on hover */
-    .card-grain {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      background-size: 80px 80px;
-      mix-blend-mode: overlay;
-      transition: opacity 0.2s;
-    }
-    .project-card:hover .card-grain {
-      opacity: 0.18;
-      animation: grainFlicker 0.15s steps(2) infinite;
-    }
-    @keyframes grainFlicker {
-      0%   { background-position: 0 0; }
-      25%  { background-position: -20px 10px; }
-      50%  { background-position: 10px -15px; }
-      75%  { background-position: -5px 20px; }
-      100% { background-position: 15px -5px; }
-    }
+    .feat-card:nth-child(1) .feat-bg { background: linear-gradient(160deg,#0d2218 0%,#1a3a28 45%,#0a1a10 100%); }
+    .feat-card:nth-child(2) .feat-bg { background: linear-gradient(140deg,#1a1006 0%,#2e1c0a 50%,#120c00 100%); }
+    .feat-card:nth-child(3) .feat-bg { background: linear-gradient(150deg,#0a0e18 0%,#131c2e 55%,#060a14 100%); }
 
-    .card-overlay {
+    /* film-strip texture overlay */
+    .feat-strip {
       position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
-    }
-
-    .card-body {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      padding: 2rem 1.8rem;
+      top: 0; left: 0;
+      width: 22px;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      border-right: 1px solid rgba(233,196,106,0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      align-items: center;
       z-index: 2;
     }
-
-    .card-tag {
-      display: inline-block;
-      font-family: var(--font-body);
-      font-size: 0.7rem;
-      letter-spacing: 0.35em;
-      text-transform: uppercase;
-      color: var(--gold);
-      border: 1px solid rgba(201,168,76,0.4);
-      padding: 0.2rem 0.6rem;
-      margin-bottom: 0.8rem;
+    .feat-strip-hole {
+      width: 10px; height: 8px;
+      background: rgba(253,246,236,0.08);
+      border-radius: 1px;
     }
 
-    .card-title {
-      font-family: var(--font-px);
-      font-size: clamp(0.6rem, 1.4vw, 0.85rem);
-      line-height: 1.8;
+    .feat-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.3) 55%, transparent 100%);
+      z-index: 1;
+    }
+
+    /* coral left-border reveal on hover */
+    .feat-card::before {
+      content: '';
+      position: absolute;
+      left: 22px; top: 0;
+      width: 3px; height: 0;
+      background: var(--coral);
+      z-index: 3;
+      transition: height 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+    .feat-card:hover::before { height: 100%; }
+
+    .feat-body {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 2.2rem 2rem 2rem 2.8rem;
+      z-index: 4;
+    }
+    .feat-tag {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-size: 0.68rem;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: var(--coral);
+      border: 1px solid rgba(231,111,81,0.4);
+      padding: 0.18rem 0.65rem;
+      margin-bottom: 0.75rem;
+      transform: translateX(-6px);
+      opacity: 0;
+      transition: transform 0.4s ease 0.1s, opacity 0.4s ease 0.1s;
+    }
+    .feat-card:hover .feat-tag { transform: translateX(0); opacity: 1; }
+
+    .feat-title {
+      font-family: var(--font-acc);
+      font-style: italic;
+      font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+      line-height: 1.2;
       color: var(--text);
       margin-bottom: 0.6rem;
     }
+    .feat-card:nth-child(2) .feat-title,
+    .feat-card:nth-child(3) .feat-title { font-size: clamp(1.2rem, 2vw, 1.7rem); }
 
-    .card-desc {
+    .feat-desc {
       font-family: var(--font-body);
       font-size: 1rem;
       color: var(--muted);
-      line-height: 1.5;
-      margin-bottom: 1.2rem;
+      line-height: 1.55;
+      max-width: 420px;
+      transform: translateY(8px);
+      opacity: 0;
+      transition: transform 0.4s ease 0.18s, opacity 0.4s ease 0.18s;
     }
+    .feat-card:hover .feat-desc { transform: translateY(0); opacity: 1; }
 
-    .card-btn {
-      display: inline-block;
+    .feat-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1.2rem;
       font-family: var(--font-body);
       font-size: 0.85rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--gold);
-      border: 1px solid var(--gold);
-      padding: 0.5rem 1.2rem;
       opacity: 0;
-      transform: translateY(8px);
-      transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s, color 0.2s;
+      transform: translateY(6px);
+      transition: opacity 0.35s ease 0.28s, transform 0.35s ease 0.28s, color 0.2s;
     }
-    .project-card:hover .card-btn {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .card-btn:hover {
-      background: var(--gold);
-      color: var(--bg);
-    }
+    .feat-cta::after { content: '→'; transition: transform 0.2s; }
+    .feat-cta:hover { color: var(--coral); }
+    .feat-cta:hover::after { transform: translateX(4px); }
+    .feat-card:hover .feat-cta { opacity: 1; transform: translateY(0); }
 
-    /* decorative frame corners */
-    .card-corner {
+    /* ════════════════════
+       THE METHOD
+    ════════════════════ */
+    #method {
+      background: var(--bg);
+      border-top: 1px solid rgba(42,157,143,0.12);
+      border-bottom: 1px solid rgba(42,157,143,0.12);
+    }
+    .method-inner { max-width: 1180px; margin: 0 auto; }
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 0;
+      margin-top: 4rem;
+      border: 1px solid rgba(42,157,143,0.15);
+    }
+    .method-col {
+      padding: 3rem 2.5rem;
+      border-right: 1px solid rgba(42,157,143,0.15);
+      position: relative;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .method-col:last-child { border-right: none; }
+    .method-col.visible { opacity: 1; transform: translateY(0); }
+    .method-col:nth-child(1) { transition-delay: 0s; }
+    .method-col:nth-child(2) { transition-delay: 0.15s; }
+    .method-col:nth-child(3) { transition-delay: 0.30s; }
+
+    /* coral accent top bar */
+    .method-col::before {
+      content: '';
       position: absolute;
-      width: 18px; height: 18px;
-      border-color: rgba(201,168,76,0.3);
-      border-style: solid;
-      z-index: 3;
-      transition: border-color 0.3s, width 0.3s, height 0.3s;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--coral), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
     }
-    .project-card:hover .card-corner { border-color: rgba(201,168,76,0.7); width: 22px; height: 22px; }
-    .card-corner.tl { top: 12px; left: 12px; border-width: 1px 0 0 1px; }
-    .card-corner.tr { top: 12px; right: 12px; border-width: 1px 1px 0 0; }
-    .card-corner.bl { bottom: 12px; left: 12px; border-width: 0 0 1px 1px; }
-    .card-corner.br { bottom: 12px; right: 12px; border-width: 0 1px 1px 0; }
+    .method-col:hover::before { opacity: 1; }
 
-    /* ══════════════════════════════════════
+    .method-num {
+      font-family: var(--font-px);
+      font-size: 0.45rem;
+      color: var(--coral);
+      letter-spacing: 0.12em;
+      margin-bottom: 1.5rem;
+      opacity: 0.6;
+    }
+    .method-title {
+      font-family: var(--font-acc);
+      font-style: italic;
+      font-size: clamp(1.4rem, 2.2vw, 1.9rem);
+      color: var(--gold);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+    .method-arrow {
+      font-size: 1.2rem;
+      color: var(--coral);
+      opacity: 0.5;
+      margin-bottom: 0.5rem;
+    }
+    .method-body {
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .method-body strong { color: var(--text); font-weight: 500; }
+
+    /* ════════════════════
+       BY THE NUMBERS
+    ════════════════════ */
+    #numbers {
+      background: var(--deep);
+      text-align: center;
+    }
+    .numbers-inner { max-width: 1100px; margin: 0 auto; }
+    .numbers-grid {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 2rem;
+      margin-top: 4rem;
+    }
+    .stat-block {
+      padding: 2.5rem 1rem;
+      border: 1px solid rgba(233,196,106,0.1);
+      position: relative;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease, border-color 0.3s;
+    }
+    .stat-block.visible { opacity: 1; transform: translateY(0); }
+    .stat-block:hover { border-color: rgba(231,111,81,0.4); }
+    .stat-block:nth-child(1) { transition-delay: 0s; }
+    .stat-block:nth-child(2) { transition-delay: 0.1s; }
+    .stat-block:nth-child(3) { transition-delay: 0.2s; }
+    .stat-block:nth-child(4) { transition-delay: 0.3s; }
+
+    .stat-num {
+      font-family: var(--font-acc);
+      font-style: italic;
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      color: var(--coral);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .stat-suffix {
+      color: var(--gold);
+    }
+    .stat-label {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ════════════════════
        ABOUT
-    ══════════════════════════════════════ */
+    ════════════════════ */
     #about {
-      background: var(--surface);
-      border-top: 1px solid rgba(201,168,76,0.08);
-      border-bottom: 1px solid rgba(201,168,76,0.08);
+      background: var(--bg);
     }
     .about-inner {
       max-width: 1200px;
@@ -429,112 +534,229 @@
     .about-grid {
       display: grid;
       grid-template-columns: 1fr 1.1fr;
-      gap: 5rem;
+      gap: 6rem;
       align-items: start;
     }
-
-    .about-quote-col {
-      position: relative;
-    }
-
     .about-quote {
       font-family: var(--font-acc);
       font-style: italic;
-      font-size: clamp(1.6rem, 3vw, 2.4rem);
-      line-height: 1.45;
+      font-size: clamp(1.5rem, 2.6vw, 2.2rem);
+      line-height: 1.5;
       color: var(--gold);
       position: relative;
       padding-left: 2rem;
+      border-left: 2px solid var(--coral);
     }
-    .about-quote::before {
-      content: '\201C';
-      position: absolute;
-      left: -0.2rem;
-      top: -0.5rem;
-      font-size: 5rem;
-      line-height: 1;
-      color: var(--green-mid);
-      opacity: 0.6;
-      font-family: var(--font-acc);
+    .about-quote cite {
+      display: block;
+      margin-top: 1.5rem;
+      font-family: var(--font-body);
+      font-style: normal;
+      font-size: 0.8rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--coral);
     }
 
-    /* pixel art camera icon */
-          <!-- character sticker -->
-          <svg viewBox="-4 0 40 56" width="160" height="224"
-  xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated;
-  filter:drop-shadow(0 0 6px rgba(57,255,110,0.3));margin-top:2rem"
-  aria-hidden="true">
-  <defs>
-    <filter id="ao" x="-20%" y="-10%" width="140%" height="120%" color-interpolation-filters="sRGB">
-      <feMorphology operator="dilate" radius="1" in="SourceAlpha" result="d"/>
-      <feFlood flood-color="#c8f8e0" flood-opacity="0.8" result="w"/>
-      <feComposite in="w" in2="d" operator="in" result="o"/>
-      <feMerge><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-  <g filter="url(#ao)">
-    <!-- hair spikes -->
-    <rect x="6" y="0" width="2" height="7" fill="#18183a"/>
-    <rect x="24" y="0" width="2" height="7" fill="#18183a"/>
-    <rect x="6" y="0" width="2" height="3" fill="#39ff6e"/>
-    <rect x="24" y="0" width="2" height="3" fill="#39ff6e"/>
-    <!-- hair mass -->
-    <rect x="5" y="5" width="22" height="6" fill="#18183a"/>
-    <rect x="2" y="7" width="4" height="7" fill="#222248"/>
-    <rect x="26" y="7" width="4" height="7" fill="#222248"/>
-    <!-- face -->
-    <rect x="6" y="9" width="20" height="15" fill="#edded0"/>
-    <rect x="14" y="9" width="4" height="3" fill="#2a9d8f"/>
-    <rect x="15" y="9" width="2" height="2" fill="#55ffcc"/>
-    <!-- eyes -->
-    <rect x="7" y="13" width="6" height="5" fill="#00cc88"/>
-    <rect x="8" y="14" width="4" height="3" fill="#021008"/>
-    <rect x="7" y="13" width="2" height="2" fill="#55ffcc"/>
-    <rect x="19" y="13" width="6" height="5" fill="#00cc88"/>
-    <rect x="20" y="14" width="4" height="3" fill="#021008"/>
-    <rect x="23" y="13" width="2" height="2" fill="#55ffcc"/>
-    <!-- cheek marks -->
-    <rect x="7" y="18" width="4" height="2" fill="#dd2244" opacity="0.7"/>
-    <rect x="21" y="18" width="4" height="2" fill="#dd2244" opacity="0.7"/>
-    <!-- neck -->
-    <rect x="14" y="24" width="4" height="3" fill="#edded0"/>
-    <!-- body -->
-    <rect x="7" y="26" width="18" height="4" fill="#1a3040"/>
-    <rect x="10" y="30" width="12" height="7" fill="#2a9d8f"/>
-    <rect x="14" y="27" width="2" height="10" fill="#0d1e2c"/>
-    <!-- sash -->
-    <rect x="11" y="31" width="4" height="2" fill="#f0ede8"/>
-    <rect x="10" y="33" width="6" height="2" fill="#f0ede8"/>
-    <rect x="9" y="35" width="8" height="2" fill="#f0ede8"/>
-    <!-- belt -->
-    <rect x="8" y="37" width="16" height="2" fill="#f0ede8"/>
-    <rect x="13" y="37" width="6" height="2" fill="#e9c46a"/>
-    <!-- pants -->
-    <rect x="9" y="39" width="6" height="9" fill="#162040"/>
-    <rect x="17" y="39" width="6" height="9" fill="#162040"/>
-    <rect x="15" y="39" width="2" height="5" fill="#0a0a14"/>
-    <!-- flares -->
-    <rect x="7" y="45" width="9" height="3" fill="#162040"/>
-    <rect x="16" y="45" width="9" height="3" fill="#162040"/>
-    <!-- boots -->
-    <rect x="6" y="48" width="10" height="4" fill="#140e08"/>
-    <rect x="16" y="48" width="10" height="4" fill="#140e08"/>
-    <!-- arms (V-pose) -->
-    <rect x="3" y="28" width="5" height="4" fill="#2a9d8f"/>
-    <rect x="0" y="32" width="5" height="4" fill="#2a9d8f"/>
-    <rect x="0" y="35" width="4" height="3" fill="#edded0"/>
-    <rect x="24" y="28" width="5" height="4" fill="#2a9d8f"/>
-    <rect x="27" y="32" width="5" height="4" fill="#2a9d8f"/>
-    <rect x="28" y="35" width="4" height="3" fill="#edded0"/>
-  </g>
-</svg>
+    /* filmstrip decoration */
+    .filmstrip {
+      display: flex;
+      gap: 3px;
+      margin-top: 2.5rem;
+      align-items: center;
+    }
+    .film-frame {
+      flex: 1;
+      aspect-ratio: 4/3;
+      background: rgba(42,157,143,0.06);
+      border: 1px solid rgba(42,157,143,0.15);
+      position: relative;
+    }
+    .film-frame::before,
+    .film-frame::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px; height: 6px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 1px;
+    }
+    .film-frame::before { top: 3px; }
+    .film-frame::after  { bottom: 3px; }
+    .film-frame.active {
+      background: rgba(231,111,81,0.12);
+      border-color: rgba(231,111,81,0.35);
+    }
+
+    .about-bio {
+      font-family: var(--font-body);
+      font-size: 1.15rem;
+      color: rgba(253,246,236,0.75);
+      line-height: 1.75;
+      margin-bottom: 1.5rem;
+    }
+    .craft-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem 1.5rem;
+      margin-top: 2rem;
+    }
+    .craft-list li {
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      color: var(--muted);
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(42,157,143,0.12);
+    }
+    .craft-list strong {
+      color: var(--teal);
+      font-weight: 600;
+    }
+
+    /* ════════════════════
+       CONTACT
+    ════════════════════ */
+    #contact {
+      background: var(--deep);
+    }
+    .contact-inner {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .contact-intro {
+      font-family: var(--font-body);
+      font-size: 1.2rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 3.5rem;
+      max-width: 580px;
+    }
+    .contact-form { display: flex; flex-direction: column; gap: 1.4rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
+    .field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .field label {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--teal);
+    }
+    .field input,
+    .field select,
+    .field textarea {
+      background: rgba(26,53,66,0.6);
+      border: 1px solid rgba(42,157,143,0.25);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      padding: 0.85rem 1rem;
+      outline: none;
+      transition: border-color 0.25s;
+      -webkit-appearance: none;
+    }
+    .field input::placeholder,
+    .field textarea::placeholder { color: rgba(253,246,236,0.2); }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus { border-color: var(--coral); }
+    .field select option { background: var(--deep); }
+    .field textarea { min-height: 140px; resize: vertical; }
+    .submit-btn {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--coral);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 1rem 2.5rem;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.25s, transform 0.15s;
+    }
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.08);
+      transform: translateX(-101%);
+      transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .submit-btn:hover { background: #d4613f; transform: translateY(-2px); }
+    .submit-btn:hover::before { transform: translateX(0); }
+
+    /* ════════════════════
+       FOOTER
+    ════════════════════ */
+    #footer {
+      background: var(--deep);
+      border-top: 1px solid rgba(233,196,106,0.08);
+      padding: 2.5rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-name {
+      font-family: var(--font-px);
+      font-size: 0.45rem;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+    }
+    .footer-tagline {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .footer-easter {
+      font-family: var(--font-body);
+      font-style: italic;
+      font-size: 0.85rem;
+      color: transparent;
+      transition: color 0.4s;
+    }
+    .footer-easter.revealed { color: var(--coral); }
+
+    /* ════════════════════
+       RESPONSIVE
+    ════════════════════ */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { gap: 1.5rem; }
+      section { padding: 5rem 1.5rem; }
+      .featured-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .feat-card:nth-child(1),
+      .feat-card:nth-child(2),
+      .feat-card:nth-child(3) { grid-column: 1; grid-row: auto; min-height: 320px; }
+      .method-grid { grid-template-columns: 1fr; }
+      .method-col { border-right: none; border-bottom: 1px solid rgba(42,157,143,0.15); }
+      .numbers-grid { grid-template-columns: repeat(2,1fr); }
+      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .form-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .numbers-grid { grid-template-columns: 1fr 1fr; }
+      .craft-list { grid-template-columns: 1fr; }
+      .submit-btn { align-self: stretch; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
 
   <!-- ── Nav ── -->
   <nav>
     <div class="nav-name">P.<br>Law</div>
     <ul class="nav-links">
       <li><a href="#work">Work</a></li>
-      <li><a href="#skills-section">Skills</a></li>
+      <li><a href="#method">Method</a></li>
       <li><a href="#about">About</a></li>
       <li><a href="#contact">Hire Me</a></li>
     </ul>
@@ -542,7 +764,7 @@
   </nav>
 
   <!-- ── ISO World Hero ── -->
-  <section id="hero" aria-label="Isometric world — Prakit's journey">
+  <section id="hero" aria-label="Isometric world — P. Law's journey">
     <canvas id="iso-canvas"></canvas>
     <div id="zone-label"><span id="zone-name"></span></div>
     <div id="iso-controls">WASD / ARROW KEYS — explore the world</div>
@@ -552,507 +774,62 @@
     </div>
   </section>
 
-  <!-- ── Skills Graphic ── -->
-<!-- ── Skills Playground ── -->
-<!-- ── Skills Playground ── -->
-  <section id="skills-section" style="padding:0;overflow:hidden;position:relative;">
-  <style>
-    #skills-section { background:#04030e; }
-    #pg-tron {
-      position:absolute;inset:0;pointer-events:none;z-index:0;opacity:.045;
-      background-image:
-        linear-gradient(rgba(57,255,110,.9) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(57,255,110,.9) 1px,transparent 1px);
-      background-size:48px 48px;
-    }
-    #pg-wrap {
-      max-width:1140px;margin:0 auto;
-      padding:5rem 2rem 4rem;
-      position:relative;z-index:1;
-      display:flex;flex-direction:column;align-items:center;gap:2rem;
-    }
-
-    /* ── main area: sticker + cards ── */
-    #pg-main {
-      display:grid;
-      grid-template-columns:180px 1fr;
-      gap:2rem;
-      width:100%;
-      align-items:start;
-    }
-
-    /* ── character sticker ── */
-    #sticker-col {
-      display:flex;flex-direction:column;align-items:center;gap:1rem;
-    }
-    #char-canvas {
-      width:128px;height:208px;
-      image-rendering:pixelated;image-rendering:crisp-edges;
-      filter:drop-shadow(0 0 10px rgba(57,255,110,0.3));
-      transition:filter .3s;
-    }
-    #char-canvas.flash { filter:drop-shadow(0 0 22px var(--glow-c,#39ff6e)) brightness(1.2); }
-    #sticker-label {
-      font-family:var(--font-px);font-size:.36rem;letter-spacing:.12em;
-      color:var(--act-col,#39ff6e);text-shadow:0 0 8px currentColor;
-      text-align:center;white-space:nowrap;min-height:1.4em;
-    }
-    #sticker-flavor {
-      font-family:var(--font-body);font-size:.82rem;color:var(--muted);
-      text-align:center;line-height:1.6;max-width:160px;min-height:2.8em;
-    }
-    #sticker-stats {
-      font-family:var(--font-px);font-size:.26rem;letter-spacing:.1em;
-      color:var(--act-col,#39ff6e);opacity:.7;text-align:center;
-    }
-    #export-btn {
-      font-family:var(--font-px);font-size:.28rem;letter-spacing:.07em;
-      color:var(--muted);background:rgba(10,10,20,.7);
-      border:1px solid rgba(139,188,184,.2);padding:.45rem .8rem;
-      cursor:none;transition:border-color .2s,color .2s;white-space:nowrap;
-    }
-    #export-btn:hover{border-color:var(--gold);color:var(--gold);}
-
-    /* ── big skill cards ── */
-    #cards-grid {
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:1rem;
-    }
-    .big-card {
-      position:relative;
-      background:rgba(4,3,14,0.92);
-      border:1px solid color-mix(in srgb,var(--sk),transparent 55%);
-      padding:1rem;cursor:none;
-      display:flex;flex-direction:column;align-items:center;gap:.5rem;
-      transition:border-color .2s,transform .18s,box-shadow .2s;
-      transform:rotate(var(--tilt,0deg));
-    }
-    .big-card:hover {
-      border-color:var(--sk);
-      box-shadow:0 0 18px color-mix(in srgb,var(--sk),transparent 40%),
-        inset 0 0 10px color-mix(in srgb,var(--sk),transparent 80%);
-      transform:rotate(0) translateY(-5px);z-index:2;
-    }
-    .big-card.active {
-      border-color:var(--sk);
-      box-shadow:0 0 28px var(--sk),
-        inset 0 0 16px color-mix(in srgb,var(--sk),transparent 75%);
-      transform:rotate(0) scale(1.04);z-index:3;
-    }
-    .bc-corner {position:absolute;width:12px;height:12px;border-color:var(--sk);border-style:solid;transition:width .2s,height .2s;}
-    .big-card:hover .bc-corner,.big-card.active .bc-corner{width:16px;height:16px;}
-    .bc-tl{top:6px;left:6px;border-width:1px 0 0 1px;}
-    .bc-tr{top:6px;right:6px;border-width:1px 1px 0 0;}
-    .bc-bl{bottom:6px;left:6px;border-width:0 0 1px 1px;}
-    .bc-br{bottom:6px;right:6px;border-width:0 1px 1px 0;}
-    .bc-icon-area {
-      width:80px;height:72px;display:flex;align-items:center;justify-content:center;
-      background:rgba(0,0,0,.5);
-      border:1px solid color-mix(in srgb,var(--sk),transparent 65%);
-    }
-    .bc-name {
-      font-family:var(--font-px);font-size:.38rem;letter-spacing:.12em;
-      color:var(--sk);text-align:center;line-height:1.9;
-    }
-    .bc-sub {
-      font-family:var(--font-body);font-size:.72rem;color:var(--muted);
-      letter-spacing:.15em;text-transform:uppercase;text-align:center;
-    }
-    .bc-stats {
-      font-family:var(--font-px);font-size:.27rem;color:var(--sk);
-      opacity:.65;letter-spacing:.06em;text-align:center;
-    }
-
-    /* stagger tilts */
-    .big-card:nth-child(odd)  {--tilt:-1.2deg;}
-    .big-card:nth-child(even) {--tilt: 1.2deg;}
-
-    /* passive panel */
-    #passive-panel {
-      background:rgba(4,3,14,.9);border:1px solid rgba(233,196,106,.18);
-      padding:.85rem 1.4rem;
-      display:none;flex-direction:row;align-items:flex-start;gap:.9rem;
-      width:100%;max-width:1140px;
-    }
-    #passive-panel.show {display:flex;}
-    #passive-icon {
-      font-family:var(--font-px);font-size:.45rem;color:var(--gold);
-      border:1px solid rgba(233,196,106,.35);padding:.3rem .7rem;
-      white-space:nowrap;flex-shrink:0;
-    }
-    #passive-text {font-family:var(--font-body);font-size:.88rem;color:var(--muted);font-style:italic;line-height:1.6;}
-    #passive-lbl  {font-family:var(--font-px);font-size:.26rem;letter-spacing:.12em;color:var(--gold);margin-bottom:.3rem;}
-
-    /* scan lines */
-    #pg-wrap::before {content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
-      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.09) 3px,rgba(0,0,0,.09) 4px);}
-    #pg-wrap>*{position:relative;z-index:1;}
-
-    #kb-hint {font-family:var(--font-px);font-size:.26rem;letter-spacing:.1em;color:var(--muted);opacity:.4;text-align:center;}
-
-    @keyframes char-pulse {0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)}}
-    #char-canvas.idle-float { animation:char-pulse 3s ease-in-out infinite; }
-
-    @media(max-width:900px){
-      #pg-main{grid-template-columns:1fr;}
-      #sticker-col{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:1rem;}
-      #cards-grid{grid-template-columns:repeat(3,1fr);}
-    }
-    @media(max-width:600px){
-      #cards-grid{grid-template-columns:repeat(2,1fr);}
-    }
-  </style>
-
-  <div id="pg-tron"></div>
-  <div id="pg-wrap">
-    <div style="text-align:center">
-      <p class="section-label">The Playground</p>
-      <h2 class="section-title" style="margin-bottom:.2rem">SKILL LOADOUT</h2>
-      <p style="font-family:var(--font-body);font-size:.8rem;color:var(--muted);letter-spacing:.2em;text-transform:uppercase">
-        Click a card — or press 1–7
-      </p>
-    </div>
-
-    <div id="pg-main">
-      <!-- LEFT: character sticker -->
-      <div id="sticker-col">
-        <canvas id="char-canvas" width="32" height="52"></canvas>
-        <div id="sticker-label">◆ P. LAW ◆</div>
-        <div id="sticker-flavor">← select a skill</div>
-        <div id="sticker-stats"></div>
-        <button id="export-btn">&#128247; STICKER PNG</button>
+  <!-- ── THE WORK ── -->
+  <section id="work" class="clip-top">
+    <div class="work-inner">
+      <div class="work-header">
+        <div>
+          <p class="section-eyebrow">Selected Work</p>
+          <h2 class="section-headline">Stories That <em>Move</em></h2>
+        </div>
+        <a href="#contact" class="work-see-all">Commission a Project →</a>
       </div>
 
-      <!-- RIGHT: big skill cards grid -->
-      <div id="cards-grid">
-        <div class="big-card bc-strike" data-skill="strike"
-      data-flavor="Sprint before they react.<br><em>When work is done — vanish.</em>"
-      data-stats="ATK+20 • SPD+15"
-      data-passive="Grants +8 momentum every morning jog. Doubles on Fridays at 4:59pm."
-      style="--sk:#39ff6e">
-  <div class="bc-corner bc-tl"></div><div class="bc-corner bc-tr"></div>
-  <div class="bc-corner bc-bl"></div><div class="bc-corner bc-br"></div>
-  <div class="bc-icon-area">
-    <svg viewBox="-4 0 60 54" width="80" height="72" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="24" y="0" width="6" height="42" fill="#39ff6e"/><rect x="24" y="0" width="6" height="15" fill="#b0ffcc"/><rect x="24" y="0" width="3" height="6" fill="#fff" opacity="0.7"/><rect x="15" y="24" width="24" height="6" fill="#e9c46a"/><rect x="24" y="30" width="6" height="12" fill="#0a0a14"/><rect x="9" y="12" width="12" height="6" fill="#39ff6e" opacity="0.6"/><rect x="15" y="6" width="6" height="6" fill="#b0ffcc" opacity="0.5"/></svg>
-  </div>
-  <div class="bc-name">STRIKE</div>
-  <div class="bc-sub">Running Hobby</div>
-  <div class="bc-stats">ATK+20 • SPD+15</div>
-</div>
-  <div class="big-card bc-guard" data-skill="guard"
-      data-flavor="Coordinate your fit.<br><em>Block with aesthetic discipline.</em>"
-      data-stats="DEF+15 • STYLE+∞"
-      data-passive="COLORLOCK passive: matching top+bottom reduces incoming chaos by 40%."
-      style="--sk:#e9c46a">
-  <div class="bc-corner bc-tl"></div><div class="bc-corner bc-tr"></div>
-  <div class="bc-corner bc-bl"></div><div class="bc-corner bc-br"></div>
-  <div class="bc-icon-area">
-    <svg viewBox="-4 0 60 54" width="80" height="72" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="12" y="3" width="24" height="33" fill="#e9c46a"/><rect x="15" y="6" width="18" height="27" fill="#ccaa00"/><rect x="15" y="3" width="18" height="6" fill="#ffee44"/><rect x="12" y="30" width="24" height="9" fill="#996600"/><rect x="21" y="12" width="6" height="15" fill="#333300"/><rect x="18" y="15" width="12" height="3" fill="#ffee44"/><rect x="18" y="15" width="3" height="9" fill="#ffee44"/><rect x="21" y="21" width="9" height="3" fill="#ffee44"/><rect x="21" y="30" width="6" height="6" fill="#ffee44"/></svg>
-  </div>
-  <div class="bc-name">GUARD</div>
-  <div class="bc-sub">Matching Clothes</div>
-  <div class="bc-stats">DEF+15 • STYLE+∞</div>
-</div>
-  <div class="big-card bc-critical" data-skill="critical"
-      data-flavor="When the pipeline goes brr.<br><em>Sequenced. Systematic. Satisfying.</em>"
-      data-stats="COMBO+30 • CRIT+25"
-      data-passive="12 closed tickets = CRITICAL ACTIVATE. Breaks everything, beautifully."
-      style="--sk:#ffcc44">
-  <div class="bc-corner bc-tl"></div><div class="bc-corner bc-tr"></div>
-  <div class="bc-corner bc-bl"></div><div class="bc-corner bc-br"></div>
-  <div class="bc-icon-area">
-    <svg viewBox="-4 0 60 54" width="80" height="72" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="24" y="0" width="6" height="45" fill="#39ff6e"/><rect x="24" y="0" width="6" height="18" fill="#b0ffcc"/><rect x="24" y="0" width="3" height="9" fill="#fff" opacity="0.8"/><rect x="15" y="27" width="18" height="6" fill="#e9c46a"/><rect x="24" y="33" width="6" height="9" fill="#0a0a14"/><rect x="18" y="21" width="12" height="12" fill="#39ff6e" opacity="0.25"/><rect x="12" y="0" width="6" height="6" fill="#b0ffcc" opacity="0.9"/><rect x="36" y="0" width="6" height="6" fill="#b0ffcc" opacity="0.9"/></svg>
-  </div>
-  <div class="bc-name">CRITICAL</div>
-  <div class="bc-sub">Workflow Ops</div>
-  <div class="bc-stats">COMBO+30 • CRIT+25</div>
-</div>
-  <div class="big-card bc-gun" data-skill="gun"
-      data-flavor="Load ALL contingencies.<br><em>Fire before they finish asking.</em>"
-      data-stats="RANGE+50 • PREP+200"
-      data-passive="SPREADSHEET STANCE: +10 ATK per backup plan doc currently open."
-      style="--sk:#66ccff">
-  <div class="bc-corner bc-tl"></div><div class="bc-corner bc-tr"></div>
-  <div class="bc-corner bc-bl"></div><div class="bc-corner bc-br"></div>
-  <div class="bc-icon-area">
-    <svg viewBox="-4 0 60 54" width="80" height="72" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="0" y="15" width="48" height="15" fill="#334422"/><rect x="0" y="15" width="48" height="6" fill="#667744"/><rect x="0" y="21" width="48" height="6" fill="#39ff6e"/><rect x="-3" y="15" width="6" height="6" fill="#667744"/><rect x="-3" y="24" width="6" height="6" fill="#667744"/><rect x="-3" y="33" width="6" height="6" fill="#667744"/><rect x="36" y="15" width="12" height="15" fill="#39ff6e"/><rect x="39" y="21" width="6" height="6" fill="#e9c46a"/><rect x="-9" y="15" width="9" height="18" fill="#39ff6e" opacity="0.8"/></svg>
-  </div>
-  <div class="bc-name">GUN BLAST</div>
-  <div class="bc-sub">Over-Planning</div>
-  <div class="bc-stats">RANGE+50 • PREP+200</div>
-</div>
-  <div class="big-card bc-photo" data-skill="photo"
-      data-flavor="Shoot first.<br><em>Model release? Never heard of her.</em>"
-      data-stats="FOCUS+40 • ARTS+15"
-      data-passive="DECISIVE MOMENT: locks best frame 0.3s before it happens. Eerie."
-      style="--sk:#e76f51">
-  <div class="bc-corner bc-tl"></div><div class="bc-corner bc-tr"></div>
-  <div class="bc-corner bc-bl"></div><div class="bc-corner bc-br"></div>
-  <div class="bc-icon-area">
-    <svg viewBox="-4 0 60 54" width="80" height="72" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="0" y="9" width="45" height="27" fill="#333344"/><rect x="3" y="12" width="39" height="21" fill="#666677"/><rect x="9" y="12" width="21" height="21" fill="#222233"/><rect x="12" y="15" width="15" height="15" fill="#0033aa"/><rect x="15" y="18" width="9" height="12" fill="#4477ff"/><rect x="18" y="21" width="3" height="6" fill="#aabbff"/><rect x="33" y="9" width="12" height="9" fill="#333344"/><rect x="0" y="9" width="30" height="6" fill="#aaa"/><rect x="39" y="12" width="6" height="3" fill="#fff" opacity="0.7"/></svg>
-  </div>
-  <div class="bc-name">SNAP FOCUS</div>
-  <div class="bc-sub">Photography</div>
-  <div class="bc-stats">FOCUS+40 • ARTS+15</div>
-</div>
-  <div class="big-card bc-dash" data-skill="dash"
-      data-flavor="Outrun every deadline.<br><em>Cardio is a coping mechanism.</em>"
-      data-stats="SPD+35 • EVADE+20"
-      data-passive="RUNNER'S HIGH: after 5km all debuffs become buffs. Suffering = power."
-      style="--sk:#00ddff">
-  <div class="bc-corner bc-tl"></div><div class="bc-corner bc-tr"></div>
-  <div class="bc-corner bc-bl"></div><div class="bc-corner bc-br"></div>
-  <div class="bc-icon-area">
-    <svg viewBox="-4 0 60 54" width="80" height="72" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="3" y="18" width="12" height="12" fill="#aaddff"/><rect x="0" y="15" width="39" height="6" fill="#39ff6e" opacity="0.5"/><rect x="0" y="24" width="33" height="6" fill="#39ff6e" opacity="0.35"/><rect x="0" y="33" width="24" height="6" fill="#39ff6e" opacity="0.2"/><rect x="24" y="6" width="12" height="21" fill="#2a9d8f"/><rect x="27" y="9" width="6" height="15" fill="#3ab8a8"/></svg>
-  </div>
-  <div class="bc-name">DASH RUSH</div>
-  <div class="bc-sub">Running (Cardio)</div>
-  <div class="bc-stats">SPD+35 • EVADE+20</div>
-</div>
-  <div class="big-card bc-runaway" data-skill="runaway"
-      data-flavor="404: Employee not found.<br><em>Sprint velocity: MAX. Dignity: −10.</em>"
-      data-stats="SPD+99 • DIGNITY-10"
-      data-passive="GONE AT 5PM: auto-triggers Fridays. Cannot be interrupted. Final form."
-      style="--sk:#ff66aa">
-  <div class="bc-corner bc-tl"></div><div class="bc-corner bc-tr"></div>
-  <div class="bc-corner bc-bl"></div><div class="bc-corner bc-br"></div>
-  <div class="bc-icon-area">
-    <svg viewBox="-4 0 60 54" width="80" height="72" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="6" y="24" width="33" height="15" fill="#2a9d8f"/><rect x="3" y="30" width="36" height="9" fill="#3ab8a8"/><rect x="6" y="21" width="12" height="6" fill="#1a3040"/><rect x="30" y="18" width="9" height="6" fill="#f0ede8"/><rect x="0" y="39" width="33" height="6" fill="#0a0a14"/><rect x="6" y="27" width="9" height="9" fill="#f0ede8"/><rect x="27" y="27" width="9" height="3" fill="#e9c46a"/><rect x="36" y="6" width="9" height="12" fill="#88ccff" opacity="0.9"/></svg>
-  </div>
-  <div class="bc-name">ESCAPE ROUTE</div>
-  <div class="bc-sub">Running (Again)</div>
-  <div class="bc-stats">SPD+99 • DIGNITY-10</div>
-</div>
-      </div>
-    </div>
+      <div class="featured-grid">
 
-    <!-- Passive panel -->
-    <div id="passive-panel">
-      <div id="passive-icon">PASSIVE</div>
-      <div style="flex:1"><div id="passive-lbl">Passive Ability</div><div id="passive-text"></div></div>
-    </div>
-
-    <div id="kb-hint">[ 1 ] STRIKE &nbsp;&nbsp; [ 2 ] GUARD &nbsp;&nbsp; [ 3 ] CRITICAL &nbsp;&nbsp; [ 4 ] GUN &nbsp;&nbsp; [ 5 ] SNAP &nbsp;&nbsp; [ 6 ] DASH &nbsp;&nbsp; [ 7 ] ESCAPE</div>
-  </div>
-
-  <script>
-  (function PG(){
-    // ── Palette ──
-    const C={"_":"transparent","hd":"#0d0d22","hm":"#18183a","hl":"#222248","hg":"#39ff6e","hn":"#b8ffcc","sk":"#edded0","et":"#006644","eg":"#00cc88","eh":"#55ffcc","ep":"#021008","jd":"#0d1e2c","jm":"#1a3040","jl":"#2a9d8f","jh":"#3ab8a8","wh":"#f0ede8","gd":"#e9c46a","pa":"#162040","bt":"#140e08","bk":"#0a0a14","ng":"#39ff6e","nb":"#b0ffcc","rd":"#dd2244","cm":"#666677","cd":"#333344","cb":"#99aabb","gm":"#334422","gl":"#667744"};
-    // ── Pose data ──
-    const POSES = {
-  idle: [[6,0,2,7,"hg"],[6,0,2,3,"hn"],[24,0,2,7,"hg"],[24,0,2,3,"hn"],[5,1,3,6,"hm"],[5,1,3,2,"hg"],[24,1,3,6,"hm"],[24,1,3,2,"hg"],[5,5,22,6,"hm"],[2,7,5,7,"hm"],[25,7,5,7,"hm"],[1,6,3,10,"hl"],[28,6,3,10,"hl"],[6,5,4,3,"hg"],[22,5,4,3,"hg"],[6,9,20,15,"sk"],[14,9,4,3,"jl"],[15,9,2,2,"eh"],[7,12,6,2,"hm"],[19,12,6,2,"hm"],[7,13,7,5,"eg"],[8,14,5,3,"ep"],[8,14,2,2,"et"],[7,13,2,2,"eh"],[18,13,7,5,"eg"],[19,14,5,3,"ep"],[21,14,2,2,"et"],[23,13,2,2,"eh"],[7,18,5,2,"rd"],[20,18,5,2,"rd"],[15,21,2,1,"sk"],[13,22,6,1,"jd"],[14,24,4,3,"sk"],[11,26,10,3,"jd"],[7,28,18,4,"jm"],[7,28,3,4,"jd"],[22,28,3,4,"jd"],[10,32,12,6,"jl"],[15,28,2,10,"jd"],[12,29,4,2,"wh"],[11,31,5,2,"wh"],[10,33,6,2,"wh"],[9,35,8,2,"wh"],[13,37,6,1,"gd"],[8,37,16,2,"wh"],[13,37,6,2,"gd"],[9,39,6,9,"pa"],[17,39,6,9,"pa"],[15,39,2,5,"bk"],[7,45,9,3,"pa"],[16,45,9,3,"pa"],[6,47,10,2,"pa"],[16,47,10,2,"pa"],[6,49,11,3,"bt"],[15,49,11,3,"bt"],[5,51,8,1,"bt"],[19,51,8,1,"bt"],[3,28,5,4,"jl"],[0,32,5,4,"jl"],[0,35,4,3,"sk"],[24,28,5,4,"jl"],[27,32,5,4,"jl"],[28,35,4,3,"sk"]],
-  strike: [[6,0,2,7,"hg"],[6,0,2,3,"hn"],[24,0,2,7,"hg"],[24,0,2,3,"hn"],[5,1,3,6,"hm"],[5,1,3,2,"hg"],[24,1,3,6,"hm"],[24,1,3,2,"hg"],[5,5,22,6,"hm"],[2,7,5,7,"hm"],[25,7,5,7,"hm"],[1,6,3,10,"hl"],[28,6,3,10,"hl"],[6,5,4,3,"hg"],[22,5,4,3,"hg"],[6,9,20,15,"sk"],[14,9,4,3,"jl"],[15,9,2,2,"eh"],[7,12,6,2,"hm"],[19,12,6,2,"hm"],[7,13,7,5,"eg"],[8,14,5,3,"ep"],[8,14,2,2,"et"],[7,13,2,2,"eh"],[18,13,7,5,"eg"],[19,14,5,3,"ep"],[21,14,2,2,"et"],[23,13,2,2,"eh"],[7,18,5,2,"rd"],[20,18,5,2,"rd"],[15,21,2,1,"sk"],[13,22,6,1,"jd"],[14,24,4,3,"sk"],[11,26,10,3,"jd"],[7,28,18,4,"jm"],[7,28,3,4,"jd"],[22,28,3,4,"jd"],[10,32,12,6,"jl"],[15,28,2,10,"jd"],[12,29,4,2,"wh"],[11,31,5,2,"wh"],[10,33,6,2,"wh"],[9,35,8,2,"wh"],[13,37,6,1,"gd"],[8,37,16,2,"wh"],[13,37,6,2,"gd"],[9,39,6,9,"pa"],[17,39,6,9,"pa"],[15,39,2,5,"bk"],[7,45,9,3,"pa"],[16,45,9,3,"pa"],[6,47,10,2,"pa"],[16,47,10,2,"pa"],[6,49,11,3,"bt"],[15,49,11,3,"bt"],[5,51,8,1,"bt"],[19,51,8,1,"bt"],[4,28,5,4,"jl"],[2,32,5,4,"jl"],[1,35,4,3,"sk"],[23,26,5,4,"jl"],[26,23,5,4,"jl"],[28,20,4,3,"sk"],[29,3,2,19,"ng"],[29,3,2,6,"nb"],[29,3,1,2,"wh"],[26,21,7,2,"gd"],[29,23,2,4,"bk"],[27,7,2,2,"ng"],[30,4,2,2,"nb"]],
-  guard: [[6,0,2,7,"hg"],[6,0,2,3,"hn"],[24,0,2,7,"hg"],[24,0,2,3,"hn"],[5,1,3,6,"hm"],[5,1,3,2,"hg"],[24,1,3,6,"hm"],[24,1,3,2,"hg"],[5,5,22,6,"hm"],[2,7,5,7,"hm"],[25,7,5,7,"hm"],[1,6,3,10,"hl"],[28,6,3,10,"hl"],[6,5,4,3,"hg"],[22,5,4,3,"hg"],[6,9,20,15,"sk"],[14,9,4,3,"jl"],[15,9,2,2,"eh"],[7,12,6,2,"hm"],[19,12,6,2,"hm"],[7,13,7,5,"eg"],[8,14,5,3,"ep"],[8,14,2,2,"et"],[7,13,2,2,"eh"],[18,13,7,5,"eg"],[19,14,5,3,"ep"],[21,14,2,2,"et"],[23,13,2,2,"eh"],[7,18,5,2,"rd"],[20,18,5,2,"rd"],[15,21,2,1,"sk"],[13,22,6,1,"jd"],[14,24,4,3,"sk"],[11,26,10,3,"jd"],[7,28,18,4,"jm"],[7,28,3,4,"jd"],[22,28,3,4,"jd"],[10,32,12,6,"jl"],[15,28,2,10,"jd"],[12,29,4,2,"wh"],[11,31,5,2,"wh"],[10,33,6,2,"wh"],[9,35,8,2,"wh"],[13,37,6,1,"gd"],[8,37,16,2,"wh"],[13,37,6,2,"gd"],[9,39,6,9,"pa"],[17,39,6,9,"pa"],[15,39,2,5,"bk"],[7,45,9,3,"pa"],[16,45,9,3,"pa"],[6,47,10,2,"pa"],[16,47,10,2,"pa"],[6,49,11,3,"bt"],[15,49,11,3,"bt"],[5,51,8,1,"bt"],[19,51,8,1,"bt"],[6,29,11,3,"jl"],[6,32,8,3,"jl"],[6,34,5,3,"sk"],[14,28,11,3,"jl"],[17,31,8,3,"jl"],[20,33,5,3,"sk"],[20,18,9,9,"gd"],[21,19,7,7,"#ccaa00"],[21,19,7,2,"#ffee44"],[24,20,3,5,"#333300"],[23,21,5,1,"#ffee44"],[23,21,1,3,"#ffee44"],[24,23,3,1,"#ffee44"],[24,25,2,2,"#ffee44"]],
-  critical: [[6,0,2,7,"hg"],[6,0,2,3,"hn"],[24,0,2,7,"hg"],[24,0,2,3,"hn"],[5,1,3,6,"hm"],[5,1,3,2,"hg"],[24,1,3,6,"hm"],[24,1,3,2,"hg"],[5,5,22,6,"hm"],[2,7,5,7,"hm"],[25,7,5,7,"hm"],[1,6,3,10,"hl"],[28,6,3,10,"hl"],[6,5,4,3,"hg"],[22,5,4,3,"hg"],[6,9,20,15,"sk"],[14,9,4,3,"jl"],[15,9,2,2,"eh"],[7,12,6,2,"hm"],[19,12,6,2,"hm"],[7,13,7,5,"eg"],[8,14,5,3,"ep"],[8,14,2,2,"et"],[7,13,2,2,"eh"],[18,13,7,5,"eg"],[19,14,5,3,"ep"],[21,14,2,2,"et"],[23,13,2,2,"eh"],[7,18,5,2,"rd"],[20,18,5,2,"rd"],[15,21,2,1,"sk"],[13,22,6,1,"jd"],[14,24,4,3,"sk"],[11,26,10,3,"jd"],[7,28,18,4,"jm"],[7,28,3,4,"jd"],[22,28,3,4,"jd"],[10,32,12,6,"jl"],[15,28,2,10,"jd"],[12,29,4,2,"wh"],[11,31,5,2,"wh"],[10,33,6,2,"wh"],[9,35,8,2,"wh"],[13,37,6,1,"gd"],[8,37,16,2,"wh"],[13,37,6,2,"gd"],[9,39,6,9,"pa"],[17,39,6,9,"pa"],[15,39,2,5,"bk"],[7,45,9,3,"pa"],[16,45,9,3,"pa"],[6,47,10,2,"pa"],[16,47,10,2,"pa"],[6,49,11,3,"bt"],[15,49,11,3,"bt"],[5,51,8,1,"bt"],[19,51,8,1,"bt"],[8,25,5,4,"jl"],[6,21,5,5,"jl"],[5,18,4,4,"sk"],[19,25,5,4,"jl"],[21,21,5,5,"jl"],[23,18,4,4,"sk"],[15,1,2,19,"ng"],[15,1,2,7,"nb"],[15,1,1,3,"wh"],[12,19,8,2,"gd"],[15,21,2,4,"bk"],[12,3,8,2,"ng"],[13,1,6,4,"ng"]],
-  gun: [[6,0,2,7,"hg"],[6,0,2,3,"hn"],[24,0,2,7,"hg"],[24,0,2,3,"hn"],[5,1,3,6,"hm"],[5,1,3,2,"hg"],[24,1,3,6,"hm"],[24,1,3,2,"hg"],[5,5,22,6,"hm"],[2,7,5,7,"hm"],[25,7,5,7,"hm"],[1,6,3,10,"hl"],[28,6,3,10,"hl"],[6,5,4,3,"hg"],[22,5,4,3,"hg"],[6,9,20,15,"sk"],[14,9,4,3,"jl"],[15,9,2,2,"eh"],[7,12,6,2,"hm"],[19,12,6,2,"hm"],[7,13,7,5,"eg"],[8,14,5,3,"ep"],[8,14,2,2,"et"],[7,13,2,2,"eh"],[18,13,7,5,"eg"],[19,14,5,3,"ep"],[21,14,2,2,"et"],[23,13,2,2,"eh"],[7,18,5,2,"rd"],[20,18,5,2,"rd"],[15,21,2,1,"sk"],[13,22,6,1,"jd"],[14,24,4,3,"sk"],[11,26,10,3,"jd"],[7,28,18,4,"jm"],[7,28,3,4,"jd"],[22,28,3,4,"jd"],[10,32,12,6,"jl"],[15,28,2,10,"jd"],[12,29,4,2,"wh"],[11,31,5,2,"wh"],[10,33,6,2,"wh"],[9,35,8,2,"wh"],[13,37,6,1,"gd"],[8,37,16,2,"wh"],[13,37,6,2,"gd"],[9,39,6,9,"pa"],[17,39,6,9,"pa"],[15,39,2,5,"bk"],[7,45,9,3,"pa"],[16,45,9,3,"pa"],[6,47,10,2,"pa"],[16,47,10,2,"pa"],[6,49,11,3,"bt"],[15,49,11,3,"bt"],[5,51,8,1,"bt"],[19,51,8,1,"bt"],[3,28,5,4,"jl"],[1,32,8,4,"jl"],[22,28,5,4,"jl"],[20,32,8,4,"jl"],[20,35,5,3,"sk"],[-4,27,26,5,"gm"],[-4,27,26,2,"gl"],[-4,29,26,2,"ng"],[-6,27,3,2,"gl"],[-6,30,3,2,"gl"],[-6,33,3,2,"gl"],[18,27,5,5,"ng"],[19,30,3,2,"gd"],[-8,28,5,4,"ng"]],
-  photo: [[6,0,2,7,"hg"],[6,0,2,3,"hn"],[24,0,2,7,"hg"],[24,0,2,3,"hn"],[5,1,3,6,"hm"],[5,1,3,2,"hg"],[24,1,3,6,"hm"],[24,1,3,2,"hg"],[5,5,22,6,"hm"],[2,7,5,7,"hm"],[25,7,5,7,"hm"],[1,6,3,10,"hl"],[28,6,3,10,"hl"],[6,5,4,3,"hg"],[22,5,4,3,"hg"],[6,9,20,15,"sk"],[14,9,4,3,"jl"],[15,9,2,2,"eh"],[7,12,6,2,"hm"],[19,12,6,2,"hm"],[7,13,7,5,"eg"],[8,14,5,3,"ep"],[8,14,2,2,"et"],[7,13,2,2,"eh"],[18,13,7,5,"eg"],[19,14,5,3,"ep"],[21,14,2,2,"et"],[23,13,2,2,"eh"],[7,18,5,2,"rd"],[20,18,5,2,"rd"],[15,21,2,1,"sk"],[13,22,6,1,"jd"],[14,24,4,3,"sk"],[11,26,10,3,"jd"],[7,28,18,4,"jm"],[7,28,3,4,"jd"],[22,28,3,4,"jd"],[10,32,12,6,"jl"],[15,28,2,10,"jd"],[12,29,4,2,"wh"],[11,31,5,2,"wh"],[10,33,6,2,"wh"],[9,35,8,2,"wh"],[13,37,6,1,"gd"],[8,37,16,2,"wh"],[13,37,6,2,"gd"],[9,39,6,9,"pa"],[17,39,6,9,"pa"],[15,39,2,5,"bk"],[7,45,9,3,"pa"],[16,45,9,3,"pa"],[6,47,10,2,"pa"],[16,47,10,2,"pa"],[6,49,11,3,"bt"],[15,49,11,3,"bt"],[5,51,8,1,"bt"],[19,51,8,1,"bt"],[6,27,5,4,"jl"],[4,23,5,5,"jl"],[3,12,1,14,"bk"],[-2,6,13,9,"cd"],[-1,7,11,7,"cm"],[1,7,6,7,"#222233"],[2,8,4,5,"#0033aa"],[3,9,2,3,"#4477ff"],[3,9,1,1,"#aabbff"],[8,6,3,3,"cd"],[-2,6,8,2,"#aaaaaa"],[10,7,2,1,"#ffffff"],[-3,4,2,3,"#00ffff"],[-3,4,3,1,"#00ffff"],[-3,7,3,1,"#00ffff"],[10,4,2,3,"#00ffff"],[9,4,3,1,"#00ffff"],[9,7,3,1,"#00ffff"],[24,28,5,4,"jl"],[27,32,5,4,"jl"],[28,35,4,3,"sk"]],
-  dash: [[6,0,2,7,"hg"],[6,0,2,3,"hn"],[24,0,2,7,"hg"],[24,0,2,3,"hn"],[5,1,3,6,"hm"],[5,1,3,2,"hg"],[24,1,3,6,"hm"],[24,1,3,2,"hg"],[5,5,22,6,"hm"],[2,7,5,7,"hm"],[25,7,5,7,"hm"],[1,6,3,10,"hl"],[28,6,3,10,"hl"],[6,5,4,3,"hg"],[22,5,4,3,"hg"],[6,9,20,15,"sk"],[14,9,4,3,"jl"],[15,9,2,2,"eh"],[7,12,6,2,"hm"],[19,12,6,2,"hm"],[7,13,7,5,"eg"],[8,14,5,3,"ep"],[8,14,2,2,"et"],[7,13,2,2,"eh"],[18,13,7,5,"eg"],[19,14,5,3,"ep"],[21,14,2,2,"et"],[23,13,2,2,"eh"],[7,18,5,2,"rd"],[20,18,5,2,"rd"],[15,21,2,1,"sk"],[13,22,6,1,"jd"],[14,24,4,3,"sk"],[11,26,10,3,"jd"],[7,28,18,4,"jm"],[7,28,3,4,"jd"],[22,28,3,4,"jd"],[10,32,12,6,"jl"],[15,28,2,10,"jd"],[12,29,4,2,"wh"],[11,31,5,2,"wh"],[10,33,6,2,"wh"],[9,35,8,2,"wh"],[13,37,6,1,"gd"],[8,37,16,2,"wh"],[13,37,6,2,"gd"],[9,39,6,9,"pa"],[17,39,6,9,"pa"],[15,39,2,5,"bk"],[7,45,9,3,"pa"],[16,45,9,3,"pa"],[6,47,10,2,"pa"],[16,47,10,2,"pa"],[6,49,11,3,"bt"],[15,49,11,3,"bt"],[5,51,8,1,"bt"],[19,51,8,1,"bt"],[4,29,5,3,"jl"],[1,32,5,3,"jl"],[0,35,4,3,"sk"],[24,27,5,3,"jl"],[27,30,5,3,"jl"],[29,32,3,3,"sk"],[-10,32,10,2,"wh"],[-14,35,12,2,"wh"],[-12,38,8,1,"wh"],[-8,31,8,1,"ng"],[-11,34,9,1,"ng"]],
-  runaway: [[6,0,2,7,"hg"],[6,0,2,3,"hn"],[24,0,2,7,"hg"],[24,0,2,3,"hn"],[5,1,3,6,"hm"],[5,1,3,2,"hg"],[24,1,3,6,"hm"],[24,1,3,2,"hg"],[5,5,22,6,"hm"],[2,7,5,7,"hm"],[25,7,5,7,"hm"],[1,6,3,10,"hl"],[28,6,3,10,"hl"],[6,5,4,3,"hg"],[22,5,4,3,"hg"],[6,9,20,15,"sk"],[14,9,4,3,"jl"],[15,9,2,2,"eh"],[7,12,6,2,"hm"],[19,12,6,2,"hm"],[7,13,7,5,"eg"],[8,14,5,3,"ep"],[8,14,2,2,"et"],[7,13,2,2,"eh"],[18,13,7,5,"eg"],[19,14,5,3,"ep"],[21,14,2,2,"et"],[23,13,2,2,"eh"],[7,18,5,2,"rd"],[20,18,5,2,"rd"],[15,21,2,1,"sk"],[13,22,6,1,"jd"],[14,24,4,3,"sk"],[11,26,10,3,"jd"],[7,28,18,4,"jm"],[7,28,3,4,"jd"],[22,28,3,4,"jd"],[10,32,12,6,"jl"],[15,28,2,10,"jd"],[12,29,4,2,"wh"],[11,31,5,2,"wh"],[10,33,6,2,"wh"],[9,35,8,2,"wh"],[13,37,6,1,"gd"],[8,37,16,2,"wh"],[13,37,6,2,"gd"],[9,39,6,9,"pa"],[17,39,6,9,"pa"],[15,39,2,5,"bk"],[7,45,9,3,"pa"],[16,45,9,3,"pa"],[6,47,10,2,"pa"],[16,47,10,2,"pa"],[6,49,11,3,"bt"],[15,49,11,3,"bt"],[5,51,8,1,"bt"],[19,51,8,1,"bt"],[5,27,5,4,"jl"],[3,31,5,4,"jl"],[2,34,4,3,"sk"],[22,26,5,4,"jl"],[25,23,5,4,"jl"],[26,21,4,3,"sk"],[3,9,2,3,"#88ccff"],[2,11,4,1,"#88ccff"],[1,1,2,5,"gd"],[1,7,2,2,"gd"],[28,33,10,2,"wh"],[29,36,8,2,"wh"],[9,39,6,7,"pa"],[8,43,8,5,"pa"],[17,39,6,6,"pa"],[18,43,7,5,"pa"],[15,39,2,4,"bk"],[7,47,9,2,"pa"],[17,47,8,2,"pa"],[6,49,10,3,"bt"],[16,49,10,3,"bt"]],
-  trans: [[6,0,2,7,"hg"],[6,0,2,3,"hn"],[24,0,2,7,"hg"],[24,0,2,3,"hn"],[5,1,3,6,"hm"],[5,1,3,2,"hg"],[24,1,3,6,"hm"],[24,1,3,2,"hg"],[5,5,22,6,"hm"],[2,7,5,7,"hm"],[25,7,5,7,"hm"],[1,6,3,10,"hl"],[28,6,3,10,"hl"],[6,5,4,3,"hg"],[22,5,4,3,"hg"],[6,9,20,15,"sk"],[14,9,4,3,"jl"],[15,9,2,2,"eh"],[7,12,6,2,"hm"],[19,12,6,2,"hm"],[7,13,7,5,"eg"],[8,14,5,3,"ep"],[8,14,2,2,"et"],[7,13,2,2,"eh"],[18,13,7,5,"eg"],[19,14,5,3,"ep"],[21,14,2,2,"et"],[23,13,2,2,"eh"],[7,18,5,2,"rd"],[20,18,5,2,"rd"],[15,21,2,1,"sk"],[13,22,6,1,"jd"],[14,24,4,3,"sk"],[11,26,10,3,"jd"],[7,28,18,4,"jm"],[7,28,3,4,"jd"],[22,28,3,4,"jd"],[10,32,12,6,"jl"],[15,28,2,10,"jd"],[12,29,4,2,"wh"],[11,31,5,2,"wh"],[10,33,6,2,"wh"],[9,35,8,2,"wh"],[13,37,6,1,"gd"],[8,37,16,2,"wh"],[13,37,6,2,"gd"],[9,39,6,9,"pa"],[17,39,6,9,"pa"],[15,39,2,5,"bk"],[7,45,9,3,"pa"],[16,45,9,3,"pa"],[6,47,10,2,"pa"],[16,47,10,2,"pa"],[6,49,11,3,"bt"],[15,49,11,3,"bt"],[5,51,8,1,"bt"],[19,51,8,1,"bt"],[3,28,5,4,"jl"],[0,32,5,4,"jl"],[0,35,4,3,"sk"],[24,28,5,4,"jl"],[27,32,5,4,"jl"],[28,35,4,3,"sk"],[7,13,7,2,"ep"],[18,13,7,2,"ep"]]
-    };
-    // ── Skill meta ──
-    const SKILLS={
-      strike:  {name:'STRIKE',       col:'#39ff6e',wave:'square',sfx:[880,1100,1320,1760]},
-      guard:   {name:'GUARD',        col:'#e9c46a',wave:'triangle',sfx:[440,550,660]},
-      critical:{name:'CRITICAL',     col:'#ffcc44',wave:'sawtooth',sfx:[220,330,440,660,880]},
-      gun:     {name:'GUN BLAST',    col:'#66ccff',wave:'square',sfx:[180,160,140,120]},
-      photo:   {name:'SNAP FOCUS',   col:'#e76f51',wave:'sine',sfx:[2200,440]},
-      dash:    {name:'DASH RUSH',    col:'#00ddff',wave:'square',sfx:[660,880,1100,1320]},
-      runaway: {name:'ESCAPE ROUTE', col:'#ff66aa',wave:'square',sfx:[880,660,440,330,220]},
-    };
-    const ORDER=['strike','guard','critical','gun','photo','dash','runaway'];
-    const S=4; // display scale (canvas is 32×52, CSS renders at 128×208)
-    const canvas=document.getElementById('char-canvas');
-    const ctx=canvas.getContext('2d');
-    const cards=document.querySelectorAll('.big-card');
-    const labelEl=document.getElementById('sticker-label');
-    const flavorEl=document.getElementById('sticker-flavor');
-    const statsEl=document.getElementById('sticker-stats');
-    const passP=document.getElementById('passive-panel');
-    const passTx=document.getElementById('passive-text');
-    const exportBtn=document.getElementById('export-btn');
-    const pgWrap=document.getElementById('pg-wrap');
-    let ac=null, audioCtx=null;
-
-    function drawPose(pose){
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      const data=POSES[pose]||POSES.idle;
-      data.forEach(([x,y,w,h,ck])=>{
-        const col=C[ck]||ck;
-        if(col==='transparent')return;
-        ctx.fillStyle=col;
-        ctx.fillRect(x,y,w,h);
-      });
-    }
-
-    function audioInit(){
-      if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-      if(audioCtx.state==='suspended') audioCtx.resume();
-    }
-
-    function playSFX(sk){
-      try{
-        audioInit();
-        const {sfx,wave}=SKILLS[sk];
-        sfx.forEach((f,i)=>{
-          const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-          o.connect(g);g.connect(audioCtx.destination);
-          o.type=wave; o.frequency.value=f;
-          const t=audioCtx.currentTime+i*0.075;
-          g.gain.setValueAtTime(0.14,t);
-          g.gain.exponentialRampToValueAtTime(0.001,t+0.16);
-          o.start(t);o.stop(t+0.17);
-        });
-      }catch(e){}
-    }
-
-    function activate(card){
-      const sk=card.dataset.skill;
-      const d=SKILLS[sk];
-      ac=sk;
-      cards.forEach(c=>c.classList.remove('active'));
-      card.classList.add('active');
-
-      playSFX(sk);
-      pgWrap.style.setProperty('--act-col',d.col);
-      canvas.style.setProperty('--glow-c',d.col);
-      canvas.classList.remove('idle-float');
-
-      // 4-frame animation
-      const frames=['trans','idle','trans',sk];
-      frames.forEach((fr,i)=>setTimeout(()=>drawPose(fr),i*100));
-      setTimeout(()=>{
-        canvas.classList.add('flash');
-        setTimeout(()=>canvas.classList.remove('flash'),500);
-      },frames.length*100);
-      setTimeout(()=>{
-        if(ac===sk) canvas.classList.add('idle-float');
-      }, frames.length*100+800);
-
-      labelEl.textContent='◆ '+d.name+' ◆';
-      labelEl.style.color=d.col;
-      flavorEl.innerHTML=card.dataset.flavor;
-      statsEl.textContent=card.dataset.stats;
-      statsEl.style.color=d.col;
-      passTx.textContent=card.dataset.passive;
-      passP.classList.add('show');
-    }
-
-    cards.forEach(card=>{
-      card.addEventListener('click',()=>activate(card));
-      card.addEventListener('mouseenter',()=>{ if(!card.classList.contains('active')) drawPose(card.dataset.skill); });
-      card.addEventListener('mouseleave',()=>{
-        const acard=document.querySelector('.big-card.active');
-        drawPose(acard?acard.dataset.skill:'idle');
-      });
-    });
-
-    document.addEventListener('keydown',e=>{
-      const i=parseInt(e.key)-1;
-      if(i>=0&&i<ORDER.length){const c=document.querySelector('.big-card.bc-'+ORDER[i]);if(c)activate(c);}
-    });
-
-    exportBtn.addEventListener('click',()=>{
-      try{audioInit();const o=audioCtx.createOscillator(),g=audioCtx.createGain();
-        o.connect(g);g.connect(audioCtx.destination);o.type='square';o.frequency.value=1400;
-        g.gain.setValueAtTime(0.12,audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.08);
-        o.start();o.stop(audioCtx.currentTime+0.08);}catch(e){}
-      // Export at 4× scale
-      const out=document.createElement('canvas');
-      out.width=canvas.width*4; out.height=canvas.height*4;
-      const octx=out.getContext('2d');
-      octx.imageSmoothingEnabled=false;
-      octx.fillStyle='#04030e'; octx.fillRect(0,0,out.width,out.height);
-      octx.drawImage(canvas,0,0,out.width,out.height);
-      const a=document.createElement('a');
-      a.download='plaw-'+(ac||'idle')+'.png';
-      a.href=out.toDataURL('image/png');
-      a.click();
-    });
-
-    // Initial draw
-    drawPose('idle');
-    canvas.classList.add('idle-float');
-  })();
-  </script>
-  </section>
-
-  <!-- ── Work ── -->
-  <section id="work-section" style="padding-top:7rem;padding-bottom:7rem;padding-left:3rem;padding-right:3rem;">
-    <div id="work">
-      <p class="section-label">Selected Work</p>
-      <h2 class="section-title">Films &amp; Projects</h2>
-
-      <div class="projects-grid">
-
-        <!-- Card 1 -->
-        <article class="project-card">
-          <div class="card-bg"></div>
-          <div class="card-grain"></div>
-          <div class="card-overlay"></div>
-          <div class="card-corner tl"></div>
-          <div class="card-corner tr"></div>
-          <div class="card-corner bl"></div>
-          <div class="card-corner br"></div>
-          <div class="card-body">
-            <span class="card-tag">Abstract Documentary</span>
-            <h3 class="card-title">Dust &amp; Distance</h3>
-            <p class="card-desc">An exploration of solitude and motion — what we leave behind and what follows us.</p>
-            <a href="#" class="card-btn">Watch Film</a>
+        <article class="feat-card" data-tilt>
+          <div class="feat-bg"></div>
+          <div class="feat-strip">
+            <div class="feat-strip-hole"></div><div class="feat-strip-hole"></div>
+            <div class="feat-strip-hole"></div><div class="feat-strip-hole"></div>
+            <div class="feat-strip-hole"></div><div class="feat-strip-hole"></div>
+          </div>
+          <div class="feat-overlay"></div>
+          <div class="feat-body">
+            <span class="feat-tag">Abstract Documentary</span>
+            <h3 class="feat-title">Dust &amp; Distance</h3>
+            <p class="feat-desc">An exploration of solitude and motion — what we leave behind and what follows us into the next horizon.</p>
+            <a href="#" class="feat-cta">Watch Film</a>
           </div>
         </article>
 
-        <!-- Card 2 -->
-        <article class="project-card">
-          <div class="card-bg"></div>
-          <div class="card-grain"></div>
-          <div class="card-overlay"></div>
-          <div class="card-corner tl"></div>
-          <div class="card-corner tr"></div>
-          <div class="card-corner bl"></div>
-          <div class="card-corner br"></div>
-          <div class="card-body">
-            <span class="card-tag">Travel Journal</span>
-            <h3 class="card-title">43°N Somewhere</h3>
-            <p class="card-desc">A photographic journal across latitudes — strangers, streets, and the spaces between.</p>
-            <a href="#" class="card-btn">View Journal</a>
+        <article class="feat-card" data-tilt>
+          <div class="feat-bg"></div>
+          <div class="feat-strip">
+            <div class="feat-strip-hole"></div><div class="feat-strip-hole"></div>
+            <div class="feat-strip-hole"></div><div class="feat-strip-hole"></div>
+          </div>
+          <div class="feat-overlay"></div>
+          <div class="feat-body">
+            <span class="feat-tag">Travel Journal</span>
+            <h3 class="feat-title">43°N Somewhere</h3>
+            <p class="feat-desc">A photographic journal across latitudes — strangers, streets, and the spaces between.</p>
+            <a href="#" class="feat-cta">View Journal</a>
           </div>
         </article>
 
-        <!-- Card 3 -->
-        <article class="project-card">
-          <div class="card-bg"></div>
-          <div class="card-grain"></div>
-          <div class="card-overlay"></div>
-          <div class="card-corner tl"></div>
-          <div class="card-corner tr"></div>
-          <div class="card-corner bl"></div>
-          <div class="card-corner br"></div>
-          <div class="card-body">
-            <span class="card-tag">Sports Film</span>
-            <h3 class="card-title">Starting Blocks</h3>
-            <p class="card-desc">Track &amp; field at its rawest — the silence before the gun, the weight of the lane.</p>
-            <a href="#" class="card-btn">Watch Film</a>
+        <article class="feat-card" data-tilt>
+          <div class="feat-bg"></div>
+          <div class="feat-strip">
+            <div class="feat-strip-hole"></div><div class="feat-strip-hole"></div>
+            <div class="feat-strip-hole"></div><div class="feat-strip-hole"></div>
           </div>
-        </article>
-
-        <!-- Card 4 -->
-        <article class="project-card">
-          <div class="card-bg"></div>
-          <div class="card-grain"></div>
-          <div class="card-overlay"></div>
-          <div class="card-corner tl"></div>
-          <div class="card-corner tr"></div>
-          <div class="card-corner bl"></div>
-          <div class="card-corner br"></div>
-          <div class="card-body">
-            <span class="card-tag">Milestone Journey</span>
-            <h3 class="card-title">Year One</h3>
-            <p class="card-desc">A personal documentary marking twelve months of becoming — uncut and unrehearsed.</p>
-            <a href="#" class="card-btn">Watch Film</a>
+          <div class="feat-overlay"></div>
+          <div class="feat-body">
+            <span class="feat-tag">Sports Film</span>
+            <h3 class="feat-title">Starting Blocks</h3>
+            <p class="feat-desc">Track &amp; field at its rawest — the silence before the gun, the weight of the lane.</p>
+            <a href="#" class="feat-cta">Watch Film</a>
           </div>
         </article>
 
@@ -1060,38 +837,88 @@
     </div>
   </section>
 
-  <div class="divider"></div>
+  <!-- ── THE METHOD ── -->
+  <section id="method">
+    <div class="method-inner">
+      <p class="section-eyebrow">How I Work</p>
+      <h2 class="section-headline">The <span>Method</span></h2>
 
-  <!-- ── About ── -->
+      <div class="method-grid">
+        <div class="method-col">
+          <div class="method-num">01</div>
+          <h3 class="method-title">Concept</h3>
+          <div class="method-arrow">↓</div>
+          <p class="method-body">
+            Every frame starts with a <strong>question</strong>, not a camera. I study the subject until I understand what they can't say out loud. Then I find the image that says it for them.
+          </p>
+        </div>
+        <div class="method-col">
+          <div class="method-num">02</div>
+          <h3 class="method-title">Craft</h3>
+          <div class="method-arrow">↓</div>
+          <p class="method-body">
+            Light, motion, rhythm. I shoot with <strong>Sony FX3 &amp; A7IV</strong>, edit in DaVinci Resolve — every cut earns its place. No filler. No formula. Just the story the moment was already trying to tell.
+          </p>
+        </div>
+        <div class="method-col">
+          <div class="method-num">03</div>
+          <h3 class="method-title">Convert</h3>
+          <div class="method-arrow">↓</div>
+          <p class="method-body">
+            Great film <strong>changes something</strong>. Whether it's a viewer who finally feels seen, a brand that earns trust, or an athlete's defining moment preserved — the goal is always emotional impact that lasts.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BY THE NUMBERS ── -->
+  <section id="numbers" class="clip-both">
+    <div class="numbers-inner">
+      <p class="section-eyebrow">By the Numbers</p>
+      <h2 class="section-headline">The <span>Proof</span></h2>
+
+      <div class="numbers-grid">
+        <div class="stat-block">
+          <div class="stat-num"><span class="count" data-target="2" data-suffix="M+">0</span><span class="stat-suffix">M+</span></div>
+          <div class="stat-label">Views Earned</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-num"><span class="count" data-target="40" data-suffix="+">0</span><span class="stat-suffix">+</span></div>
+          <div class="stat-label">Brands Worked With</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-num"><span class="count" data-target="60" data-suffix="+">0</span><span class="stat-suffix">+</span></div>
+          <div class="stat-label">Races Filmed</div>
+        </div>
+        <div class="stat-block">
+          <div class="stat-num"><span class="count" data-target="24" data-suffix="+">0</span><span class="stat-suffix">+</span></div>
+          <div class="stat-label">Countries Visited</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── ABOUT ── -->
   <section id="about">
     <div class="about-inner">
-      <p class="section-label">The Filmmaker</p>
-      <h2 class="section-title">About Me</h2>
+      <p class="section-eyebrow">The Filmmaker</p>
+      <h2 class="section-headline">About <span>Me</span></h2>
 
       <div class="about-grid">
         <div class="about-quote-col">
           <blockquote class="about-quote">
             I don&rsquo;t just record moments &mdash; I run alongside them until they trust me enough to stay still.
+            <cite>— P. Law</cite>
           </blockquote>
 
-          <!-- pixel art: simple camera silhouette -->
-          <div class="pixel-deco" aria-hidden="true">
-            <!-- row 1 -->
-            <div class="px b"></div><div class="px b"></div><div class="px d"></div><div class="px d"></div><div class="px d"></div><div class="px b"></div><div class="px b"></div><div class="px b"></div><div class="px b"></div><div class="px b"></div>
-            <!-- row 2 -->
-            <div class="px b"></div><div class="px d"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px d"></div><div class="px b"></div><div class="px o"></div><div class="px o"></div><div class="px b"></div>
-            <!-- row 3 -->
-            <div class="px d"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px d"></div>
-            <!-- row 4 -->
-            <div class="px d"></div><div class="px g"></div><div class="px b"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px b"></div><div class="px g"></div><div class="px g"></div><div class="px d"></div>
-            <!-- row 5 -->
-            <div class="px d"></div><div class="px g"></div><div class="px g"></div><div class="px b"></div><div class="px g"></div><div class="px b"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px d"></div>
-            <!-- row 6 -->
-            <div class="px d"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px b"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px d"></div>
-            <!-- row 7 -->
-            <div class="px d"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px g"></div><div class="px d"></div>
-            <!-- row 8 -->
-            <div class="px b"></div><div class="px d"></div><div class="px d"></div><div class="px d"></div><div class="px d"></div><div class="px d"></div><div class="px d"></div><div class="px d"></div><div class="px d"></div><div class="px b"></div>
+          <!-- filmstrip decoration -->
+          <div class="filmstrip" aria-hidden="true">
+            <div class="film-frame active"></div>
+            <div class="film-frame"></div>
+            <div class="film-frame active"></div>
+            <div class="film-frame"></div>
+            <div class="film-frame active"></div>
           </div>
         </div>
 
@@ -1099,9 +926,9 @@
           <p class="about-bio">
             I&rsquo;m a filmmaker drawn to the in-between moments — the exhale before a race, the last frame of golden hour,
             the way a city looks when you&rsquo;re the only one awake. My work spans abstract documentary, travel photography,
-            sports filmmaking, and personal milestone storytelling. Each project is a journal entry with a lens.
+            sports filmmaking, and personal milestone storytelling.
           </p>
-          <p class="about-bio" style="margin-top:-1rem;">
+          <p class="about-bio">
             Based everywhere I haven&rsquo;t been yet. Currently chasing light and athletes in equal measure.
           </p>
 
@@ -1118,51 +945,48 @@
     </div>
   </section>
 
-  <div class="divider"></div>
+  <!-- ── CONTACT ── -->
+  <section id="contact" class="clip-top">
+    <div class="contact-inner">
+      <p class="section-eyebrow">Let&rsquo;s Collaborate</p>
+      <h2 class="section-headline">Got a story <em>worth</em> telling?</h2>
+      <p class="contact-intro">
+        A race worth capturing? A journey that deserves more than a camera roll?
+        Let&rsquo;s make something that moves people.
+      </p>
 
-  <!-- ── Contact ── -->
-  <section id="contact">
-    <p class="section-label">Let&rsquo;s Collaborate</p>
-    <h2 class="section-title">Hire Me</h2>
-    <p class="contact-intro">
-      Got a story worth telling? A race worth capturing? A journey that deserves more than a camera roll?
-      Let&rsquo;s make something unforgettable.
-    </p>
-
-    <form class="contact-form" onsubmit="handleSubmit(event)">
-      <div class="form-row">
-        <div class="field">
-          <label for="name">Your Name</label>
-          <input type="text" id="name" name="name" placeholder="Full name" required />
+      <form class="contact-form" onsubmit="handleSubmit(event)">
+        <div class="form-row">
+          <div class="field">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" placeholder="Full name" required />
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" required />
+          </div>
         </div>
         <div class="field">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="you@example.com" required />
+          <label for="project-type">Project Type</label>
+          <select id="project-type" name="project_type">
+            <option value="">Select a category</option>
+            <option value="documentary">Documentary Film</option>
+            <option value="sports">Sports &amp; Track Film</option>
+            <option value="travel">Travel Photography / Journal</option>
+            <option value="milestone">Milestone / Personal Story</option>
+            <option value="commercial">Commercial / Brand Film</option>
+            <option value="other">Something Else</option>
+          </select>
         </div>
-      </div>
-
-      <div class="field">
-        <label for="project-type">Project Type</label>
-        <select id="project-type" name="project_type">
-          <option value="">Select a category</option>
-          <option value="documentary">Documentary Film</option>
-          <option value="sports">Sports &amp; Track Film</option>
-          <option value="travel">Travel Photography / Journal</option>
-          <option value="milestone">Milestone / Personal Story</option>
-          <option value="commercial">Commercial / Brand Film</option>
-          <option value="other">Something Else</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="message">Tell Me About It</label>
-        <textarea id="message" name="message" placeholder="What are you trying to capture? Where? When?"></textarea>
-      </div>
-
-      <button type="submit" class="submit-btn">
-        <span>Send the Message</span>
-      </button>
-    </form>
+        <div class="field">
+          <label for="message">Tell Me About It</label>
+          <textarea id="message" name="message" placeholder="What are you trying to capture? Where? When?"></textarea>
+        </div>
+        <button type="submit" class="submit-btn">
+          <span>Send the Message</span>
+        </button>
+      </form>
+    </div>
   </section>
 
   <!-- ── Footer ── -->
@@ -1171,20 +995,10 @@
       <div class="footer-name">P. Law &copy; 2026</div>
       <div class="footer-easter" id="easter">still rolling.</div>
     </div>
-    <div class="footer-right">Filmmaker &mdash; Always Rolling</div>
+    <div class="footer-tagline">Filmmaker &mdash; Always Rolling</div>
   </footer>
 
   <script>
-    /* ── Custom cursor ── */
-    const cursor = document.getElementById('cursor');
-    let mx = -100, my = -100;
-    document.addEventListener('mousemove', e => {
-      mx = e.clientX; my = e.clientY;
-      cursor.style.left = mx + 'px';
-      cursor.style.top  = my + 'px';
-    });
-
-    /* ── ISO WORLD ENGINE ── */
     /* ── ISO WORLD ENGINE ── */
     (function IsoWorld() {
       const canvas = document.getElementById('iso-canvas');
@@ -1932,6 +1746,7 @@
     })();
 
     /* ── PIANO JAZZ SOUNDTRACK ── */
+    /* ── PIANO JAZZ SOUNDTRACK ── */
     (function PianoJazz() {
       let actx = null, masterGain = null, isPlaying = false;
       let schedulerTimer = null, nextNoteTime = 0, beatIdx = 0;
@@ -2045,19 +1860,57 @@
     })();
 
 
-    /* ── Scroll-triggered card reveal ── */
-    const cards = document.querySelectorAll('.project-card');
-    const observer = new IntersectionObserver(entries => {
+    /* ── Scroll-triggered reveals ── */
+    const revealEls = document.querySelectorAll('.feat-card, .method-col, .stat-block');
+    const revealObs = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
+          revealObs.unobserve(entry.target);
         }
       });
     }, { threshold: 0.12 });
-    cards.forEach(c => observer.observe(c));
+    revealEls.forEach(el => revealObs.observe(el));
 
-    /* ── Footer easter egg (triple-click) ── */
+    /* ── Count-up animation ── */
+    const counts = document.querySelectorAll('.count');
+    const countObs = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = +el.dataset.target;
+        const dur = 1800;
+        const start = performance.now();
+        function step(now) {
+          const t = Math.min((now - start) / dur, 1);
+          const ease = 1 - Math.pow(1 - t, 3);
+          el.textContent = Math.round(ease * target);
+          if (t < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+        countObs.unobserve(el);
+      });
+    }, { threshold: 0.5 });
+    counts.forEach(el => countObs.observe(el));
+
+    /* ── Magnetic card tilt ── */
+    document.querySelectorAll('[data-tilt]').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const cx = (e.clientX - r.left) / r.width  - 0.5;
+        const cy = (e.clientY - r.top)  / r.height - 0.5;
+        card.style.transform = `perspective(900px) rotateY(${cx*8}deg) rotateX(${-cy*6}deg) scale(1.02)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(900px) rotateY(0) rotateX(0) scale(1)';
+        card.style.transition = 'transform 0.5s ease';
+      });
+      card.addEventListener('mouseenter', () => {
+        card.style.transition = 'transform 0.12s ease';
+      });
+    });
+
+    /* ── Footer easter egg ── */
     let clickCount = 0, clickTimer;
     document.getElementById('footer').addEventListener('click', () => {
       clickCount++;
@@ -2069,7 +1922,7 @@
       }
     });
 
-    /* ── Contact form handler ── */
+    /* ── Contact form ── */
     function handleSubmit(e) {
       e.preventDefault();
       const btn  = e.target.querySelector('.submit-btn span');
