@@ -1212,12 +1212,31 @@
         bldTp2:'#2a9d8f', bldL2:'#1a7a6a', bldR2:'#125a50', // teal variant
         win:'#e9c46a', winD:'#5a3010',
         lamp:'#c8b080', lampG:'#f4a261',
-        // Medical
-        hFloor:'#e8dcc8', hLine:'#c8b8a0',
-        hWallT:'#fdf6ec', hWallL:'#e8dcc8', hWallR:'#d0c4b0',
-        cross:'#e76f51',
-        bed:'#fdf6ec', bedF:'#e8f4f0', pillow:'#ffffff',
-        desk:'#d0c4b0', deskT:'#e8dcc8',
+        // Medical – golden-hour warm stone RPG hospital district
+        cbT:'#c8a870', cbL:'#a08050', cbR:'#7a6038',    // cobblestone tile
+        cbLine:'rgba(90,60,30,0.18)',
+        mgT:'#5aaa44', mgL:'#3a8230', mgR:'#2a6224',    // medical garden grass
+        // Hospital main – cream stone, red-tile roof
+        hRT:'#c84444', hRL:'#a03030', hRR:'#802020',    // roof tiles
+        hWT:'#ede0c4', hWL:'#c8b898', hWR:'#a89878',    // wall
+        hCR:'#dd2244', hCW:'#f8f4ee',                   // cross (red+white)
+        hWnL:'#f4c46a', hWnD:'#c07820',                 // windows lit/dark
+        // Small clinic
+        clRT:'#b83030', clRL:'#882020', clRR:'#661818',
+        clWT:'#ddd0b0', clWL:'#b8a888', clWR:'#988868',
+        // Ambulance
+        ambW:'#f8f4ee', ambR:'#dd2244', ambG:'#f4a261',
+        ambBT:'#ddd0b0', ambBL:'#b8a888', ambBR:'#988868',
+        // Futuristic gadgets (Toriko-inspired)
+        gdM:'#6a8aaa', gdL:'#4a6a8a', gdH:'#8abadc', gdGlow:'#4abec8',
+        gdPad:'#2a4a5a', gdScreen:'#00ccaa',
+        // Garden/fountain/nature
+        fnT:'#a8c8d8', fnL:'#6a9ab0', fnR:'#507890',   // fountain stone
+        fnW:'#aaddee',                                   // water
+        magLeaf:'#2aaa66', magGlow:'#39ff8e',            // healing tree
+        // Med lantern
+        mlP:'#c8a870', mlG:'#f4c870',
+        // Kept for plants used elsewhere
         plant:'#2a7a40', plantL:'#3a9a55', pot:'#c25540',
         // Chibi character – coral/teal outfit
         hair:'#1a2a40', hairH:'#2a9d8f',
@@ -1257,11 +1276,59 @@
             else if (rv < 0.50) { worldMap[r][c]='walk'; objMap[r][c]='bldA'; }
             else                { worldMap[r][c]='walk'; objMap[r][c]='bldB'; }
           } else {
-            if      (rv < 0.16) { worldMap[r][c]='hf'; objMap[r][c]='bed'; }
-            else if (rv < 0.24) { worldMap[r][c]='hf'; objMap[r][c]='cross_obj'; }
-            else if (rv < 0.28) { worldMap[r][c]='hf'; objMap[r][c]='desk'; }
-            else if (rv < 0.32) { worldMap[r][c]='hf'; objMap[r][c]='plant'; }
-            else                { worldMap[r][c]='hf'; objMap[r][c]=null; }
+            // ── Medical district – structured golden-hour RPG hospital town ──
+            const mr = r - CITY_END; // 0-20 within medical zone
+            // Main boulevard (stone path rows 0-1 & col 20-21, col 40-41)
+            const isBlvdR = (mr <= 1);
+            const isBlvdC = (c >= 19 && c <= 21) || (c >= 39 && c <= 41);
+            const isCrossPath = (mr >= 10 && mr <= 11);
+            // Main hospital campus (anchor): rows mr 3-8, cols 24-38
+            const isHospCampus = (mr >= 3 && mr <= 8 && c >= 24 && c <= 38);
+            // Garden/courtyard: rows mr 4-9, cols 14-22
+            const isGarden = (mr >= 4 && mr <= 9 && c >= 14 && c <= 22);
+            // Ambulance bay: rows mr 12-15, cols 36-46
+            const isAmbBay = (mr >= 12 && mr <= 16 && c >= 36 && c <= 46);
+            // Clinic cluster A: rows mr 13-18, cols 12-22
+            const isClinicA = (mr >= 13 && mr <= 18 && c >= 12 && c <= 22);
+
+            if (isBlvdR || isBlvdC || isCrossPath) {
+              worldMap[r][c] = 'cobble';
+              objMap[r][c] = (!isBlvdR && !isCrossPath && (c===19||c===40) && rv < 0.35) ? 'med_lamp' : null;
+            } else if (isHospCampus) {
+              worldMap[r][c] = 'cobble';
+              // One anchor hospital building placed deterministically
+              if (c === 31 && mr === 6) { objMap[r][c] = 'hosp_main'; }
+              else if (c === 26 && mr === 4) { objMap[r][c] = 'gadget_a'; }
+              else if (c === 36 && mr === 4) { objMap[r][c] = 'gadget_b'; }
+              else if (rv < 0.08) { objMap[r][c] = 'med_lamp'; }
+              else { objMap[r][c] = null; }
+            } else if (isGarden) {
+              worldMap[r][c] = 'med_grass';
+              if (c === 18 && mr === 6) { objMap[r][c] = 'fountain'; }
+              else if (rv < 0.14) { objMap[r][c] = 'mag_tree'; }
+              else if (rv < 0.24) { objMap[r][c] = 'garden_bed'; }
+              else { objMap[r][c] = null; }
+            } else if (isAmbBay) {
+              worldMap[r][c] = 'cobble';
+              if (c === 42 && mr === 14) { objMap[r][c] = 'amb_bay'; }
+              else if (rv < 0.06) { objMap[r][c] = 'gadget_a'; }
+              else { objMap[r][c] = null; }
+            } else if (isClinicA) {
+              worldMap[r][c] = 'cobble';
+              if (c === 17 && mr === 16) { objMap[r][c] = 'clinic_a'; }
+              else if (c === 13 && mr === 14) { objMap[r][c] = 'clinic_b'; }
+              else if (rv < 0.06) { objMap[r][c] = 'med_lamp'; }
+              else { objMap[r][c] = null; }
+            } else {
+              // General outskirts: scattered small clinics + gadgets + garden patches
+              if      (rv < 0.05) { worldMap[r][c]='cobble';    objMap[r][c]='clinic_b'; }
+              else if (rv < 0.08) { worldMap[r][c]='cobble';    objMap[r][c]='gadget_a'; }
+              else if (rv < 0.12) { worldMap[r][c]='med_grass'; objMap[r][c]='garden_bed'; }
+              else if (rv < 0.15) { worldMap[r][c]='med_grass'; objMap[r][c]='mag_tree'; }
+              else if (rv < 0.18) { worldMap[r][c]='cobble';    objMap[r][c]='med_lamp'; }
+              else if (rv < 0.52) { worldMap[r][c]='cobble';    objMap[r][c]=null; }
+              else                { worldMap[r][c]='med_grass';  objMap[r][c]=null; }
+            }
           }
         }
       }
@@ -1390,6 +1457,218 @@
         block(x, y-8, 8, P.pot, '#a04030', '#803020');
         ctx.fillStyle = P.plant;  ctx.beginPath(); ctx.arc(x-6, y-15, 9, 0, Math.PI*2); ctx.fill();
         ctx.fillStyle = P.plantL; ctx.beginPath(); ctx.arc(x+5, y-18, 8, 0, Math.PI*2); ctx.fill();
+      }
+
+      // ── Medical district draw functions ──
+      function drawCobble(x, y) {
+        diamond(x, y, P.cbT);
+        // cobblestone grid lines
+        ctx.strokeStyle = P.cbLine; ctx.lineWidth = 0.7;
+        ctx.beginPath(); ctx.moveTo(x-TW*0.25,y+TH*0.25); ctx.lineTo(x+TW*0.25,y+TH*0.75); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x+TW*0.25,y+TH*0.25); ctx.lineTo(x-TW*0.25,y+TH*0.75); ctx.stroke();
+      }
+      function drawMedGrass(x, y) {
+        diamond(x, y, P.mgT, 'rgba(20,80,20,0.07)');
+        ctx.fillStyle = P.magLeaf; ctx.fillRect(x-3,y+TH*0.38,5,3); ctx.fillRect(x+9,y+TH*0.5,4,3);
+      }
+
+      // Main hospital — 5-storey anchor building, warm cream stone, red-tile roof
+      function drawHospMain(x, y) {
+        const h = 120, rH = 22;
+        // shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        ctx.beginPath(); ctx.ellipse(x, y+TH*0.8, TW*0.7, 12, 0, 0, Math.PI*2); ctx.fill();
+        // base wall block
+        block(x, y-h, h, P.hWT, P.hWL, P.hWR);
+        // roof ridge (red tiles)
+        block(x, y-h-rH, rH, P.hRT, P.hRL, P.hRR);
+        // red cross on roof face (left wall)
+        ctx.fillStyle = P.hCR;
+        ctx.fillRect(x-TW*0.38, y-h-rH+4, 6, 18);   // vertical bar
+        ctx.fillRect(x-TW*0.46, y-h-rH+10, 22, 6);   // horizontal bar
+        ctx.fillStyle = P.hCW;
+        ctx.fillRect(x-TW*0.36, y-h-rH+6, 2, 14);
+        ctx.fillRect(x-TW*0.44, y-h-rH+12, 18, 2);
+        // windows (5 floors, left wall)
+        for (let fl = 0; fl < 5; fl++) {
+          const wy = y - h + 8 + fl * 22;
+          const lit = (fl + Math.floor(x)) % 3 !== 0;
+          ctx.fillStyle = lit ? P.hWnL : P.hWnD;
+          ctx.fillRect(x-TW*0.46, wy,    12, 9);
+          ctx.fillRect(x-TW*0.28, wy+4,  12, 9);
+          // right wall windows
+          ctx.fillRect(x+TW*0.12, wy,    12, 9);
+          ctx.fillRect(x+TW*0.28, wy+4,  12, 9);
+        }
+        // entrance arch (ground floor front)
+        ctx.fillStyle = P.hCR;
+        ctx.fillRect(x-10, y-14, 20, 14);
+        ctx.fillStyle = '#1a0a00';
+        ctx.beginPath(); ctx.arc(x, y-14, 10, Math.PI, 0); ctx.fill();
+        // sign above entrance
+        ctx.fillStyle = P.hCW; ctx.font = 'bold 7px monospace';
+        ctx.textAlign = 'center'; ctx.fillText('HOSPITAL', x, y-22);
+      }
+
+      // Small clinic A — 3-storey warm stone
+      function drawClinicA(x, y) {
+        const h = 70, rH = 14;
+        ctx.fillStyle = 'rgba(0,0,0,0.12)';
+        ctx.beginPath(); ctx.ellipse(x, y+TH*0.75, TW*0.5, 8, 0, 0, Math.PI*2); ctx.fill();
+        block(x, y-h, h, P.clWT, P.clWL, P.clWR);
+        block(x, y-h-rH, rH, P.clRT, P.clRL, P.clRR);
+        // cross sign on wall
+        ctx.fillStyle = P.hCR;
+        ctx.fillRect(x-TW*0.42, y-h+12, 5, 14); ctx.fillRect(x-TW*0.48, y-h+17, 17, 5);
+        // windows (3 floors)
+        for (let fl = 0; fl < 3; fl++) {
+          const wy = y - h + 8 + fl * 20;
+          ctx.fillStyle = P.hWnL; ctx.fillRect(x-TW*0.44, wy, 10, 8);
+          ctx.fillStyle = P.hWnD; ctx.fillRect(x+TW*0.14, wy, 10, 8);
+        }
+      }
+
+      // Small clinic B — 2-storey, slightly different shape
+      function drawClinicB(x, y) {
+        const h = 44, rH = 10;
+        block(x, y-h, h, P.clWT, P.clWL, P.clWR);
+        block(x, y-h-rH, rH, P.hRT, P.hRL, P.hRR);
+        ctx.fillStyle = P.hCR; ctx.fillRect(x-TW*0.38,y-h+8,4,10); ctx.fillRect(x-TW*0.43,y-h+12,12,4);
+        for (let fl = 0; fl < 2; fl++) {
+          ctx.fillStyle = P.hWnL; ctx.fillRect(x-TW*0.4, y-h+6+fl*18, 9, 7);
+        }
+      }
+
+      // Ambulance bay — open-sided canopy with parked vehicle
+      function drawAmbBay(x, y) {
+        const h = 30, roofH = 10;
+        // Canopy pillars
+        ctx.fillStyle = P.ambBL;
+        ctx.fillRect(x-TW*0.5+2, y-h, 6, h); ctx.fillRect(x+TW*0.5-8, y-h, 6, h);
+        // Canopy roof
+        block(x, y-h, roofH, P.hRT, P.hRL, P.hRR);
+        // Ambulance body
+        ctx.fillStyle = P.ambW;
+        ctx.fillRect(x-26, y-28, 52, 22);
+        ctx.fillStyle = P.ambR;
+        ctx.fillRect(x-26, y-28, 18, 8);   // red stripe left
+        ctx.fillRect(x+8,  y-28, 18, 8);   // red stripe right
+        // Wheels
+        ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(x-16, y-8, 5, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x+16, y-8, 5, 0, Math.PI*2); ctx.fill();
+        // Ambulance cross
+        ctx.fillStyle = P.ambR;
+        ctx.fillRect(x-3, y-24, 6, 14); ctx.fillRect(x-9, y-19, 18, 5);
+        // Roof light bar
+        ctx.shadowColor = P.ambR; ctx.shadowBlur = 10;
+        ctx.fillStyle = P.ambR; ctx.fillRect(x-8, y-32, 16, 4);
+        ctx.shadowBlur = 0;
+      }
+
+      // Garden flower bed
+      function drawGardenBed(x, y) {
+        // Small raised planter box
+        block(x, y-6, 6, '#c8b880', '#a09060', '#807040');
+        // Colorful flowers
+        const colors = [P.hCR,'#e9c46a','#f4a261','#b5ead7'];
+        for (let i = 0; i < 4; i++) {
+          ctx.fillStyle = colors[i];
+          ctx.beginPath(); ctx.arc(x - 12 + i*8, y-10, 4, 0, Math.PI*2); ctx.fill();
+          ctx.fillStyle = '#fff8e0'; ctx.beginPath(); ctx.arc(x - 12 + i*8, y-10, 1.5, 0, Math.PI*2); ctx.fill();
+        }
+        ctx.strokeStyle = P.mgL; ctx.lineWidth = 1;
+        for (let i = 0; i < 4; i++) {
+          ctx.beginPath(); ctx.moveTo(x-12+i*8, y-10); ctx.lineTo(x-12+i*8, y-6); ctx.stroke();
+        }
+      }
+
+      // Magical healing tree (Toriko-inspired, bioluminescent glow)
+      function drawMagTree(x, y, t) {
+        // trunk
+        block(x, y-36, 10, '#7a5a2a','#5a3a10','#3a2808');
+        // glow halo
+        ctx.shadowColor = P.magGlow; ctx.shadowBlur = 18;
+        ctx.fillStyle = P.leafC+'99'; ctx.beginPath(); ctx.arc(x, y-56, 24, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = P.magLeaf; ctx.beginPath(); ctx.arc(x, y-56, 20, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = P.magGlow; ctx.beginPath(); ctx.arc(x-8, y-64, 13, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = P.magLeaf; ctx.beginPath(); ctx.arc(x+7, y-62, 12, 0, Math.PI*2); ctx.fill();
+        // floating sparkles
+        const sOff = Math.sin((t||0)*0.04)*3;
+        ctx.fillStyle = P.magGlow; ctx.globalAlpha = 0.7;
+        ctx.fillRect(x+14, y-68+sOff, 2, 2); ctx.fillRect(x-18, y-72-sOff, 2, 2);
+        ctx.fillRect(x+4,  y-80+sOff*0.5, 2, 2);
+        ctx.globalAlpha = 1;
+      }
+
+      // Courtyard fountain
+      function drawFountain(x, y, t) {
+        // base basin ring
+        diamond(x, y, P.fnT, 'rgba(0,0,0,0.1)');
+        block(x, y-8, 8, P.fnT, P.fnL, P.fnR);
+        // water surface
+        ctx.fillStyle = P.fnW + 'bb';
+        ctx.beginPath(); ctx.ellipse(x, y-8, TW*0.32, TH*0.32, 0, 0, Math.PI*2); ctx.fill();
+        // centre pillar
+        block(x, y-22, 14, P.cbT, P.cbL, P.cbR);
+        // water arc glow
+        const wt = Math.sin((t||0)*0.05)*4;
+        ctx.shadowColor = P.fnW; ctx.shadowBlur = 8;
+        ctx.strokeStyle = P.fnW; ctx.lineWidth = 2; ctx.globalAlpha = 0.8;
+        ctx.beginPath(); ctx.arc(x-6, y-26, 8, Math.PI*1.1, Math.PI*1.9); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x+6, y-26, 8, Math.PI*1.1, Math.PI*1.9); ctx.stroke();
+        ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+      }
+
+      // Futuristic med gadget A — DNA scanner tower
+      function drawGadgetA(x, y, t) {
+        // base plinth
+        block(x, y-8, 8, P.gdPad, P.gdL, P.gdL+'88');
+        // tower pillar
+        ctx.fillStyle = P.gdM; ctx.fillRect(x-4, y-42, 8, 34);
+        // scan ring
+        ctx.strokeStyle = P.gdGlow; ctx.lineWidth = 2;
+        ctx.shadowColor = P.gdGlow; ctx.shadowBlur = 10;
+        ctx.beginPath(); ctx.ellipse(x, y-38, 14, 5, 0, 0, Math.PI*2); ctx.stroke();
+        const ringY = y-38 + Math.sin((t||0)*0.06)*6;
+        ctx.beginPath(); ctx.ellipse(x, ringY, 14, 5, 0, 0, Math.PI*2); ctx.stroke();
+        ctx.shadowBlur = 0;
+        // screen top
+        ctx.fillStyle = P.gdScreen;
+        ctx.fillRect(x-10, y-55, 20, 13);
+        ctx.fillStyle = '#ffffff'; ctx.font = '5px monospace'; ctx.textAlign = 'center';
+        ctx.fillText('◈', x, y-45);
+      }
+
+      // Futuristic med gadget B — bioreactor pod
+      function drawGadgetB(x, y, t) {
+        block(x, y-8, 8, P.gdPad, P.gdL, P.gdL);
+        // pod cylinder
+        ctx.fillStyle = P.gdM;
+        ctx.fillRect(x-12, y-46, 24, 38);
+        // dome top
+        ctx.fillStyle = P.gdH;
+        ctx.beginPath(); ctx.ellipse(x, y-46, 12, 8, 0, 0, Math.PI*2); ctx.fill();
+        // inner glow liquid
+        ctx.fillStyle = P.gdGlow + '88';
+        ctx.fillRect(x-8, y-40, 16, 28);
+        // pulsing highlight
+        ctx.shadowColor = P.gdScreen; ctx.shadowBlur = 14 + Math.sin((t||0)*0.07)*6;
+        ctx.strokeStyle = P.gdScreen; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.ellipse(x, y-46, 6, 4, 0, 0, Math.PI*2); ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+
+      // Medical RPG lantern — warm amber glow
+      function drawMedLamp(x, y) {
+        ctx.strokeStyle = P.mlP; ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(x, y+TH*0.5); ctx.lineTo(x, y-32); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x, y-32); ctx.lineTo(x+12, y-38); ctx.stroke();
+        // lamp head
+        ctx.fillStyle = P.mlP; ctx.fillRect(x+8, y-44, 10, 10);
+        ctx.shadowColor = P.mlG; ctx.shadowBlur = 18;
+        ctx.fillStyle = P.mlG; ctx.beginPath(); ctx.arc(x+13, y-39, 5, 0, Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0;
       }
 
       // ── CHIBI CHARACTER – 256px tall ──
@@ -1524,7 +1803,7 @@
       const ZONES = [
         { maxRow: GRASS_END-1, name: '◆  GRASS PLAINS',  col: '#2a9d8f' },
         { maxRow: CITY_END-1,  name: '◆  CITY',          col: '#e9c46a' },
-        { maxRow: WH,          name: '◆  MEDICAL FIELD', col: '#e76f51' },
+        { maxRow: WH,          name: '◆  MEDICAL DISTRICT', col: '#f4a261' },
       ];
       let lastZone = -1;
       function updateZone() {
@@ -1603,23 +1882,36 @@
             const s = toScreen(gx2, gy2);
             if (!inView(s.x, s.y)) continue;
             const t2 = worldMap[gy2][gx2];
-            if      (t2 === 'grass') drawGrass(s.x, s.y, (gx2*3+gy2*2)%3);
-            else if (t2 === 'dirt')  drawDirt(s.x, s.y);
-            else if (t2 === 'water') drawWater(s.x, s.y, tick);
-            else if (t2 === 'road')  drawRoad(s.x, s.y);
-            else if (t2 === 'walk')  drawWalk(s.x, s.y);
-            else if (t2 === 'hf')    drawHF(s.x, s.y);
+            if      (t2 === 'grass')     drawGrass(s.x, s.y, (gx2*3+gy2*2)%3);
+            else if (t2 === 'dirt')      drawDirt(s.x, s.y);
+            else if (t2 === 'water')     drawWater(s.x, s.y, tick);
+            else if (t2 === 'road')      drawRoad(s.x, s.y);
+            else if (t2 === 'walk')      drawWalk(s.x, s.y);
+            else if (t2 === 'hf')        drawHF(s.x, s.y);
+            else if (t2 === 'cobble')    drawCobble(s.x, s.y);
+            else if (t2 === 'med_grass') drawMedGrass(s.x, s.y);
             const o = objMap[gy2][gx2];
-            if      (o === 'tree')      drawTree(s.x, s.y);
-            else if (o === 'flower_r')  drawFlower(s.x, s.y, P.flowerR);
-            else if (o === 'flower_y')  drawFlower(s.x, s.y, P.flowerY);
-            else if (o === 'bldA')      drawBuilding(s.x, s.y, false);
-            else if (o === 'bldB')      drawBuilding(s.x, s.y, true);
-            else if (o === 'lamp')      drawLamp(s.x, s.y);
-            else if (o === 'bed')       drawBed(s.x, s.y);
-            else if (o === 'cross_obj') drawCrossObj(s.x, s.y);
-            else if (o === 'desk')      drawDesk(s.x, s.y);
-            else if (o === 'plant')     drawPlant(s.x, s.y);
+            if      (o === 'tree')       drawTree(s.x, s.y);
+            else if (o === 'flower_r')   drawFlower(s.x, s.y, P.flowerR);
+            else if (o === 'flower_y')   drawFlower(s.x, s.y, P.flowerY);
+            else if (o === 'bldA')       drawBuilding(s.x, s.y, false);
+            else if (o === 'bldB')       drawBuilding(s.x, s.y, true);
+            else if (o === 'lamp')       drawLamp(s.x, s.y);
+            else if (o === 'bed')        drawBed(s.x, s.y);
+            else if (o === 'cross_obj')  drawCrossObj(s.x, s.y);
+            else if (o === 'desk')       drawDesk(s.x, s.y);
+            else if (o === 'plant')      drawPlant(s.x, s.y);
+            // Medical district objects
+            else if (o === 'hosp_main')  drawHospMain(s.x, s.y);
+            else if (o === 'clinic_a')   drawClinicA(s.x, s.y);
+            else if (o === 'clinic_b')   drawClinicB(s.x, s.y);
+            else if (o === 'amb_bay')    drawAmbBay(s.x, s.y);
+            else if (o === 'garden_bed') drawGardenBed(s.x, s.y);
+            else if (o === 'mag_tree')   drawMagTree(s.x, s.y, tick);
+            else if (o === 'fountain')   drawFountain(s.x, s.y, tick);
+            else if (o === 'gadget_a')   drawGadgetA(s.x, s.y, tick);
+            else if (o === 'gadget_b')   drawGadgetB(s.x, s.y, tick);
+            else if (o === 'med_lamp')   drawMedLamp(s.x, s.y);
           }
         }
 
