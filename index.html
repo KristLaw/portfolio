@@ -731,500 +731,771 @@
   </section>
 
   <!-- ── Skills Graphic ── -->
-  <section id="skills-section" style="padding:0;overflow:hidden;">
+<!-- ── Skills Playground ── -->
+  <section id="skills-section" style="padding:0;overflow:hidden;position:relative;">
   <style>
-    #skills-scene {
-      width:100%; background:#07051a;
-      position:relative; overflow:hidden;
-      display:flex; align-items:center; justify-content:center;
-      min-height:580px;
+    #skills-section { background:#04030e; }
+    #playground-tron {
+      position:absolute; inset:0; pointer-events:none; z-index:0;
+      opacity:.06;
+      background-image:linear-gradient(rgba(57,255,110,.7) 1px,transparent 1px),linear-gradient(90deg,rgba(57,255,110,.7) 1px,transparent 1px);
+      background-size:40px 40px;
     }
-    #skills-scene::after {
-      content:''; position:absolute; inset:0;
-      pointer-events:none; z-index:10;
-      background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.18) 2px,rgba(0,0,0,0.18) 4px);
+    #playground-wrap {
+      max-width:960px; margin:0 auto;
+      padding:5rem 2rem 4rem;
+      display:flex; flex-direction:column; align-items:center; gap:2rem;
+      position:relative; z-index:1;
     }
-    @keyframes floatTL { 0%,100%{transform:translate(0,0) rotate(-4deg)} 50%{transform:translate(-5px,-11px) rotate(-5.5deg)} }
-    @keyframes floatBL { 0%,100%{transform:translate(0,0) rotate(3deg)}  50%{transform:translate(-7px,10px)  rotate(4.5deg)} }
-    @keyframes floatTR { 0%,100%{transform:translate(0,0) rotate(4deg)}  50%{transform:translate(5px,-10px)  rotate(5.5deg)} }
-    @keyframes floatBR { 0%,100%{transform:translate(0,0) rotate(-3deg)} 50%{transform:translate(7px,11px)   rotate(-4.5deg)} }
-    @keyframes charFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
-    @keyframes glitchChar {
-      0%,92%,100%{transform:translateY(0) translateX(0)}
-      93%{transform:translateY(0) translateX(-4px)}
-      94%{transform:translateY(0) translateX(3px)}
-      95%{transform:translateY(0) translateX(-2px)}
-      96%{transform:translateY(0) translateX(0)}
+    #playground-arena {
+      display:grid;
+      grid-template-columns:1fr 210px 1fr;
+      grid-template-rows:auto auto auto;
+      gap:1.2rem; align-items:center;
+      width:100%; max-width:880px;
     }
-    @keyframes twinkle { 0%,100%{opacity:.15} 50%{opacity:1} }
-    @keyframes scanMove { 0%{transform:translateY(-100%)} 100%{transform:translateY(600px)} }
-    .sc-tl { animation: floatTL 4.2s ease-in-out infinite; transform-origin:center; }
-    .sc-bl { animation: floatBL 4.6s ease-in-out infinite .6s; transform-origin:center; }
-    .sc-tr { animation: floatTR 3.9s ease-in-out infinite 1.1s; transform-origin:center; }
-    .sc-br { animation: floatBR 4.4s ease-in-out infinite .3s; transform-origin:center; }
-    .cg    { animation: charFloat 3.2s ease-in-out infinite .2s, glitchChar 9s steps(1) infinite 2s; }
-    .star  { animation: twinkle var(--d,2s) ease-in-out infinite var(--dl,0s); }
+    #char-stage {
+      grid-column:2; grid-row:1/3;
+      display:flex; flex-direction:column; align-items:center; gap:.5rem;
+    }
+    #char-svg {
+      width:184px; height:220px;
+      filter:drop-shadow(0 0 6px rgba(57,255,110,0.2));
+      overflow:visible; transition:filter .3s;
+    }
+    #char-svg.sk-flash { filter:drop-shadow(0 0 18px var(--glow-c,#39ff6e)) brightness(1.15); }
+    #skill-name-display {
+      font-family:var(--font-px); font-size:.35rem; letter-spacing:.1em;
+      color:var(--active-c,#39ff6e); text-shadow:0 0 8px currentColor;
+      text-align:center; white-space:nowrap; min-height:1.2em;
+    }
+    #flavor-box {
+      font-family:var(--font-body); font-size:.82rem; color:var(--muted);
+      text-align:center; line-height:1.6; max-width:240px; min-height:2.8em;
+    }
+    #stats-display {
+      font-family:var(--font-px); font-size:.28rem; letter-spacing:.1em;
+      color:var(--active-c,#39ff6e); opacity:.7; text-align:center; min-height:.8em;
+    }
+    /* export btn */
+    #export-btn {
+      font-family:var(--font-px); font-size:.3rem; letter-spacing:.08em;
+      color:var(--muted); background:rgba(10,10,20,.7);
+      border:1px solid rgba(139,188,184,.25); padding:.4rem .8rem;
+      cursor:none; transition:border-color .2s, color .2s; margin-top:.3rem;
+    }
+    #export-btn:hover { border-color:var(--gold); color:var(--gold); }
+
+    /* passive panel */
+    #passive-panel {
+      grid-column:1/4; grid-row:3;
+      background:rgba(4,3,14,.85);
+      border:1px solid rgba(233,196,106,.18);
+      padding:.8rem 1.2rem;
+      display:none; align-items:flex-start; gap:.8rem;
+    }
+    #passive-panel.visible { display:flex; }
+    #passive-icon {
+      font-family:var(--font-px); font-size:.55rem; color:var(--gold); flex-shrink:0;
+      padding:.2rem .5rem; border:1px solid rgba(233,196,106,.3);
+    }
+    #passive-text {
+      font-family:var(--font-body); font-size:.88rem; color:var(--muted);
+      font-style:italic; line-height:1.55;
+    }
+    #passive-label {
+      font-family:var(--font-px); font-size:.28rem; letter-spacing:.1em;
+      color:var(--gold); text-transform:uppercase; margin-bottom:.2rem;
+    }
+
+    /* skill cards */
+    .skill-card {
+      position:relative; background:rgba(4,3,14,0.92);
+      border:1px solid color-mix(in srgb,var(--sk-color),transparent 58%);
+      padding:.85rem .75rem;
+      cursor:none;
+      display:flex; flex-direction:column; align-items:center; gap:.35rem;
+      transition:border-color .2s, transform .2s, box-shadow .2s;
+      transform:rotate(var(--sk-rot,0deg));
+    }
+    .skill-card:hover {
+      border-color:var(--sk-color);
+      box-shadow:0 0 14px color-mix(in srgb,var(--sk-color),transparent 45%),
+                 inset 0 0 8px color-mix(in srgb,var(--sk-color),transparent 82%);
+      transform:rotate(0deg) translateY(-4px); z-index:2;
+    }
+    .skill-card.active {
+      border-color:var(--sk-color);
+      box-shadow:0 0 22px var(--sk-color),
+                 inset 0 0 14px color-mix(in srgb,var(--sk-color),transparent 78%);
+      transform:rotate(0deg) scale(1.04); z-index:3;
+    }
+    .sk-corner { position:absolute; width:10px; height:10px; border-color:var(--sk-color); border-style:solid; }
+    .skill-card:hover .sk-corner,.skill-card.active .sk-corner { width:14px; height:14px; }
+    .sk-tl { top:5px; left:5px; border-width:1px 0 0 1px; }
+    .sk-tr { top:5px; right:5px; border-width:1px 1px 0 0; }
+    .sk-bl { bottom:5px; left:5px; border-width:0 0 1px 1px; }
+    .sk-br { bottom:5px; right:5px; border-width:0 1px 1px 0; }
+    .sk-icon-wrap { width:56px; height:56px; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.4); border:1px solid color-mix(in srgb,var(--sk-color),transparent 72%); }
+    .sk-name { font-family:var(--font-px); font-size:.3rem; letter-spacing:.08em; color:var(--sk-color); text-align:center; line-height:1.8; }
+    .sk-sub  { font-family:var(--font-body); font-size:.68rem; color:var(--muted); letter-spacing:.15em; text-transform:uppercase; }
+    .sk-stats { font-family:var(--font-px); font-size:.24rem; color:var(--sk-color); opacity:.6; letter-spacing:.06em; text-align:center; }
+
+    .sk-dash     { grid-column:1; grid-row:1; justify-self:end; --sk-rot:-2deg; }
+    .sk-guard    { grid-column:3; grid-row:1; justify-self:start; --sk-rot:2deg; }
+    .sk-photo    { grid-column:1; grid-row:2; justify-self:end; --sk-rot:1.5deg; }
+    .sk-critical { grid-column:3; grid-row:2; justify-self:start; --sk-rot:-1.5deg; }
+    .sk-runaway  { grid-column:1/4; grid-row:3; justify-self:center; max-width:190px; margin-top:.3rem; }
+
+    /* scanlines */
+    #playground-wrap::before { content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
+      background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.10) 3px,rgba(0,0,0,.10) 4px); }
+    #playground-wrap > * { position:relative; z-index:1; }
+
+    @keyframes sk-glitch {
+      0%,100%{transform:translateX(0) scaleX(1)}
+      20%{transform:translateX(-4px) scaleX(.98)}
+      40%{transform:translateX(4px) scaleX(1.02)}
+      60%{transform:translateX(-2px) scaleX(.99)}
+      80%{transform:translateX(2px) scaleX(1.01)}
+    }
+    @media(max-width:700px){
+      #playground-arena { grid-template-columns:1fr 1fr; grid-template-rows:auto auto auto auto; }
+      #char-stage { grid-column:1/3; grid-row:1; }
+      .sk-dash    { grid-column:1; grid-row:2; justify-self:center; }
+      .sk-guard   { grid-column:2; grid-row:2; justify-self:center; }
+      .sk-photo   { grid-column:1; grid-row:3; justify-self:center; }
+      .sk-critical{ grid-column:2; grid-row:3; justify-self:center; }
+      .sk-runaway { grid-column:1/3; grid-row:4; }
+      #passive-panel { grid-column:1/3; }
+    }
   </style>
 
-  <div id="skills-scene">
-  <svg viewBox="0 0 900 580" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:1200px;display:block;">
-    <defs>
-      <radialGradient id="bgr" cx="50%" cy="48%" r="68%">
-        <stop offset="0%"   stop-color="#1c1040"/>
-        <stop offset="55%"  stop-color="#0c0720"/>
-        <stop offset="100%" stop-color="#040310"/>
-      </radialGradient>
-      <filter id="fg"  x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5"  result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      <filter id="fc"  x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="6"  result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      <filter id="fp"  x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4"  result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      <filter id="faur" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="18"/></filter>
-      <!-- card gradients -->
-      <linearGradient id="gcTL" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00ffaa" stop-opacity=".16"/><stop offset="100%" stop-color="#001a0f" stop-opacity=".04"/></linearGradient>
-      <linearGradient id="gcBL" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00ccff" stop-opacity=".14"/><stop offset="100%" stop-color="#000d1a" stop-opacity=".04"/></linearGradient>
-      <linearGradient id="gcTR" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff44aa" stop-opacity=".14"/><stop offset="100%" stop-color="#1a000d" stop-opacity=".04"/></linearGradient>
-      <linearGradient id="gcBR" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffaa00" stop-opacity=".14"/><stop offset="100%" stop-color="#1a0d00" stop-opacity=".04"/></linearGradient>
-    </defs>
+  <div id="playground-tron"></div>
+  <div id="playground-wrap">
+    <div style="text-align:center">
+      <p class="section-label">The Playground</p>
+      <h2 class="section-title" style="margin-bottom:0">SKILL LOADOUT</h2>
+      <p style="font-family:var(--font-body);font-size:.82rem;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;margin-top:.4rem">Click a card to activate skill</p>
+    </div>
 
-    <!-- BG -->
-    <rect width="900" height="580" fill="url(#bgr)"/>
+    <div id="playground-arena">
+      <div class="skill-card sk-dash" data-skill="dash" data-flavor="Sprint before they react.<br><em>When work is done — vanish.</em>" data-stats="ATK+20 • SPD+15" data-passive="Running: approach problems at pace, strike while momentum is high. Also literal: gone at 5pm." style="--sk-color:#39ff6e">
+      <div class="sk-corner sk-tl"></div><div class="sk-corner sk-tr"></div>
+      <div class="sk-corner sk-bl"></div><div class="sk-corner sk-br"></div>
+      <div class="sk-icon-wrap">
+        <svg viewBox="0 0 32 32" width="56" height="56" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="14" y="2" width="4" height="28" fill="#39ff6e"/>
+<rect x="14" y="2" width="4" height="8" fill="#b0ffcc"/>
+<rect x="8" y="18" width="16" height="4" fill="#e9c46a"/>
+<rect x="14" y="22" width="4" height="8" fill="#0a0a14"/>
+<rect x="4" y="10" width="8" height="4" fill="#39ff6e" opacity="0.5"/>
+<rect x="8" y="6" width="4" height="4" fill="#39ff6e" opacity="0.3"/></svg>
+      </div>
+      <div class="sk-name">DASH STRIKE</div>
+      <div class="sk-sub">Running Hobby</div>
+      <div class="sk-stats">ATK+20 • SPD+15</div>
+    </div>
+    <div class="skill-card sk-guard" data-skill="guard" data-flavor="Coordinate your fit.<br><em>Block with aesthetic discipline.</em>" data-stats="DEF+15 • STYLE+∞" data-passive="Outfit coordination = defensive strategy. Clash in clothes = clash in logic. Never both." style="--sk-color:#00ccff">
+      <div class="sk-corner sk-tl"></div><div class="sk-corner sk-tr"></div>
+      <div class="sk-corner sk-bl"></div><div class="sk-corner sk-br"></div>
+      <div class="sk-icon-wrap">
+        <svg viewBox="0 0 32 32" width="56" height="56" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="10" y="4" width="12" height="20" fill="#2a9d8f"/>
+<rect x="12" y="6" width="8" height="16" fill="#1e3a47"/>
+<rect x="12" y="4" width="8" height="2" fill="#3ab8a8"/>
+<rect x="10" y="24" width="12" height="4" fill="#1e3a47"/>
+<rect x="18" y="12" width="4" height="8" fill="#e9c46a"/>
+<rect x="14" y="14" width="4" height="4" fill="#f0ede8"/></svg>
+      </div>
+      <div class="sk-name">STYLE GUARD</div>
+      <div class="sk-sub">Matching Clothes</div>
+      <div class="sk-stats">DEF+15 • STYLE+∞</div>
+    </div>
+    <div class="skill-card sk-critical" data-skill="critical" data-flavor="When the pipeline goes brr.<br><em>Sequenced. Systematic. Satisfying.</em>" data-stats="COMBO+30 • CRIT+25" data-passive="SOP mastery, process chaining, the satisfying CLICK when a workflow closes correctly." style="--sk-color:#e9c46a">
+      <div class="sk-corner sk-tl"></div><div class="sk-corner sk-tr"></div>
+      <div class="sk-corner sk-bl"></div><div class="sk-corner sk-br"></div>
+      <div class="sk-icon-wrap">
+        <svg viewBox="0 0 32 32" width="56" height="56" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="4" y="4" width="24" height="10" fill="#1e3a47"/>
+<rect x="6" y="6" width="20" height="6" fill="#2a9d8f"/>
+<rect x="8" y="6" width="16" height="2" fill="#3ab8a8"/>
+<rect x="14" y="14" width="4" height="16" fill="#18100a"/>
+<rect x="4" y="4" width="24" height="10" fill="#39ff6e" opacity="0.2"/>
+<rect x="2" y="2" width="4" height="4" fill="#b0ffcc" opacity="0.8"/>
+<rect x="26" y="2" width="4" height="4" fill="#b0ffcc" opacity="0.8"/></svg>
+      </div>
+      <div class="sk-name">CRITICAL EXEC</div>
+      <div class="sk-sub">Workflow Ops</div>
+      <div class="sk-stats">COMBO+30 • CRIT+25</div>
+    </div>
+    <div class="skill-card sk-photo" data-skill="photo" data-flavor="Shoot first.<br><em>Ask for model release never.</em>" data-stats="FOCUS+40 • ARTS+15" data-passive="Framing, exposure, decisive moment — the same eye that edits footage, edits workflow." style="--sk-color:#e76f51">
+      <div class="sk-corner sk-tl"></div><div class="sk-corner sk-tr"></div>
+      <div class="sk-corner sk-bl"></div><div class="sk-corner sk-br"></div>
+      <div class="sk-icon-wrap">
+        <svg viewBox="0 0 32 32" width="56" height="56" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="2" y="6" width="28" height="20" fill="#444455"/>
+<rect x="4" y="8" width="24" height="16" fill="#888898"/>
+<rect x="8" y="8" width="14" height="16" fill="#333355"/>
+<rect x="10" y="10" width="10" height="12" fill="#1144aa"/>
+<rect x="14" y="12" width="4" height="8" fill="#4477ff"/>
+<rect x="14" y="12" width="2" height="2" fill="#99aaff"/>
+<rect x="20" y="6" width="8" height="6" fill="#444455"/>
+<rect x="0" y="6" width="16" height="2" fill="#aaaaaa"/>
+<rect x="24" y="8" width="4" height="2" fill="#ffffff" opacity="0.7"/></svg>
+      </div>
+      <div class="sk-name">SNAP FOCUS</div>
+      <div class="sk-sub">Photography</div>
+      <div class="sk-stats">FOCUS+40 • ARTS+15</div>
+    </div>
+    <div class="skill-card sk-runaway" data-skill="runaway" data-flavor="404: Employee not found.<br><em>Sprint velocity: MAX.</em>" data-stats="SPD+99 • DIGNITY-10" data-passive="The truest skill. When in doubt, outrun the problem. Cardio is a coping mechanism." style="--sk-color:#ff66aa">
+      <div class="sk-corner sk-tl"></div><div class="sk-corner sk-tr"></div>
+      <div class="sk-corner sk-bl"></div><div class="sk-corner sk-br"></div>
+      <div class="sk-icon-wrap">
+        <svg viewBox="0 0 32 32" width="56" height="56" xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated"><rect x="2" y="16" width="28" height="10" fill="#2a9d8f"/>
+<rect x="0" y="22" width="30" height="6" fill="#3ab8a8"/>
+<rect x="2" y="14" width="8" height="4" fill="#2a9d8f"/>
+<rect x="24" y="12" width="6" height="4" fill="#f0ede8"/>
+<rect x="0" y="26" width="28" height="4" fill="#0a0a14"/>
+<rect x="2" y="20" width="6" height="6" fill="#f0ede8"/>
+<rect x="18" y="18" width="8" height="2" fill="#e9c46a"/></svg>
+      </div>
+      <div class="sk-name">ESCAPE ROUTE</div>
+      <div class="sk-sub">Running (Again)</div>
+      <div class="sk-stats">SPD+99 • DIGNITY-10</div>
+    </div>
 
-    <!-- Tron grid -->
-    <g opacity=".1" stroke="#4488ff" stroke-width=".6">
-      <line x1="100" y1="0" x2="100" y2="580"/><line x1="200" y1="0" x2="200" y2="580"/>
-      <line x1="300" y1="0" x2="300" y2="580"/><line x1="400" y1="0" x2="400" y2="580"/>
-      <line x1="500" y1="0" x2="500" y2="580"/><line x1="600" y1="0" x2="600" y2="580"/>
-      <line x1="700" y1="0" x2="700" y2="580"/><line x1="800" y1="0" x2="800" y2="580"/>
-      <line x1="0" y1="72"  x2="900" y2="72"/> <line x1="0" y1="144" x2="900" y2="144"/>
-      <line x1="0" y1="216" x2="900" y2="216"/><line x1="0" y1="288" x2="900" y2="288"/>
-      <line x1="0" y1="360" x2="900" y2="360"/><line x1="0" y1="432" x2="900" y2="432"/>
-      <line x1="0" y1="504" x2="900" y2="504"/>
-    </g>
-
-    <!-- Stars -->
-    <g fill="white">
-      <rect class="star" style="--d:2.1s;--dl:0s"   x="42"  y="28"  width="2" height="2"/>
-      <rect class="star" style="--d:1.7s;--dl:.3s"  x="148" y="55"  width="1" height="1"/>
-      <rect class="star" style="--d:2.8s;--dl:.8s"  x="248" y="18"  width="2" height="2"/>
-      <rect class="star" style="--d:1.5s;--dl:.5s"  x="375" y="42"  width="1" height="1"/>
-      <rect class="star" style="--d:3.1s;--dl:1.2s" x="522" y="12"  width="2" height="2"/>
-      <rect class="star" style="--d:2.3s;--dl:.7s"  x="648" y="52"  width="1" height="1"/>
-      <rect class="star" style="--d:1.9s;--dl:.4s"  x="778" y="28"  width="2" height="2"/>
-      <rect class="star" style="--d:2.5s;--dl:1.0s" x="858" y="68"  width="1" height="1"/>
-      <rect class="star" style="--d:1.6s;--dl:.2s"  x="68"  y="530" width="2" height="2"/>
-      <rect class="star" style="--d:2.9s;--dl:.9s"  x="818" y="505" width="1" height="1"/>
-      <rect class="star" style="--d:2.2s;--dl:.6s"  x="178" y="555" width="2" height="2"/>
-      <rect class="star" style="--d:1.8s;--dl:1.4s" x="695" y="565" width="1" height="1"/>
-      <rect class="star" style="--d:3.0s;--dl:.1s"  x="28"  y="275" width="1" height="1"/>
-      <rect class="star" style="--d:1.4s;--dl:1.1s" x="868" y="315" width="2" height="2"/>
-      <rect class="star" style="--d:2.6s;--dl:.45s" x="455" y="35"  width="1" height="1"/>
-      <rect class="star" style="--d:1.3s;--dl:1.6s" x="322" y="545" width="2" height="2"/>
-    </g>
-
-    <!-- Moving scan line -->
-    <rect width="900" height="2" fill="#00ffaa" opacity=".04">
-      <animateTransform attributeName="transform" type="translate" from="0,-2" to="0,582" dur="5s" repeatCount="indefinite"/>
-    </rect>
-
-    <!-- ═══════════════════════════════════
-         CARD TL: Communication / HR
-    ════════════════════════════════════ -->
-    <g class="sc-tl" transform="translate(88,52)">
-      <g transform="skewX(-3) skewY(4)">
-        <rect x="0" y="0" width="192" height="158" rx="2" fill="#081512" stroke="#00ffaa" stroke-width="1.5" opacity=".92"/>
-        <rect x="0" y="0" width="192" height="158" rx="2" fill="url(#gcTL)" opacity=".7"/>
-        <path d="M4,14 L4,4 L14,4"   stroke="#00ffaa" stroke-width="1.5" fill="none"/>
-        <path d="M178,4 L188,4 L188,14"  stroke="#00ffaa" stroke-width="1.5" fill="none"/>
-        <path d="M4,144 L4,154 L14,154"  stroke="#00ffaa" stroke-width="1.5" fill="none"/>
-        <path d="M178,154 L188,154 L188,144" stroke="#00ffaa" stroke-width="1.5" fill="none"/>
-        <rect x="8" y="9" width="176" height="1" fill="#00ffaa" opacity=".3"/>
-        <!-- PIXEL ART: Microphone + speech bubbles (8px grid) -->
-        <g transform="translate(50,16)" filter="url(#fg)">
-          <!-- mic capsule -->
-          <rect x="32" y="0"  width="8"  height="2"  fill="#00ffaa"/>
-          <rect x="28" y="2"  width="16" height="2"  fill="#00ffaa"/>
-          <rect x="24" y="4"  width="24" height="2"  fill="#00eebb"/>
-          <rect x="22" y="6"  width="28" height="2"  fill="#00ddaa"/>
-          <rect x="22" y="8"  width="28" height="2"  fill="#00ddaa"/>
-          <rect x="22" y="10" width="28" height="2"  fill="#00ccaa"/>
-          <rect x="22" y="12" width="28" height="2"  fill="#00ccaa"/>
-          <rect x="24" y="14" width="24" height="2"  fill="#00bbaa"/>
-          <rect x="28" y="16" width="16" height="2"  fill="#00bbaa"/>
-          <rect x="32" y="18" width="8"  height="2"  fill="#00aaaa"/>
-          <!-- grille lines -->
-          <rect x="24" y="7"  width="24" height="1"  fill="#003322" opacity=".9"/>
-          <rect x="24" y="11" width="24" height="1"  fill="#003322" opacity=".9"/>
-          <rect x="24" y="15" width="24" height="1"  fill="#003322" opacity=".9"/>
-          <!-- stand -->
-          <rect x="34" y="20" width="4"  height="18" fill="#009966"/>
-          <rect x="26" y="38" width="20" height="2"  fill="#009966"/>
-          <rect x="22" y="40" width="28" height="2"  fill="#007744"/>
-          <!-- speech bubble 1 (large, right) -->
-          <rect x="56" y="0"  width="20" height="14" fill="#00ffaa" opacity=".85"/>
-          <rect x="54" y="2"  width="24" height="10" fill="#00ffaa" opacity=".9"/>
-          <rect x="60" y="14" width="4"  height="4"  fill="#00ffaa" opacity=".85"/>
-          <rect x="64" y="16" width="4"  height="4"  fill="#00ffaa" opacity=".7"/>
-          <!-- pixel text in bubble -->
-          <rect x="58" y="5"  width="4" height="2" fill="#001a10"/>
-          <rect x="64" y="5"  width="4" height="2" fill="#001a10"/>
-          <rect x="70" y="5"  width="4" height="2" fill="#001a10"/>
-          <rect x="60" y="9"  width="12" height="2" fill="#001a10"/>
-          <!-- speech bubble 2 (small) -->
-          <rect x="52" y="22" width="14" height="10" fill="#00cc88" opacity=".75"/>
-          <rect x="50" y="24" width="18" height="6"  fill="#00cc88" opacity=".8"/>
-          <rect x="54" y="32" width="4"  height="4"  fill="#00cc88" opacity=".75"/>
-          <rect x="58" y="34" width="4"  height="2"  fill="#00cc88" opacity=".6"/>
-        </g>
-        <rect x="8" y="102" width="176" height="1" fill="#00ffaa" opacity=".18"/>
-        <text x="96" y="114" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="6.5" fill="#00ffaa">COMMUNICATION</text>
-        <text x="96" y="128" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="5.5" fill="#00bb88">Social Intelligence</text>
-        <text x="96" y="142" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="5"   fill="#008855">[ HR ]</text>
+      <div id="char-stage">
+        <div id="skill-name-display">◆ SELECT A SKILL ◆</div>
+        <svg id="char-svg" viewBox="-8 0 192 216" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="c-outline" x="-15%" y="-10%" width="130%" height="120%" color-interpolation-filters="sRGB">
+              <feMorphology operator="dilate" radius="1.2" in="SourceAlpha" result="d"/>
+              <feFlood flood-color="#ddeedd" flood-opacity="0.85" result="w"/>
+              <feComposite in="w" in2="d" operator="in" result="o"/>
+              <feMerge><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <g filter="url(#c-outline)">
+            <g id="pose-idle" class="char-pose">
+        <rect x="48" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="116" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="48" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="116" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="32" y="20" width="112" height="20" fill="#12122e"/>
+        <rect x="16" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="136" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="8" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="152" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="36" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="124" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="40" y="36" width="96" height="56" fill="#efc4a0"/>
+        <rect x="52" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="56" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="52" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="96" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="100" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="116" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="40" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="104" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="84" y="68" width="8" height="4" fill="#d0a890"/>
+        <rect x="72" y="76" width="32" height="4" fill="#c09080"/>
+        <rect x="76" y="92" width="24" height="12" fill="#efc4a0"/>
+        <rect x="52" y="100" width="72" height="12" fill="#1e3a47"/>
+        <rect x="36" y="108" width="104" height="16" fill="#1e3a47"/>
+        <rect x="56" y="124" width="64" height="24" fill="#2a9d8f"/>
+        <rect x="84" y="124" width="8" height="24" fill="#1e3a47"/>
+        <rect x="48" y="148" width="80" height="8" fill="#f0ede8"/>
+        <rect x="76" y="148" width="24" height="8" fill="#e9c46a"/>
+        <rect x="56" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="92" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="84" y="156" width="8" height="20" fill="#0a0a14"/>
+        <rect x="52" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="92" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="48" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="108" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="16" y="108" width="24" height="12" fill="#2a9d8f"/>
+        <rect x="4" y="120" width="24" height="12" fill="#2a9d8f"/>
+        <rect x="0" y="132" width="20" height="12" fill="#efc4a0"/>
+        <rect x="136" y="108" width="24" height="12" fill="#2a9d8f"/>
+        <rect x="148" y="120" width="24" height="12" fill="#2a9d8f"/>
+        <rect x="156" y="132" width="20" height="12" fill="#efc4a0"/>
       </g>
-    </g>
-
-    <!-- ═══════════════════════════════════
-         CARD BL: Core Skills / Book
-    ════════════════════════════════════ -->
-    <g class="sc-bl" transform="translate(55,378)">
-      <g transform="skewX(-4) skewY(-3)">
-        <rect x="0" y="0" width="188" height="158" rx="2" fill="#060c14" stroke="#00ccff" stroke-width="1.5" opacity=".92"/>
-        <rect x="0" y="0" width="188" height="158" rx="2" fill="url(#gcBL)" opacity=".7"/>
-        <path d="M4,14 L4,4 L14,4"   stroke="#00ccff" stroke-width="1.5" fill="none"/>
-        <path d="M174,4 L184,4 L184,14"  stroke="#00ccff" stroke-width="1.5" fill="none"/>
-        <path d="M4,144 L4,154 L14,154"  stroke="#00ccff" stroke-width="1.5" fill="none"/>
-        <path d="M174,154 L184,154 L184,144" stroke="#00ccff" stroke-width="1.5" fill="none"/>
-        <rect x="8" y="9" width="172" height="1" fill="#00ccff" opacity=".3"/>
-        <!-- PIXEL ART: Glowing tome / book -->
-        <g transform="translate(42,14)" filter="url(#fc)">
-          <!-- spine -->
-          <rect x="0"  y="10" width="8"  height="52" fill="#0077aa"/>
-          <rect x="2"  y="8"  width="6"  height="56" fill="#0099cc"/>
-          <!-- back cover -->
-          <rect x="8"  y="6"  width="52" height="56" fill="#b8e8ff"/>
-          <!-- pages -->
-          <rect x="10" y="8"  width="48" height="52" fill="#e0f4ff"/>
-          <!-- page lines -->
-          <rect x="14" y="14" width="38" height="2"  fill="#99ccee"/>
-          <rect x="14" y="20" width="38" height="2"  fill="#99ccee"/>
-          <rect x="14" y="26" width="28" height="2"  fill="#99ccee"/>
-          <rect x="14" y="32" width="38" height="2"  fill="#99ccee"/>
-          <rect x="14" y="38" width="20" height="2"  fill="#99ccee"/>
-          <rect x="14" y="44" width="38" height="2"  fill="#99ccee"/>
-          <rect x="14" y="50" width="32" height="2"  fill="#99ccee"/>
-          <!-- Glowing rune -->
-          <rect x="28" y="12" width="2"  height="2"  fill="#00ffff"/>
-          <rect x="24" y="14" width="10" height="2"  fill="#00ffff"/>
-          <rect x="22" y="16" width="14" height="2"  fill="#00eeff"/>
-          <rect x="22" y="18" width="14" height="2"  fill="#00eeff"/>
-          <rect x="24" y="20" width="4"  height="2"  fill="#00ffff"/>
-          <rect x="30" y="20" width="4"  height="2"  fill="#00ffff"/>
-          <rect x="26" y="22" width="6"  height="2"  fill="#00ccff"/>
-          <!-- scroll handle / bottom clasp -->
-          <rect x="4"  y="62" width="58" height="4"  fill="#005588"/>
-          <rect x="0"  y="60" width="66" height="2"  fill="#0077aa"/>
-          <!-- energy sparks -->
-          <rect x="64" y="10" width="4" height="4" fill="#00ffff" opacity=".85"/>
-          <rect x="70" y="22" width="4" height="4" fill="#00ccff" opacity=".65"/>
-          <rect x="68" y="36" width="2" height="2" fill="#00ffff" opacity=".9"/>
-          <rect x="72" y="50" width="4" height="4" fill="#88eeff" opacity=".7"/>
-        </g>
-        <rect x="8" y="102" width="172" height="1" fill="#00ccff" opacity=".18"/>
-        <text x="94" y="114" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="6.5" fill="#00ccff">CORE SKILLS</text>
-        <text x="94" y="128" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="5.5" fill="#0099cc">Knowledge Base</text>
-        <text x="94" y="142" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="5"   fill="#006699">[ EXPERTISE ]</text>
+    <g id="pose-dash" class="char-pose" style="display:none">
+        <rect x="48" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="116" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="48" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="116" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="32" y="20" width="112" height="20" fill="#12122e"/>
+        <rect x="16" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="136" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="8" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="152" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="36" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="124" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="40" y="36" width="96" height="56" fill="#efc4a0"/>
+        <rect x="52" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="56" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="52" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="96" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="100" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="116" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="40" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="104" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="84" y="68" width="8" height="4" fill="#d0a890"/>
+        <rect x="72" y="76" width="32" height="4" fill="#c09080"/>
+        <rect x="76" y="92" width="24" height="12" fill="#efc4a0"/>
+        <rect x="52" y="100" width="72" height="12" fill="#1e3a47"/>
+        <rect x="36" y="108" width="104" height="16" fill="#1e3a47"/>
+        <rect x="56" y="124" width="64" height="24" fill="#2a9d8f"/>
+        <rect x="84" y="124" width="8" height="24" fill="#1e3a47"/>
+        <rect x="48" y="148" width="80" height="8" fill="#f0ede8"/>
+        <rect x="76" y="148" width="24" height="8" fill="#e9c46a"/>
+        <rect x="56" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="92" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="84" y="156" width="8" height="20" fill="#0a0a14"/>
+        <rect x="52" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="92" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="48" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="108" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="20" y="108" width="24" height="12" fill="#2a9d8f"/>
+        <rect x="8" y="120" width="24" height="12" fill="#2a9d8f"/>
+        <rect x="4" y="132" width="16" height="12" fill="#efc4a0"/>
+        <rect x="132" y="100" width="24" height="12" fill="#2a9d8f"/>
+        <rect x="144" y="88" width="24" height="16" fill="#2a9d8f"/>
+        <rect x="152" y="80" width="20" height="12" fill="#efc4a0"/>
+        <rect x="164" y="12" width="8" height="76" fill="#39ff6e"/>
+        <rect x="164" y="12" width="8" height="20" fill="#b0ffcc"/>
+        <rect x="148" y="84" width="36" height="8" fill="#e9c46a"/>
+        <rect x="164" y="92" width="8" height="20" fill="#0a0a14"/>
+        <rect x="144" y="32" width="8" height="8" fill="#39ff6e" opacity="0.7"/>
+        <rect x="156" y="20" width="8" height="8" fill="#39ff6e" opacity="0.5"/>
+        <rect x="148" y="48" width="12" height="4" fill="#39ff6e" opacity="0.4"/>
       </g>
-    </g>
-
-    <!-- ═══════════════════════════════════
-         CARD TR: Medical / RD&QC
-    ════════════════════════════════════ -->
-    <g class="sc-tr" transform="translate(618,48)">
-      <g transform="skewX(3) skewY(4)">
-        <rect x="0" y="0" width="192" height="158" rx="2" fill="#140814" stroke="#ff44aa" stroke-width="1.5" opacity=".92"/>
-        <rect x="0" y="0" width="192" height="158" rx="2" fill="url(#gcTR)" opacity=".7"/>
-        <path d="M4,14 L4,4 L14,4"   stroke="#ff44aa" stroke-width="1.5" fill="none"/>
-        <path d="M178,4 L188,4 L188,14"  stroke="#ff44aa" stroke-width="1.5" fill="none"/>
-        <path d="M4,144 L4,154 L14,154"  stroke="#ff44aa" stroke-width="1.5" fill="none"/>
-        <path d="M178,154 L188,154 L188,144" stroke="#ff44aa" stroke-width="1.5" fill="none"/>
-        <rect x="8" y="9" width="176" height="1" fill="#ff44aa" opacity=".3"/>
-        <!-- PIXEL ART: Caduceus (wings + serpents + rod) -->
-        <g transform="translate(50,10)" filter="url(#fp)">
-          <!-- Wings left -->
-          <rect x="10" y="0"  width="22" height="4"  fill="#cc88ff"/>
-          <rect x="6"  y="4"  width="24" height="4"  fill="#bb66ee"/>
-          <rect x="4"  y="8"  width="18" height="4"  fill="#aa44dd"/>
-          <rect x="6"  y="12" width="12" height="4"  fill="#9933cc"/>
-          <!-- Wings right -->
-          <rect x="60" y="0"  width="22" height="4"  fill="#cc88ff"/>
-          <rect x="62" y="4"  width="24" height="4"  fill="#bb66ee"/>
-          <rect x="70" y="8"  width="18" height="4"  fill="#aa44dd"/>
-          <rect x="74" y="12" width="12" height="4"  fill="#9933cc"/>
-          <!-- Rod -->
-          <rect x="44" y="0"  width="4"  height="80" fill="#ddaaff"/>
-          <!-- Serpent left -->
-          <rect x="36" y="4"  width="8"  height="4"  fill="#ff66bb"/>
-          <rect x="32" y="8"  width="8"  height="4"  fill="#ff44aa"/>
-          <rect x="30" y="12" width="8"  height="4"  fill="#ff44aa"/>
-          <rect x="32" y="16" width="8"  height="4"  fill="#ff66bb"/>
-          <rect x="36" y="20" width="8"  height="4"  fill="#ff88cc"/>
-          <rect x="40" y="24" width="4"  height="4"  fill="#ffaadd"/>
-          <rect x="40" y="28" width="4"  height="4"  fill="#ffaadd"/>
-          <rect x="38" y="32" width="6"  height="4"  fill="#ff88cc"/>
-          <rect x="34" y="36" width="8"  height="4"  fill="#ff66bb"/>
-          <rect x="30" y="40" width="8"  height="4"  fill="#ff44aa"/>
-          <rect x="32" y="44" width="8"  height="4"  fill="#ff66bb"/>
-          <rect x="36" y="48" width="8"  height="4"  fill="#ff88cc"/>
-          <!-- Serpent right -->
-          <rect x="48" y="4"  width="8"  height="4"  fill="#ff66bb"/>
-          <rect x="52" y="8"  width="8"  height="4"  fill="#ff44aa"/>
-          <rect x="54" y="12" width="8"  height="4"  fill="#ff44aa"/>
-          <rect x="52" y="16" width="8"  height="4"  fill="#ff66bb"/>
-          <rect x="48" y="20" width="8"  height="4"  fill="#ff88cc"/>
-          <rect x="48" y="24" width="4"  height="4"  fill="#ffaadd"/>
-          <rect x="48" y="28" width="4"  height="4"  fill="#ffaadd"/>
-          <rect x="48" y="32" width="6"  height="4"  fill="#ff88cc"/>
-          <rect x="50" y="36" width="8"  height="4"  fill="#ff66bb"/>
-          <rect x="54" y="40" width="8"  height="4"  fill="#ff44aa"/>
-          <rect x="52" y="44" width="8"  height="4"  fill="#ff66bb"/>
-          <rect x="48" y="48" width="8"  height="4"  fill="#ff88cc"/>
-          <!-- White cross top -->
-          <rect x="40" y="0"  width="12" height="4"  fill="#ffffff"/>
-          <!-- Syringe tip bottom -->
-          <rect x="42" y="80" width="8"  height="6"  fill="#bb99cc"/>
-          <rect x="44" y="86" width="4"  height="4"  fill="#9977aa"/>
-          <rect x="45" y="90" width="2"  height="6"  fill="#ccbbdd"/>
-        </g>
-        <rect x="8" y="102" width="176" height="1" fill="#ff44aa" opacity=".18"/>
-        <text x="96" y="114" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="6.5" fill="#ff44aa">MEDICAL</text>
-        <text x="96" y="128" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="5.5" fill="#cc3388">Knowledge</text>
-        <text x="96" y="142" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="5"   fill="#aa2266">[ RD &amp; QC ]</text>
+    <g id="pose-guard" class="char-pose" style="display:none">
+        <rect x="48" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="116" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="48" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="116" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="32" y="20" width="112" height="20" fill="#12122e"/>
+        <rect x="16" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="136" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="8" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="152" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="36" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="124" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="40" y="36" width="96" height="56" fill="#efc4a0"/>
+        <rect x="52" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="56" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="52" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="96" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="100" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="116" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="40" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="104" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="84" y="68" width="8" height="4" fill="#d0a890"/>
+        <rect x="72" y="76" width="32" height="4" fill="#c09080"/>
+        <rect x="76" y="92" width="24" height="12" fill="#efc4a0"/>
+        <rect x="52" y="100" width="72" height="12" fill="#1e3a47"/>
+        <rect x="36" y="108" width="104" height="16" fill="#1e3a47"/>
+        <rect x="56" y="124" width="64" height="24" fill="#2a9d8f"/>
+        <rect x="84" y="124" width="8" height="24" fill="#1e3a47"/>
+        <rect x="48" y="148" width="80" height="8" fill="#f0ede8"/>
+        <rect x="76" y="148" width="24" height="8" fill="#e9c46a"/>
+        <rect x="56" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="92" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="84" y="156" width="8" height="20" fill="#0a0a14"/>
+        <rect x="52" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="92" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="48" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="108" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="36" y="108" width="48" height="12" fill="#2a9d8f"/>
+        <rect x="36" y="120" width="36" height="12" fill="#2a9d8f"/>
+        <rect x="36" y="128" width="24" height="12" fill="#efc4a0"/>
+        <rect x="72" y="104" width="48" height="12" fill="#2a9d8f"/>
+        <rect x="84" y="116" width="36" height="12" fill="#2a9d8f"/>
+        <rect x="104" y="124" width="24" height="12" fill="#efc4a0"/>
+        <rect x="84" y="128" width="8" height="8" fill="#e9c46a"/>
+        <rect x="76" y="132" width="24" height="4" fill="#e9c46a" opacity="0.5"/>
+        <rect x="84" y="124" width="8" height="4" fill="#e9c46a" opacity="0.5"/>
+        <rect x="84" y="136" width="8" height="4" fill="#e9c46a" opacity="0.5"/>
+        <rect x="56" y="128" width="16" height="4" fill="#00ccff" opacity="0.5"/>
+        <rect x="104" y="128" width="16" height="4" fill="#00ccff" opacity="0.5"/>
       </g>
-    </g>
-
-    <!-- ═══════════════════════════════════
-         CARD BR: Production
-    ════════════════════════════════════ -->
-    <g class="sc-br" transform="translate(630,372)">
-      <g transform="skewX(4) skewY(-4)">
-        <rect x="0" y="0" width="188" height="162" rx="2" fill="#140e00" stroke="#ffaa00" stroke-width="1.5" opacity=".92"/>
-        <rect x="0" y="0" width="188" height="162" rx="2" fill="url(#gcBR)" opacity=".7"/>
-        <path d="M4,14 L4,4 L14,4"   stroke="#ffaa00" stroke-width="1.5" fill="none"/>
-        <path d="M174,4 L184,4 L184,14"  stroke="#ffaa00" stroke-width="1.5" fill="none"/>
-        <path d="M4,148 L4,158 L14,158"  stroke="#ffaa00" stroke-width="1.5" fill="none"/>
-        <path d="M174,158 L184,158 L184,148" stroke="#ffaa00" stroke-width="1.5" fill="none"/>
-        <rect x="8" y="9" width="172" height="1" fill="#ffaa00" opacity=".3"/>
-        <!-- PIXEL ART: Gear + wrench -->
-        <g transform="translate(28,10)" filter="url(#fg)">
-          <!-- Gear teeth (outer notches) -->
-          <rect x="38" y="0"  width="14" height="6"  fill="#ffaa00"/>
-          <rect x="68" y="6"  width="6"  height="14" fill="#ffaa00"/>
-          <rect x="76" y="32" width="6"  height="14" fill="#ffaa00"/>
-          <rect x="68" y="52" width="6"  height="14" fill="#ffaa00"/>
-          <rect x="38" y="58" width="14" height="6"  fill="#ffaa00"/>
-          <rect x="16" y="52" width="6"  height="14" fill="#ffaa00"/>
-          <rect x="8"  y="32" width="6"  height="14" fill="#ffaa00"/>
-          <rect x="16" y="6"  width="6"  height="14" fill="#ffaa00"/>
-          <!-- Gear outer ring -->
-          <rect x="20" y="6"  width="50" height="52" rx="24" fill="#cc8800"/>
-          <!-- Gear face -->
-          <rect x="22" y="8"  width="46" height="48" rx="22" fill="#ffaa00"/>
-          <!-- Inner hole -->
-          <rect x="34" y="20" width="22" height="24" rx="10" fill="#140e00"/>
-          <!-- Spokes -->
-          <rect x="42" y="10" width="6"  height="44" fill="#dd9900"/>
-          <rect x="22" y="28" width="46" height="8"  fill="#dd9900"/>
-          <!-- Wrench handle (rotated ~-40deg via pixel stair) -->
-          <rect x="60" y="52" width="8"  height="8"  fill="#aa6600"/>
-          <rect x="64" y="58" width="8"  height="6"  fill="#aa6600"/>
-          <rect x="68" y="62" width="8"  height="6"  fill="#996600"/>
-          <rect x="72" y="66" width="6"  height="6"  fill="#884400"/>
-          <rect x="76" y="70" width="6"  height="6"  fill="#773300"/>
-          <rect x="78" y="74" width="6"  height="4"  fill="#662200"/>
-          <!-- wrench head highlight -->
-          <rect x="58" y="50" width="14" height="4"  fill="#ffcc44"/>
-          <!-- Sparks -->
-          <rect x="80" y="48" width="6"  height="6"  fill="#ffff44" opacity=".9"/>
-          <rect x="86" y="54" width="4"  height="4"  fill="#ffffff"  opacity=".8"/>
-          <rect x="78" y="56" width="4"  height="2"  fill="#ffff44" opacity=".75"/>
-          <rect x="84" y="44" width="2"  height="2"  fill="#ffffaa" opacity=".85"/>
-        </g>
-        <rect x="8" y="104" width="172" height="1" fill="#ffaa00" opacity=".18"/>
-        <text x="94" y="116" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="6.5" fill="#ffaa00">PRODUCTION</text>
-        <text x="94" y="130" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="5.5" fill="#cc8800">Manufacturing</text>
-        <text x="94" y="144" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="5"   fill="#996600">[ OPERATIONS ]</text>
+    <g id="pose-critical" class="char-pose" style="display:none">
+        <rect x="48" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="116" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="48" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="116" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="32" y="20" width="112" height="20" fill="#12122e"/>
+        <rect x="16" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="136" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="8" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="152" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="36" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="124" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="40" y="36" width="96" height="56" fill="#efc4a0"/>
+        <rect x="52" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="56" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="52" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="96" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="100" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="116" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="40" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="104" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="84" y="68" width="8" height="4" fill="#d0a890"/>
+        <rect x="72" y="76" width="32" height="4" fill="#c09080"/>
+        <rect x="76" y="92" width="24" height="12" fill="#efc4a0"/>
+        <rect x="52" y="100" width="72" height="12" fill="#1e3a47"/>
+        <rect x="36" y="108" width="104" height="16" fill="#1e3a47"/>
+        <rect x="56" y="124" width="64" height="24" fill="#2a9d8f"/>
+        <rect x="84" y="124" width="8" height="24" fill="#1e3a47"/>
+        <rect x="48" y="148" width="80" height="8" fill="#f0ede8"/>
+        <rect x="76" y="148" width="24" height="8" fill="#e9c46a"/>
+        <rect x="56" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="92" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="84" y="156" width="8" height="20" fill="#0a0a14"/>
+        <rect x="52" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="92" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="48" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="108" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="40" y="92" width="20" height="16" fill="#2a9d8f"/>
+        <rect x="32" y="76" width="20" height="20" fill="#2a9d8f"/>
+        <rect x="28" y="64" width="16" height="16" fill="#efc4a0"/>
+        <rect x="116" y="92" width="20" height="16" fill="#2a9d8f"/>
+        <rect x="124" y="76" width="20" height="20" fill="#2a9d8f"/>
+        <rect x="132" y="64" width="16" height="16" fill="#efc4a0"/>
+        <rect x="32" y="44" width="112" height="20" fill="#1e3a47"/>
+        <rect x="40" y="48" width="96" height="12" fill="#2a9d8f"/>
+        <rect x="48" y="48" width="80" height="8" fill="#3ab8a8"/>
+        <rect x="80" y="64" width="16" height="20" fill="#18100a"/>
+        <rect x="28" y="40" width="120" height="28" fill="#39ff6e" opacity="0.2"/>
+        <rect x="36" y="44" width="104" height="20" fill="#39ff6e" opacity="0.15"/>
+        <rect x="24" y="40" width="8" height="8" fill="#b0ffcc" opacity="0.8"/>
+        <rect x="144" y="40" width="8" height="8" fill="#b0ffcc" opacity="0.8"/>
       </g>
-    </g>
+    <g id="pose-photo" class="char-pose" style="display:none">
+        <rect x="48" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="116" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="48" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="116" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="32" y="20" width="112" height="20" fill="#12122e"/>
+        <rect x="16" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="136" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="8" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="152" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="36" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="124" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="40" y="36" width="96" height="56" fill="#efc4a0"/>
+        <rect x="52" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="56" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="52" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="96" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="100" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="116" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="40" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="104" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="84" y="68" width="8" height="4" fill="#d0a890"/>
+        <rect x="72" y="76" width="32" height="4" fill="#c09080"/>
+        <rect x="76" y="92" width="24" height="12" fill="#efc4a0"/>
+        <rect x="52" y="100" width="72" height="12" fill="#1e3a47"/>
+        <rect x="36" y="108" width="104" height="16" fill="#1e3a47"/>
+        <rect x="56" y="124" width="64" height="24" fill="#2a9d8f"/>
+        <rect x="84" y="124" width="8" height="24" fill="#1e3a47"/>
+        <rect x="48" y="148" width="80" height="8" fill="#f0ede8"/>
+        <rect x="76" y="148" width="24" height="8" fill="#e9c46a"/>
+        <rect x="56" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="92" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="84" y="156" width="8" height="20" fill="#0a0a14"/>
+        <rect x="52" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="92" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="48" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="108" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="32" y="104" width="20" height="12" fill="#2a9d8f"/>
+        <rect x="24" y="92" width="20" height="16" fill="#2a9d8f"/>
+        <rect x="0" y="48" width="48" height="32" fill="#444455"/>
+        <rect x="4" y="52" width="40" height="24" fill="#888898"/>
+        <rect x="12" y="52" width="24" height="24" fill="#333355"/>
+        <rect x="16" y="56" width="16" height="16" fill="#1144aa"/>
+        <rect x="20" y="60" width="8" height="8" fill="#4477ff"/>
+        <rect x="20" y="60" width="4" height="4" fill="#99aaff"/>
+        <rect x="36" y="48" width="12" height="12" fill="#444455"/>
+        <rect x="0" y="48" width="24" height="4" fill="#aaaaaa"/>
+        <rect x="40" y="52" width="8" height="4" fill="#ffffff" opacity="0.6"/>
+        <rect x="132" y="108" width="24" height="12" fill="#2a9d8f"/>
+        <rect x="144" y="120" width="24" height="12" fill="#2a9d8f"/>
+        <rect x="152" y="132" width="16" height="12" fill="#efc4a0"/>
+        <rect x="-8" y="40" width="8" height="12" fill="#00ffff" opacity="0.8"/>
+        <rect x="48" y="40" width="8" height="12" fill="#00ffff" opacity="0.8"/>
+        <rect x="-8" y="40" width="12" height="4" fill="#00ffff" opacity="0.8"/>
+        <rect x="44" y="40" width="12" height="4" fill="#00ffff" opacity="0.8"/>
+      </g>
+    <g id="pose-runaway" class="char-pose" style="display:none">
+        <rect x="48" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="116" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="48" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="116" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="32" y="20" width="112" height="20" fill="#12122e"/>
+        <rect x="16" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="136" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="8" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="152" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="36" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="124" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="40" y="36" width="96" height="56" fill="#efc4a0"/>
+        <rect x="52" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="56" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="52" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="96" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="100" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="116" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="40" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="104" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="84" y="68" width="8" height="4" fill="#d0a890"/>
+        <rect x="72" y="76" width="32" height="4" fill="#c09080"/>
+        <rect x="76" y="92" width="24" height="12" fill="#efc4a0"/>
+        <rect x="52" y="100" width="72" height="12" fill="#1e3a47"/>
+        <rect x="36" y="108" width="104" height="16" fill="#1e3a47"/>
+        <rect x="56" y="124" width="64" height="24" fill="#2a9d8f"/>
+        <rect x="84" y="124" width="8" height="24" fill="#1e3a47"/>
+        <rect x="48" y="148" width="80" height="8" fill="#f0ede8"/>
+        <rect x="76" y="148" width="24" height="8" fill="#e9c46a"/>
+        <rect x="56" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="92" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="84" y="156" width="8" height="20" fill="#0a0a14"/>
+        <rect x="52" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="92" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="48" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="108" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="36" y="100" width="20" height="12" fill="#2a9d8f"/>
+        <rect x="28" y="112" width="20" height="12" fill="#2a9d8f"/>
+        <rect x="24" y="124" width="16" height="12" fill="#efc4a0"/>
+        <rect x="128" y="100" width="20" height="12" fill="#2a9d8f"/>
+        <rect x="140" y="88" width="20" height="16" fill="#2a9d8f"/>
+        <rect x="148" y="80" width="16" height="12" fill="#efc4a0"/>
+        <rect x="24" y="40" width="8" height="12" fill="#99ddff" opacity="0.8"/>
+        <rect x="20" y="48" width="16" height="4" fill="#99ddff" opacity="0.8"/>
+        <rect x="12" y="12" width="8" height="20" fill="#e9c46a" opacity="0.9"/>
+        <rect x="12" y="36" width="8" height="8" fill="#e9c46a" opacity="0.9"/>
+        <rect x="0" y="116" width="20" height="4" fill="#f0ede8" opacity="0.5"/>
+        <rect x="0" y="124" width="28" height="4" fill="#f0ede8" opacity="0.35"/>
+        <rect x="0" y="136" width="16" height="4" fill="#f0ede8" opacity="0.2"/>
+        <rect x="52" y="156" width="24" height="24" fill="#162040"/>
+        <rect x="44" y="180" width="32" height="20" fill="#162040"/>
+        <rect x="92" y="156" width="24" height="20" fill="#162040"/>
+        <rect x="92" y="176" width="24" height="20" fill="#162040"/>
+        <rect x="44" y="200" width="28" height="12" fill="#18100a"/>
+        <rect x="92" y="196" width="32" height="12" fill="#18100a"/>
+        <rect x="76" y="156" width="16" height="16" fill="#0a0a14"/>
+      </g>
+    <g id="pose-trans" class="char-pose" style="display:none">
+        <rect x="48" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="116" y="0" width="12" height="32" fill="#12122e"/>
+        <rect x="48" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="116" y="0" width="12" height="12" fill="#39ff6e"/>
+        <rect x="32" y="20" width="112" height="20" fill="#12122e"/>
+        <rect x="16" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="136" y="28" width="24" height="28" fill="#12122e"/>
+        <rect x="8" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="152" y="20" width="16" height="36" fill="#1e1e48"/>
+        <rect x="36" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="124" y="20" width="16" height="8" fill="#39ff6e"/>
+        <rect x="40" y="36" width="96" height="56" fill="#efc4a0"/>
+        <rect x="52" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="56" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="52" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="96" y="44" width="28" height="20" fill="#00cc88"/>
+        <rect x="100" y="48" width="20" height="12" fill="#030805"/>
+        <rect x="116" y="44" width="8" height="8" fill="#c8f8e0"/>
+        <rect x="40" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="104" y="64" width="32" height="4" fill="#cc2244" opacity="0.6"/>
+        <rect x="84" y="68" width="8" height="4" fill="#d0a890"/>
+        <rect x="72" y="76" width="32" height="4" fill="#c09080"/>
+        <rect x="76" y="92" width="24" height="12" fill="#efc4a0"/>
+        <rect x="52" y="100" width="72" height="12" fill="#1e3a47"/>
+        <rect x="36" y="108" width="104" height="16" fill="#1e3a47"/>
+        <rect x="56" y="124" width="64" height="24" fill="#2a9d8f"/>
+        <rect x="84" y="124" width="8" height="24" fill="#1e3a47"/>
+        <rect x="48" y="148" width="80" height="8" fill="#f0ede8"/>
+        <rect x="76" y="148" width="24" height="8" fill="#e9c46a"/>
+        <rect x="56" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="92" y="156" width="28" height="40" fill="#162040"/>
+        <rect x="84" y="156" width="8" height="20" fill="#0a0a14"/>
+        <rect x="52" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="92" y="196" width="32" height="16" fill="#18100a"/>
+        <rect x="48" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="108" y="208" width="20" height="4" fill="#18100a"/>
+        <rect x="16" y="112" width="24" height="12" fill="#2a9d8f"/>
+        <rect x="8" y="124" width="24" height="12" fill="#2a9d8f"/>
+        <rect x="0" y="136" width="20" height="8" fill="#efc4a0"/>
+        <rect x="136" y="112" width="24" height="12" fill="#2a9d8f"/>
+        <rect x="144" y="124" width="24" height="12" fill="#2a9d8f"/>
+        <rect x="156" y="136" width="20" height="8" fill="#efc4a0"/>
+        <rect x="52" y="44" width="28" height="8" fill="#030805"/>
+        <rect x="96" y="44" width="28" height="8" fill="#030805"/>
+      </g>
+          </g>
+        </svg>
+        <div id="flavor-box">← click a skill card</div>
+        <div id="stats-display"></div>
+        <button id="export-btn" title="Export character as PNG">&#128247; EXPORT STICKER</button>
+      </div>
 
-    <!-- ═══════════════════════════════════
-         CHARACTER (center, pixel art)
-         8px pixel size, ~18x28 pixel grid
-         Centered at x=450, top ~y=168
-    ════════════════════════════════════ -->
-    <!-- Aura glow -->
-    <ellipse cx="450" cy="310" rx="72" ry="95" fill="#00ff88" opacity=".05" filter="url(#faur)">
-      <animate attributeName="rx" values="72;86;72" dur="3.2s" repeatCount="indefinite"/>
-      <animate attributeName="ry" values="95;110;95" dur="3.2s" repeatCount="indefinite"/>
-    </ellipse>
-    <!-- Shadow -->
-    <ellipse cx="450" cy="424" rx="78" ry="12" fill="#00ffaa" opacity=".08"/>
-    <ellipse cx="450" cy="424" rx="44" ry="6"  fill="#00ffaa" opacity=".12"/>
-
-    <g class="cg">
-      <!-- HAIR — dark navy, teal highlight streaks -->
-      <rect x="418" y="168" width="64" height="8"  fill="#12122e"/>
-      <rect x="410" y="176" width="80" height="8"  fill="#12122e"/>
-      <rect x="402" y="184" width="16" height="8"  fill="#12122e"/>
-      <rect x="482" y="184" width="16" height="8"  fill="#12122e"/>
-      <rect x="394" y="184" width="16" height="40" fill="#0c0c22"/>
-      <rect x="490" y="184" width="16" height="40" fill="#0c0c22"/>
-      <rect x="386" y="224" width="16" height="28" fill="#0c0c22"/>
-      <rect x="498" y="224" width="16" height="28" fill="#0c0c22"/>
-      <!-- teal highlights in hair -->
-      <rect x="418" y="168" width="8"  height="20" fill="#00ffaa" opacity=".55"/>
-      <rect x="436" y="168" width="4"  height="10" fill="#00ddaa" opacity=".45"/>
-      <rect x="458" y="172" width="4"  height="12" fill="#00ccaa" opacity=".35"/>
-
-      <!-- HEAD / FACE — skin -->
-      <rect x="410" y="192" width="80" height="8"  fill="#f0c8a0"/>
-      <rect x="402" y="200" width="96" height="8"  fill="#f0c8a0"/>
-      <rect x="402" y="208" width="96" height="8"  fill="#efc4a0"/>
-      <rect x="402" y="216" width="96" height="8"  fill="#efc4a0"/>
-      <rect x="410" y="224" width="80" height="8"  fill="#eec0a0"/>
-
-      <!-- EYES — glowing teal -->
-      <rect x="416" y="208" width="14" height="8"  fill="#00ffcc" filter="url(#fg)"/>
-      <rect x="416" y="208" width="14" height="8"  fill="#00eecc"/>
-      <rect x="418" y="208" width="10" height="8"  fill="#001a12"/>
-      <rect x="420" y="210" width="6"  height="4"  fill="#00ffaa"/>
-      <rect x="466" y="208" width="14" height="8"  fill="#00ffcc" filter="url(#fg)"/>
-      <rect x="466" y="208" width="14" height="8"  fill="#00eecc"/>
-      <rect x="468" y="208" width="10" height="8"  fill="#001a12"/>
-      <rect x="470" y="210" width="6"  height="4"  fill="#00ffaa"/>
-
-      <!-- Mouth -->
-      <rect x="432" y="220" width="32" height="4"  fill="#c09070"/>
-      <rect x="436" y="220" width="24" height="4"  fill="#d8a888"/>
-
-      <!-- NECK -->
-      <rect x="426" y="232" width="48" height="8"  fill="#e8c090"/>
-      <rect x="434" y="240" width="32" height="8"  fill="#e0b888"/>
-
-      <!-- OUTFIT — dark teal/navy jacket -->
-      <!-- Shoulders -->
-      <rect x="410" y="248" width="80" height="8"  fill="#1a2a3a"/>
-      <rect x="402" y="256" width="96" height="8"  fill="#1c2c3c"/>
-      <!-- Body -->
-      <rect x="394" y="264" width="112" height="8" fill="#1e2e3e"/>
-      <rect x="394" y="272" width="112" height="8" fill="#1e2e3e"/>
-      <rect x="394" y="280" width="112" height="8" fill="#1c2c3e"/>
-      <rect x="394" y="288" width="112" height="8" fill="#1c2c3e"/>
-      <!-- inner white shirt visible -->
-      <rect x="434" y="248" width="32" height="10" fill="#eeeeff"/>
-      <rect x="438" y="248" width="24" height="18" fill="#e8e8ff"/>
-      <!-- Teal accent stripe -->
-      <rect x="442" y="256" width="16" height="42" fill="#00aa88" opacity=".45"/>
-      <rect x="445" y="256" width="10" height="42" fill="#00cc99" opacity=".35"/>
-      <!-- Jacket trim lines -->
-      <rect x="402" y="256" width="2"  height="40" fill="#2a3a4a"/>
-      <rect x="496" y="256" width="2"  height="40" fill="#2a3a4a"/>
-
-      <!-- BELT -->
-      <rect x="402" y="296" width="96" height="8"  fill="#181828"/>
-      <rect x="440" y="296" width="20" height="8"  fill="#c9a84c"/>
-      <rect x="444" y="298" width="12" height="4"  fill="#ffcc44"/>
-
-      <!-- LEFT ARM — reaching forward/down holding energy item -->
-      <rect x="378" y="264" width="16" height="8"  fill="#1a2a3a"/>
-      <rect x="370" y="272" width="16" height="8"  fill="#1a2a3a"/>
-      <rect x="362" y="280" width="16" height="8"  fill="#1c2c3c"/>
-      <rect x="354" y="288" width="16" height="8"  fill="#1c2c3c"/>
-      <!-- forearm -->
-      <rect x="346" y="288" width="16" height="8"  fill="#e0b888"/>
-      <rect x="338" y="288" width="14" height="8"  fill="#d8b080"/>
-      <!-- Held energy orb (glowing teal item) -->
-      <rect x="314" y="278" width="28" height="24" fill="#00ddff" opacity=".2"/>
-      <rect x="318" y="282" width="20" height="16" fill="#00eeff" opacity=".5" filter="url(#fc)"/>
-      <rect x="322" y="286" width="12" height="8"  fill="#ffffff"  opacity=".7"/>
-      <rect x="324" y="288" width="8"  height="4"  fill="#00ffff"  opacity=".9"/>
-
-      <!-- RIGHT ARM — raised/extended up-right -->
-      <rect x="506" y="256" width="16" height="8"  fill="#1a2a3a"/>
-      <rect x="514" y="248" width="16" height="8"  fill="#1a2a3a"/>
-      <rect x="522" y="240" width="16" height="8"  fill="#1c2c3c"/>
-      <rect x="530" y="232" width="16" height="8"  fill="#e0b888"/>
-      <rect x="538" y="224" width="14" height="8"  fill="#d8b080"/>
-
-      <!-- PANTS — dark navy -->
-      <rect x="402" y="304" width="96" height="8"  fill="#1a2244"/>
-      <rect x="402" y="312" width="96" height="8"  fill="#1a2244"/>
-      <rect x="402" y="320" width="96" height="8"  fill="#162040"/>
-      <rect x="402" y="328" width="96" height="8"  fill="#162040"/>
-
-      <!-- Left leg (action pose, stepping forward) -->
-      <rect x="402" y="336" width="48" height="8"  fill="#162040"/>
-      <rect x="394" y="344" width="48" height="8"  fill="#162040"/>
-      <rect x="386" y="352" width="44" height="8"  fill="#1a2444"/>
-      <rect x="378" y="360" width="44" height="8"  fill="#1a2444"/>
-      <!-- Left boot -->
-      <rect x="370" y="368" width="48" height="8"  fill="#2a2010"/>
-      <rect x="362" y="376" width="56" height="8"  fill="#221a08"/>
-      <rect x="362" y="384" width="48" height="4"  fill="#111008"/>
-
-      <!-- Right leg (back leg) -->
-      <rect x="450" y="336" width="48" height="8"  fill="#162040"/>
-      <rect x="458" y="344" width="48" height="8"  fill="#162040"/>
-      <rect x="466" y="352" width="44" height="8"  fill="#1a2444"/>
-      <rect x="474" y="360" width="44" height="8"  fill="#1a2444"/>
-      <!-- Right boot -->
-      <rect x="482" y="368" width="48" height="8"  fill="#2a2010"/>
-      <rect x="482" y="376" width="56" height="8"  fill="#221a08"/>
-      <rect x="490" y="384" width="48" height="4"  fill="#111008"/>
-
-      <!-- Pixel scanline accent on character -->
-      <rect x="394" y="280" width="112" height="1" fill="#00ffaa" opacity=".25"/>
-      <rect x="394" y="304" width="112" height="1" fill="#00ffaa" opacity=".18"/>
-
-      <!-- Floating energy pixels around character -->
-      <rect x="544" y="270" width="6" height="6" fill="#00ffaa" opacity=".8">
-        <animate attributeName="opacity" values=".8;0;.8" dur="1.3s" repeatCount="indefinite"/>
-      </rect>
-      <rect x="552" y="288" width="4" height="4" fill="#00ccff" opacity=".7">
-        <animate attributeName="opacity" values=".7;0;.7" dur="1.9s" repeatCount="indefinite" begin=".4s"/>
-      </rect>
-      <rect x="548" y="312" width="6" height="6" fill="#ffaa00" opacity=".6">
-        <animate attributeName="opacity" values=".6;0;.6" dur="2.2s" repeatCount="indefinite" begin=".9s"/>
-      </rect>
-      <rect x="336" y="260" width="6" height="6" fill="#00ffaa" opacity=".6">
-        <animate attributeName="opacity" values=".6;0;.6" dur="1.6s" repeatCount="indefinite" begin=".7s"/>
-      </rect>
-      <rect x="328" y="276" width="4" height="4" fill="#ff44aa" opacity=".65">
-        <animate attributeName="opacity" values=".65;0;.65" dur="2.0s" repeatCount="indefinite" begin="1.1s"/>
-      </rect>
-      <rect x="558" y="300" width="4" height="4" fill="#ff44aa" opacity=".5">
-        <animate attributeName="opacity" values=".5;0;.5" dur="1.7s" repeatCount="indefinite" begin=".5s"/>
-      </rect>
-    </g>
-
-    <!-- Energy lines: cards → character -->
-    <g stroke-dasharray="5 7" stroke-width="1.2">
-      <line x1="284" y1="130" x2="412" y2="228" stroke="#00ffaa" opacity=".0">
-        <animate attributeName="opacity" values="0;.35;.18;.35;0" dur="2.1s" repeatCount="indefinite"/>
-      </line>
-      <line x1="246" y1="452" x2="412" y2="352" stroke="#00ccff" opacity=".0">
-        <animate attributeName="opacity" values="0;.35;.18;.35;0" dur="2.5s" repeatCount="indefinite" begin=".5s"/>
-      </line>
-      <line x1="618" y1="126" x2="488" y2="222" stroke="#ff44aa" opacity=".0">
-        <animate attributeName="opacity" values="0;.35;.18;.35;0" dur="2.3s" repeatCount="indefinite" begin=".9s"/>
-      </line>
-      <line x1="632" y1="450" x2="488" y2="348" stroke="#ffaa00" opacity=".0">
-        <animate attributeName="opacity" values="0;.35;.18;.35;0" dur="2.7s" repeatCount="indefinite" begin=".2s"/>
-      </line>
-    </g>
-
-    <!-- Section labels -->
-    <text x="450" y="554" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="11" fill="#00ffaa" opacity=".88" letter-spacing="3">SKILL LOADOUT</text>
-    <text x="450" y="572" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="5.5" fill="#00aa66" opacity=".65" letter-spacing="2">SELECT YOUR EXPERTISE</text>
-  </svg>
+      <div id="passive-panel">
+        <div id="passive-icon">PASSIVE</div>
+        <div>
+          <div id="passive-label">passive ability</div>
+          <div id="passive-text"></div>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <script>
+  (function SkillPlayground(){
+    const SKILLS={
+      dash:     {name:'DASH STRIKE',   col:'#39ff6e', sfxFreq:[880,1100,1320], sfxType:'square'},
+      guard:    {name:'STYLE GUARD',   col:'#00ccff', sfxFreq:[440,550,440],   sfxType:'triangle'},
+      critical: {name:'CRITICAL EXEC', col:'#e9c46a', sfxFreq:[220,330,440,660], sfxType:'sawtooth'},
+      photo:    {name:'SNAP FOCUS',    col:'#e76f51', sfxFreq:[2000,400],      sfxType:'sine'},
+      runaway:  {name:'ESCAPE ROUTE',  col:'#ff66aa', sfxFreq:[660,550,440,330,220], sfxType:'square'},
+    };
+
+    const poses  =document.querySelectorAll('.char-pose');
+    const cards  =document.querySelectorAll('.skill-card');
+    const nameEl =document.getElementById('skill-name-display');
+    const flavor =document.getElementById('flavor-box');
+    const statsEl=document.getElementById('stats-display');
+    const charSvg=document.getElementById('char-svg');
+    const passivePanel=document.getElementById('passive-panel');
+    const passiveText =document.getElementById('passive-text');
+    const exportBtn   =document.getElementById('export-btn');
+    const wrap        =document.getElementById('playground-wrap');
+    let audioCtx=null;
+    let activeSkill=null;
+
+    function initAudio(){
+      if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    }
+
+    function playSkillSFX(skill){
+      try{
+        initAudio();
+        const {sfxFreq,sfxType}=SKILLS[skill];
+        sfxFreq.forEach((freq,i)=>{
+          const osc=audioCtx.createOscillator();
+          const gain=audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type=sfxType;
+          osc.frequency.setValueAtTime(freq,audioCtx.currentTime+i*0.06);
+          gain.gain.setValueAtTime(0.18,audioCtx.currentTime+i*0.06);
+          gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+i*0.06+0.14);
+          osc.start(audioCtx.currentTime+i*0.06);
+          osc.stop(audioCtx.currentTime+i*0.06+0.15);
+        });
+      }catch(e){}
+    }
+
+    function showPose(id){
+      poses.forEach(p=>p.style.display='none');
+      const p=document.getElementById('pose-'+id);
+      if(p) p.style.display='block';
+    }
+
+    function activateSkill(card){
+      const skill=card.dataset.skill;
+      const data=SKILLS[skill];
+      activeSkill=skill;
+
+      cards.forEach(c=>c.classList.remove('active'));
+      card.classList.add('active');
+
+      // Frame-by-frame: trans → pose (100ms each frame)
+      showPose('trans');
+      charSvg.style.setProperty('--glow-c',data.col);
+      wrap.style.setProperty('--active-c',data.col);
+
+      playSkillSFX(skill);
+
+      // Flash frame 1: trans (squint/crouch)
+      setTimeout(()=>{ showPose('trans'); },0);
+      // Frame 2: half-way (back to idle briefly)
+      setTimeout(()=>{ showPose('idle'); },100);
+      // Frame 3: trans again
+      setTimeout(()=>{ showPose('trans'); },200);
+      // Frame 4: final pose
+      setTimeout(()=>{
+        showPose(skill);
+        charSvg.classList.add('sk-flash');
+        setTimeout(()=>charSvg.classList.remove('sk-flash'),500);
+      },300);
+
+      nameEl.textContent='◆ '+data.name+' ◆';
+      nameEl.style.color=data.col;
+      flavor.innerHTML=card.dataset.flavor;
+      statsEl.textContent=card.dataset.stats;
+      statsEl.style.color=data.col;
+
+      // passive panel
+      passiveText.textContent=card.dataset.passive;
+      passivePanel.classList.add('visible');
+    }
+
+    cards.forEach(card=>{
+      card.addEventListener('click',()=>activateSkill(card));
+      card.addEventListener('mouseenter',()=>{
+        if(!card.classList.contains('active')){
+          showPose(card.dataset.skill);
+        }
+      });
+      card.addEventListener('mouseleave',()=>{
+        const ac=document.querySelector('.skill-card.active');
+        showPose(ac?ac.dataset.skill:'idle');
+      });
+    });
+
+    // Export as PNG via canvas
+    exportBtn.addEventListener('click',()=>{
+      try{
+        initAudio();
+        // quick click SFX
+        const osc=audioCtx.createOscillator();
+        const g=audioCtx.createGain();
+        osc.connect(g);g.connect(audioCtx.destination);
+        osc.type='square'; osc.frequency.value=1200;
+        g.gain.setValueAtTime(0.15,audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.1);
+        osc.start(); osc.stop(audioCtx.currentTime+0.1);
+      }catch(e){}
+
+      const svgEl=charSvg;
+      const svgData=new XMLSerializer().serializeToString(svgEl);
+      const svgBlob=new Blob([svgData],{type:'image/svg+xml;charset=utf-8'});
+      const url=URL.createObjectURL(svgBlob);
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        canvas.width=192; canvas.height=220;
+        const ctx=canvas.getContext('2d');
+        ctx.fillStyle='#04030e';
+        ctx.fillRect(0,0,192,220);
+        ctx.drawImage(img,0,0);
+        URL.revokeObjectURL(url);
+        const a=document.createElement('a');
+        a.download='plaw-char-'+(activeSkill||'idle')+'.png';
+        a.href=canvas.toDataURL('image/png');
+        a.click();
+      };
+      img.src=url;
+    });
+
+    // Keyboard shortcut: 1-5 to activate skills
+    const skillOrder=['dash','guard','critical','photo','runaway'];
+    document.addEventListener('keydown',e=>{
+      const idx=parseInt(e.key)-1;
+      if(idx>=0&&idx<5){
+        const card=document.querySelector('.skill-card.sk-'+skillOrder[idx]);
+        if(card) activateSkill(card);
+      }
+    });
+  })();
+  </script>
   </section>
 
   <!-- ── Work ── -->
