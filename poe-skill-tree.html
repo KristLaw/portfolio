@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Passive Skill Tree</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0804;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', serif;
+    cursor: grab;
+    user-select: none;
+  }
+  body.panning { cursor: grabbing; }
+
+  #svg-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  #tree-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* HUD */
+  #hud {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    z-index: 100;
+    pointer-events: none;
+  }
+  #points-display {
+    background: linear-gradient(135deg, rgba(10,6,2,0.95) 0%, rgba(20,14,4,0.95) 100%);
+    border: 1px solid #5a3e10;
+    border-radius: 4px;
+    padding: 10px 18px;
+    color: #c8922a;
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 0 20px rgba(138,100,20,0.3), inset 0 1px 0 rgba(255,200,50,0.1);
+  }
+  #points-display span { color: #f0c040; font-size: 20px; font-weight: bold; }
+
+  /* Class filter */
+  #class-filter {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 100;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    max-width: 280px;
+  }
+  .class-btn {
+    padding: 5px 11px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    pointer-events: all;
+    transition: all 0.2s;
+    font-family: inherit;
+    background: rgba(10,6,2,0.85);
+    color: #aaa;
+  }
+  .class-btn:hover { filter: brightness(1.4); }
+  .class-btn.active { color: #fff; }
+  .class-btn[data-class="Marauder"]  { border-color: #c0392b; }
+  .class-btn[data-class="Ranger"]    { border-color: #27ae60; }
+  .class-btn[data-class="Witch"]     { border-color: #8e44ad; }
+  .class-btn[data-class="Duelist"]   { border-color: #d4ac0d; }
+  .class-btn[data-class="Templar"]   { border-color: #e8e8e8; }
+  .class-btn[data-class="Shadow"]    { border-color: #17a589; }
+  .class-btn[data-class="Scion"]     { border-color: #bdc3c7; }
+  .class-btn.active[data-class="Marauder"]  { background: rgba(192,57,43,0.25); color: #e74c3c; }
+  .class-btn.active[data-class="Ranger"]    { background: rgba(39,174,96,0.25); color: #2ecc71; }
+  .class-btn.active[data-class="Witch"]     { background: rgba(142,68,173,0.25); color: #9b59b6; }
+  .class-btn.active[data-class="Duelist"]   { background: rgba(212,172,13,0.25); color: #f1c40f; }
+  .class-btn.active[data-class="Templar"]   { background: rgba(232,232,232,0.15); color: #fff; }
+  .class-btn.active[data-class="Shadow"]    { background: rgba(23,165,137,0.25); color: #1abc9c; }
+  .class-btn.active[data-class="Scion"]     { background: rgba(189,195,199,0.15); color: #ecf0f1; }
+
+  /* Search */
+  #search-box {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+  }
+  #search-input {
+    background: rgba(10,6,2,0.9);
+    border: 1px solid #5a3e10;
+    border-radius: 3px;
+    color: #f0c040;
+    font-size: 13px;
+    font-family: inherit;
+    padding: 8px 16px;
+    width: 240px;
+    outline: none;
+    letter-spacing: 0.5px;
+    transition: border-color 0.2s;
+  }
+  #search-input::placeholder { color: #4a3010; }
+  #search-input:focus { border-color: #8b6914; box-shadow: 0 0 12px rgba(138,100,20,0.4); }
+
+  /* Reset button */
+  #reset-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 18px;
+    z-index: 100;
+    background: rgba(10,6,2,0.9);
+    border: 1px solid #5a3e10;
+    border-radius: 3px;
+    color: #c8922a;
+    font-size: 12px;
+    font-family: inherit;
+    padding: 8px 16px;
+    cursor: pointer;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  #reset-btn:hover { border-color: #8b6914; color: #f0c040; box-shadow: 0 0 12px rgba(138,100,20,0.3); }
+
+  /* Tooltip */
+  #tooltip {
+    position: fixed;
+    z-index: 200;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s;
+    max-width: 240px;
+  }
+  #tooltip.visible { opacity: 1; }
+  #tooltip-inner {
+    background: linear-gradient(170deg, rgba(16,11,4,0.97) 0%, rgba(8,5,2,0.97) 100%);
+    border: 1px solid #6b4f12;
+    border-radius: 4px;
+    padding: 10px 14px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.8), 0 0 12px rgba(138,100,20,0.2);
+  }
+  #tooltip-name {
+    color: #f0c040;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  #tooltip-type {
+    color: #8b6914;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  #tooltip-stats {
+    color: #c8a878;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  #tooltip-flavor {
+    color: #7a6040;
+    font-size: 11px;
+    font-style: italic;
+    margin-top: 6px;
+    border-top: 1px solid #3a2a08;
+    padding-top: 6px;
+    line-height: 1.5;
+  }
+
+  /* Invalid flash */
+  @keyframes shakeNode {
+    0%,100% { transform: translate(0,0); }
+    20% { transform: translate(-3px,0); }
+    40% { transform: translate(3px,0); }
+    60% { transform: translate(-2px,0); }
+    80% { transform: translate(2px,0); }
+  }
+  .node-shake { animation: shakeNode 0.35s ease; }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div id="points-display">Points Spent: <span id="pts">0</span> / 120</div>
+</div>
+
+<div id="class-filter">
+  <button class="class-btn" data-class="Marauder">Marauder</button>
+  <button class="class-btn" data-class="Ranger">Ranger</button>
+  <button class="class-btn" data-class="Witch">Witch</button>
+  <button class="class-btn" data-class="Duelist">Duelist</button>
+  <button class="class-btn" data-class="Templar">Templar</button>
+  <button class="class-btn" data-class="Shadow">Shadow</button>
+  <button class="class-btn" data-class="Scion">Scion</button>
+</div>
+
+<div id="search-box">
+  <input type="text" id="search-input" placeholder="Search passives… (fire, life, str…)">
+</div>
+
+<button id="reset-btn">Reset Tree</button>
+
+<div id="tooltip">
+  <div id="tooltip-inner">
+    <div id="tooltip-name"></div>
+    <div id="tooltip-type"></div>
+    <div id="tooltip-stats"></div>
+    <div id="tooltip-flavor"></div>
+  </div>
+</div>
+
+<div id="svg-container">
+  <svg id="tree-svg" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Background texture -->
+      <filter id="noise-filter" x="0%" y="0%" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" result="noiseOut"/>
+        <feColorMatrix type="saturate" values="0" in="noiseOut" result="grayNoise"/>
+        <feBlend in="SourceGraphic" in2="grayNoise" mode="multiply" result="blended"/>
+        <feComposite in="blended" in2="SourceGraphic" operator="in"/>
+      </filter>
+
+      <!-- Node glow filter -->
+      <filter id="glow-gold" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feColorMatrix type="matrix" values="1 0.8 0 0 0  0.8 0.5 0 0 0  0 0 0 0 0  0 0 0 1 0" in="blur" result="coloredBlur"/>
+        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow-gold-strong" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="6" result="blur"/>
+        <feColorMatrix type="matrix" values="1 0.7 0 0 0.1  0.6 0.4 0 0 0  0 0 0 0 0  0 0 0 1 0" in="blur" result="coloredBlur"/>
+        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow-white" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="4" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow-red" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="5" result="blur"/>
+        <feColorMatrix type="matrix" values="1 0 0 0 0.2  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" in="blur" result="coloredBlur"/>
+        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+
+      <!-- Keystone pulse animation -->
+      <filter id="glow-keystone" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur stdDeviation="8" result="blur"/>
+        <feColorMatrix type="matrix" values="1 0.6 0 0 0.2  0.6 0.3 0 0 0  0 0 0.1 0 0  0 0 0 1 0" in="blur" result="coloredBlur"/>
+        <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+
+      <!-- Class start filters -->
+      <filter id="glow-marauder" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="6" result="blur"/>
+        <feColorMatrix type="matrix" values="1 0 0 0 0.3  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" in="blur" result="cb"/>
+        <feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow-ranger" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="6" result="blur"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 0  0.8 0.3 0 0 0.1  0 0 0 0 0  0 0 0 1 0" in="blur" result="cb"/>
+        <feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow-witch" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="6" result="blur"/>
+        <feColorMatrix type="matrix" values="0.3 0 0.5 0 0  0 0 0 0 0  0.5 0 1 0 0.2  0 0 0 1 0" in="blur" result="cb"/>
+        <feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="glow-shadow" x="-80%" y="-80%" width="260%" height="260%">
+        <feGaussianBlur stdDeviation="6" result="blur"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 0  0.5 0.3 0 0 0  0 0.3 0.5 0 0.1  0 0 0 1 0" in="blur" result="cb"/>
+        <feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+
+    <!-- Background rect for shimmer -->
+    <rect id="bg-rect" x="-5000" y="-5000" width="10000" height="10000" fill="#0a0804"/>
+    <!-- Vignette overlay -->
+    <radialGradient id="vignette-grad" cx="50%" cy="50%" r="70%" gradientUnits="userSpaceOnUse">
+      <stop offset="30%" stop-color="transparent"/>
+      <stop offset="100%" stop-color="#030201" stop-opacity="0.85"/>
+    </radialGradient>
+
+    <!-- Main tree group (transformed for zoom/pan) -->
+    <g id="tree-root" transform="translate(0,0) scale(1)">
+      <g id="lines-layer"></g>
+      <g id="nodes-layer"></g>
+    </g>
+
+    <!-- Vignette on top -->
+    <rect id="vignette" x="0" y="0" width="100%" height="100%" fill="url(#vignette-grad)" pointer-events="none"/>
+  </svg>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  DATA DEFINITIONS
+// ═══════════════════════════════════════════════════
+
+const KEYSTONES = {
+  'chaos-inocu': {
+    name: 'Chaos Inoculation',
+    symbol: '☠',
+    stats: 'Maximum Life becomes 1\nImmune to Chaos Damage',
+    flavor: 'To be immune to poison, one must first survive it.',
+    type: 'keystone'
+  },
+  'mind-over-matter': {
+    name: 'Mind Over Matter',
+    symbol: '✸',
+    stats: '40% of Damage taken from Mana before Life',
+    flavor: 'The mind is the greatest shield.',
+    type: 'keystone'
+  },
+  'crimson-dance': {
+    name: 'Crimson Dance',
+    symbol: '☽',
+    stats: 'Bleed can stack up to 8 times\nYou do not inherently cause Bleeding\n50% less Bleeding damage',
+    flavor: 'The blood remembers every wound.',
+    type: 'keystone'
+  },
+  'eternal-youth': {
+    name: 'Eternal Youth',
+    symbol: '⚡',
+    stats: 'Life Regeneration instead restores Energy Shield\nLife Leech restores Energy Shield instead',
+    flavor: 'Death is merely an inconvenience for those who refuse it.',
+    type: 'keystone'
+  },
+};
+
+const NOTABLES = {
+  'iron-reflexes':     { name: 'Iron Reflexes',      symbol: '⬡', stats: 'Converts all Evasion to Armour\n+20 Dexterity',                    type: 'notable' },
+  'blood-magic':       { name: 'Blood Magic',         symbol: '✦', stats: 'Reserve Life instead of Mana\n+50 Maximum Life',                   type: 'notable' },
+  'ghost-reaver':      { name: 'Ghost Reaver',        symbol: '⬡', stats: 'Life Leech applies to Energy Shield\n25% less Life Leech rate',    type: 'notable' },
+  'resolute-tech':     { name: 'Resolute Technique',  symbol: '✦', stats: 'Never deal Critical Strikes\nYour hits can\'t be Evaded',          type: 'notable' },
+  'acrobatics':        { name: 'Acrobatics',          symbol: '⬡', stats: '30% chance to Dodge Attack Hits\n50% less Armour and Block chance',type: 'notable' },
+  'pain-attunement':   { name: 'Pain Attunement',     symbol: '✦', stats: '30% more Spell Damage when on Low Life',                           type: 'notable' },
+  'conduit':           { name: 'Conduit',             symbol: '⬡', stats: 'Sharing Charges with Nearby Allies\nGain Power Charges on Kill',   type: 'notable' },
+  'eldritch-battery':  { name: 'Eldritch Battery',    symbol: '✦', stats: 'Spend Energy Shield before Mana for Skills\n+50 Maximum Energy Shield', type: 'notable' },
+  'avatar-of-fire':    { name: 'Avatar of Fire',      symbol: '⬡', stats: '50% of Physical/Cold/Lightning converted to Fire\nDeal no non-Fire Damage', type: 'notable' },
+  'vaal-pact':         { name: 'Vaal Pact',           symbol: '✦', stats: 'Life Leech is instant\nLife Regeneration has no effect',           type: 'notable' },
+  'unwavering-stance': { name: 'Unwavering Stance',   symbol: '⬡', stats: 'Cannot be Stunned\nCannot Evade enemy Attacks',                   type: 'notable' },
+  'elem-overload':     { name: 'Elemental Overload',  symbol: '✦', stats: '40% more Elemental Damage if you Crit recently\nNo extra damage from Crits', type: 'notable' },
+};
+
+const SMALL_STATS = [
+  '+10 Strength', '+10 Dexterity', '+10 Intelligence',
+  '5% increased Maximum Life', '4% increased maximum Mana',
+  '8% Fire Resistance', '8% Cold Resistance', '8% Lightning Resistance',
+  '12% increased Physical Damage', '10% increased Attack Speed',
+  '6% increased Cast Speed', '15% increased Elemental Damage',
+  '8% increased Area of Effect', '6% increased Projectile Speed',
+  '+20 Accuracy Rating', '3% increased Movement Speed',
+  '10% increased Armour', '8% increased Evasion Rating',
+  '5% increased Energy Shield', '12% increased Minion Damage',
+  '10% increased Totem Damage', '8% increased Trap Damage',
+  '+15 Life gained on Kill', '+8 Mana gained on Kill',
+  '15% increased Melee Physical Damage', '10% increased Spell Damage',
+];
+
+const CLASS_COLORS = {
+  Marauder: { fill: '#8b1a1a', stroke: '#e74c3c', glow: 'glow-marauder' },
+  Ranger:   { fill: '#1a4a2a', stroke: '#2ecc71', glow: 'glow-ranger'   },
+  Witch:    { fill: '#3a1a5a', stroke: '#9b59b6', glow: 'glow-witch'    },
+  Duelist:  { fill: '#5a4a0a', stroke: '#f1c40f', glow: 'glow-gold'     },
+  Templar:  { fill: '#3a3a3a', stroke: '#ecf0f1', glow: 'glow-white'    },
+  Shadow:   { fill: '#0a3a35', stroke: '#1abc9c', glow: 'glow-shadow'   },
+  Scion:    { fill: '#2a2a2a', stroke: '#bdc3c7', glow: 'glow-gold'     },
+};
+
+const CLASS_NAMES = ['Marauder','Ranger','Witch','Duelist','Templar','Shadow','Scion'];
+
+// ═══════════════════════════════════════════════════
+//  TREE GENERATION
+// ═══════════════════════════════════════════════════
+
+let nodes = [];       // { id, x, y, type, data, allocated, classOrigin }
+let edges = [];       // { a, b } (indices into nodes)
+let nodeMap = {};     // id → index
+
+const CX = 600, CY = 600; // SVG coordinate center
+
+function rng(seed) {
+  // Simple deterministic random
+  let s = seed;
+  return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; };
+}
+const rand = rng(42);
+
+function polar(cx, cy, r, angleDeg) {
+  const a = (angleDeg - 90) * Math.PI / 180;
+  return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+}
+
+function buildTree() {
+  const RING_RADII = [0, 100, 185, 275, 365, 450, 520];
+
+  // Center node (always allocated)
+  nodes.push({ id: 'center', x: CX, y: CY, type: 'center', data: { name: 'The Scion', stats: 'The heart of all paths.\nAll journeys begin here.', type: 'center', symbol: '✦' }, allocated: true, classOrigin: 'Scion' });
+  nodeMap['center'] = 0;
+
+  // 7 Class start nodes on outer ring
+  CLASS_NAMES.forEach((cls, i) => {
+    const angle = (i / 7) * 360;
+    const [x, y] = polar(CX, CY, RING_RADII[6], angle);
+    const id = `start-${cls}`;
+    nodes.push({ id, x, y, type: 'start', data: { name: cls, stats: `${cls} starting location`, type: 'start', symbol: cls[0] }, allocated: false, classOrigin: cls });
+    nodeMap[id] = nodes.length - 1;
+  });
+
+  // Notable and Keystone placement
+  const notableKeys = Object.keys(NOTABLES);
+  const keystoneKeys = Object.keys(KEYSTONES);
+
+  // Per-class arms: rings 1-5
+  const ringCounts = [0, 6, 12, 18, 22, 20]; // nodes per ring per class
+  CLASS_NAMES.forEach((cls, ci) => {
+    const baseAngle = (ci / 7) * 360;
+    const spread = 360 / 7 * 0.82; // angular spread for each class
+
+    // Place nodes on rings 1-5
+    [1, 2, 3, 4, 5].forEach((ring) => {
+      const r = RING_RADII[ring];
+      const count = [0, 4, 7, 10, 12, 10][ring];
+      const notableFreq = ring >= 2 ? 3 : 5; // every Nth is notable
+      const keystoneRing = ring === 3;
+
+      for (let ni = 0; ni < count; ni++) {
+        const frac = count === 1 ? 0.5 : ni / (count - 1);
+        const angle = baseAngle - spread / 2 + frac * spread;
+        // Jitter
+        const jitterR = (rand() - 0.5) * 18;
+        const jitterA = (rand() - 0.5) * (spread / count) * 0.6;
+        const [x, y] = polar(CX, CY, r + jitterR, angle + jitterA);
+
+        let type = 'small';
+        let data;
+        let isKeystone = false;
+
+        if (keystoneRing && ni === Math.floor(count / 2) && ci < keystoneKeys.length) {
+          type = 'keystone';
+          data = KEYSTONES[keystoneKeys[ci % keystoneKeys.length]];
+          isKeystone = true;
+        } else if ((ni % notableFreq === 1) && notableKeys.length > 0) {
+          type = 'notable';
+          const nki = (ci * 7 + ni + ring * 3) % notableKeys.length;
+          data = NOTABLES[notableKeys[nki]];
+        } else {
+          const si = (ci * 31 + ni * 7 + ring * 13) % SMALL_STATS.length;
+          data = { name: SMALL_STATS[si], stats: SMALL_STATS[si], type: 'small' };
+        }
+
+        const id = `n-${cls}-${ring}-${ni}`;
+        nodes.push({ id, x, y, type, data, allocated: false, classOrigin: cls });
+        nodeMap[id] = nodes.length - 1;
+      }
+    });
+  });
+
+  // Inter-class shared path nodes (middle zone)
+  const sharedAngles = CLASS_NAMES.map((_, i) => ((i + 0.5) / 7) * 360);
+  sharedAngles.forEach((angle, i) => {
+    [2, 3, 4].forEach((ring, ri) => {
+      const r = RING_RADII[ring];
+      const jitterR = (rand() - 0.5) * 20;
+      const jitterA = (rand() - 0.5) * 8;
+      const [x, y] = polar(CX, CY, r + jitterR, angle + jitterA);
+      const si = (i * 17 + ri * 11) % SMALL_STATS.length;
+      const isNotable = ri === 1 && i % 2 === 0;
+      let type = isNotable ? 'notable' : 'small';
+      let data;
+      if (isNotable) {
+        const nki = (i + ri * 3) % notableKeys.length;
+        data = NOTABLES[notableKeys[nki]];
+      } else {
+        data = { name: SMALL_STATS[si], stats: SMALL_STATS[si], type: 'small' };
+      }
+      const id = `shared-${i}-${ring}`;
+      nodes.push({ id, x, y, type, data, allocated: false, classOrigin: null });
+      nodeMap[id] = nodes.length - 1;
+    });
+  });
+
+  // Build edges using proximity + radial structure
+  buildEdges();
+}
+
+function dist(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function buildEdges() {
+  // Connect center to inner ring nodes and class starts via mid-path
+  const centerIdx = 0;
+
+  // Connect each class start to its nearest ring-1 nodes
+  CLASS_NAMES.forEach((cls) => {
+    const startIdx = nodeMap[`start-${cls}`];
+    const startNode = nodes[startIdx];
+
+    // Find closest ring-1 and ring-2 nodes in same class
+    const classRing5 = nodes.filter((n, i) => i > 7 && n.classOrigin === cls && n.id.includes('-5-'));
+    classRing5.sort((a, b) => dist(startNode, a) - dist(startNode, b));
+    if (classRing5.length > 0) {
+      addEdge(startIdx, nodeMap[classRing5[0].id]);
+      if (classRing5.length > 1) addEdge(startIdx, nodeMap[classRing5[1].id]);
+    }
+  });
+
+  // Connect center to ring-1 nodes
+  const ring1Nodes = nodes.filter((n, i) => i > 7 && n.id.includes('-1-'));
+  ring1Nodes.forEach(n => {
+    if (dist(nodes[centerIdx], n) < 160) {
+      addEdge(centerIdx, nodeMap[n.id]);
+    }
+  });
+
+  // Also connect center to nearby shared nodes
+  const sharedRing2 = nodes.filter(n => n.id.startsWith('shared-') && n.id.includes('-2'));
+  sharedRing2.forEach(n => {
+    if (dist(nodes[centerIdx], n) < 200) {
+      addEdge(centerIdx, nodeMap[n.id]);
+    }
+  });
+
+  // Connect nodes within each class by proximity (spiderweb arms)
+  const edgeThreshold = 120;
+  CLASS_NAMES.forEach(cls => {
+    const classNodes = nodes.filter((n, i) => i > 7 && n.classOrigin === cls);
+    classNodes.sort((a, b) => {
+      const ra = Math.hypot(a.x - CX, a.y - CY);
+      const rb = Math.hypot(b.x - CX, b.y - CY);
+      return ra - rb;
+    });
+
+    // Connect each to 2-3 nearest within class
+    classNodes.forEach(n => {
+      const idx = nodeMap[n.id];
+      const near = classNodes
+        .filter(m => m.id !== n.id && dist(n, m) < edgeThreshold)
+        .sort((a, b) => dist(n, a) - dist(n, b))
+        .slice(0, 3);
+      near.forEach(m => addEdge(idx, nodeMap[m.id]));
+    });
+  });
+
+  // Cross-class connections (the web threads)
+  const sharedNodes = nodes.filter(n => n.id.startsWith('shared-'));
+  sharedNodes.forEach(n => {
+    const idx = nodeMap[n.id];
+    // Connect to nearby nodes of any class
+    const near = nodes.filter((m, mi) => mi !== idx && dist(n, m) < 100 && !m.id.startsWith('start-'))
+      .sort((a, b) => dist(n, a) - dist(n, b))
+      .slice(0, 4);
+    near.forEach(m => addEdge(idx, nodeMap[m.id]));
+  });
+
+  // Extra cross-connections between class arms for web density
+  nodes.forEach((n, i) => {
+    if (i === 0 || n.type === 'start') return;
+    const crossNear = nodes.filter((m, mi) => {
+      if (mi <= i || mi === 0 || m.type === 'start') return false;
+      if (m.classOrigin === n.classOrigin) return false;
+      return dist(n, m) < 85;
+    }).sort((a, b) => dist(n, a) - dist(n, b)).slice(0, 2);
+    crossNear.forEach(m => addEdge(i, nodeMap[m.id]));
+  });
+}
+
+const edgeSet = new Set();
+function addEdge(a, b) {
+  if (a === undefined || b === undefined || a === b) return;
+  const key = a < b ? `${a}-${b}` : `${b}-${a}`;
+  if (edgeSet.has(key)) return;
+  edgeSet.add(key);
+  edges.push({ a, b });
+}
+
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+
+let pointsSpent = 0;
+let activeClassFilter = null;
+let searchQuery = '';
+let pan = { x: 0, y: 0 };
+let scale = 1.0;
+let isDragging = false;
+let lastMouse = { x: 0, y: 0 };
+
+// ═══════════════════════════════════════════════════
+//  ADJACENCY
+// ═══════════════════════════════════════════════════
+
+let adjacency = []; // adjacency[i] = [j, k, ...]
+
+function buildAdjacency() {
+  adjacency = nodes.map(() => []);
+  edges.forEach(({ a, b }) => {
+    adjacency[a].push(b);
+    adjacency[b].push(a);
+  });
+}
+
+function isConnectedToAllocated(nodeIdx) {
+  return adjacency[nodeIdx].some(ni => nodes[ni].allocated);
+}
+
+function wouldDisconnect(nodeIdx) {
+  // BFS from center through allocated nodes, excluding nodeIdx
+  // If any other allocated node can't be reached → would disconnect
+  const allocated = nodes.map((n, i) => n.allocated && i !== nodeIdx);
+  if (!allocated.some(Boolean)) return false;
+
+  const visited = new Set([0]); // start from center
+  const queue = [0];
+  while (queue.length > 0) {
+    const cur = queue.shift();
+    adjacency[cur].forEach(nb => {
+      if (!visited.has(nb) && allocated[nb]) {
+        visited.add(nb);
+        queue.push(nb);
+      }
+    });
+  }
+
+  // Check if any allocated node (except nodeIdx) wasn't visited
+  for (let i = 1; i < nodes.length; i++) {
+    if (i !== nodeIdx && nodes[i].allocated && !visited.has(i)) return true;
+  }
+  return false;
+}
+
+// ═══════════════════════════════════════════════════
+//  RENDERING
+// ═══════════════════════════════════════════════════
+
+const svg = document.getElementById('tree-svg');
+const linesLayer = document.getElementById('lines-layer');
+const nodesLayer = document.getElementById('nodes-layer');
+
+const nodeElements = []; // SVG <g> per node
+const edgeElements = []; // SVG <line> per edge
+
+function nodeRadius(type) {
+  switch(type) {
+    case 'center': return 20;
+    case 'start': return 34;
+    case 'keystone': return 28;
+    case 'notable': return 18;
+    default: return 10;
+  }
+}
+
+function createEdgeSVG(idx) {
+  const { a, b } = edges[idx];
+  const na = nodes[a], nb = nodes[b];
+
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', na.x);
+  line.setAttribute('y1', na.y);
+  line.setAttribute('x2', nb.x);
+  line.setAttribute('y2', nb.y);
+  line.setAttribute('stroke', '#2a1e06');
+  line.setAttribute('stroke-width', '1.5');
+  line.setAttribute('stroke-linecap', 'round');
+  line.setAttribute('class', 'tree-edge');
+  line.dataset.edgeIdx = idx;
+
+  linesLayer.appendChild(line);
+  edgeElements[idx] = line;
+}
+
+function createNodeSVG(idx) {
+  const node = nodes[idx];
+  const r = nodeRadius(node.type);
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.setAttribute('transform', `translate(${node.x},${node.y})`);
+  g.setAttribute('class', 'tree-node');
+  g.dataset.nodeIdx = idx;
+  g.style.cursor = node.type === 'start' || node.type === 'center' ? 'default' : 'pointer';
+
+  if (node.type === 'start') {
+    const cc = CLASS_COLORS[node.data.name] || CLASS_COLORS.Scion;
+    // Outer decorative ring
+    const outerRing = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    outerRing.setAttribute('r', r + 10);
+    outerRing.setAttribute('fill', 'none');
+    outerRing.setAttribute('stroke', cc.stroke);
+    outerRing.setAttribute('stroke-width', '1.5');
+    outerRing.setAttribute('opacity', '0.4');
+    g.appendChild(outerRing);
+
+    const outerRing2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    outerRing2.setAttribute('r', r + 6);
+    outerRing2.setAttribute('fill', 'none');
+    outerRing2.setAttribute('stroke', cc.stroke);
+    outerRing2.setAttribute('stroke-width', '1');
+    outerRing2.setAttribute('opacity', '0.6');
+    g.appendChild(outerRing2);
+
+    const main = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    main.setAttribute('r', r);
+    main.setAttribute('fill', cc.fill);
+    main.setAttribute('stroke', cc.stroke);
+    main.setAttribute('stroke-width', '2.5');
+    g.appendChild(main);
+
+    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('dominant-baseline', 'central');
+    label.setAttribute('fill', cc.stroke);
+    label.setAttribute('font-size', '12');
+    label.setAttribute('font-weight', 'bold');
+    label.textContent = node.data.name.substring(0, 3).toUpperCase();
+    g.appendChild(label);
+
+    g.setAttribute('filter', `url(#${cc.glow})`);
+
+  } else if (node.type === 'center') {
+    // Center: jewel
+    const outer = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    outer.setAttribute('r', r + 14);
+    outer.setAttribute('fill', 'none');
+    outer.setAttribute('stroke', '#8b6914');
+    outer.setAttribute('stroke-width', '1');
+    outer.setAttribute('opacity', '0.5');
+    g.appendChild(outer);
+
+    const ring1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    ring1.setAttribute('r', r + 8);
+    ring1.setAttribute('fill', 'none');
+    ring1.setAttribute('stroke', '#c8922a');
+    ring1.setAttribute('stroke-width', '1.5');
+    g.appendChild(ring1);
+
+    const main = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    main.setAttribute('r', r);
+    main.setAttribute('fill', '#1a1004');
+    main.setAttribute('stroke', '#f0c040');
+    main.setAttribute('stroke-width', '2');
+    g.appendChild(main);
+
+    const sym = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    sym.setAttribute('text-anchor', 'middle');
+    sym.setAttribute('dominant-baseline', 'central');
+    sym.setAttribute('fill', '#f0c040');
+    sym.setAttribute('font-size', '14');
+    sym.textContent = '✦';
+    g.appendChild(sym);
+    g.setAttribute('filter', 'url(#glow-gold-strong)');
+
+  } else if (node.type === 'keystone') {
+    const ring1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    ring1.setAttribute('r', r + 7);
+    ring1.setAttribute('fill', 'none');
+    ring1.setAttribute('stroke', '#4a3208');
+    ring1.setAttribute('stroke-width', '2');
+    g.appendChild(ring1);
+
+    const ring2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    ring2.setAttribute('r', r + 3);
+    ring2.setAttribute('fill', 'none');
+    ring2.setAttribute('stroke', '#3a2806');
+    ring2.setAttribute('stroke-width', '1.5');
+    g.appendChild(ring2);
+
+    const main = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    main.setAttribute('r', r);
+    main.setAttribute('fill', '#0e0b04');
+    main.setAttribute('stroke', '#4a3208');
+    main.setAttribute('stroke-width', '2');
+    main.setAttribute('class', 'node-main');
+    g.appendChild(main);
+
+    const sym = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    sym.setAttribute('text-anchor', 'middle');
+    sym.setAttribute('dominant-baseline', 'central');
+    sym.setAttribute('fill', '#4a3208');
+    sym.setAttribute('font-size', '16');
+    sym.setAttribute('class', 'node-symbol');
+    sym.textContent = node.data.symbol || '✸';
+    g.appendChild(sym);
+
+  } else if (node.type === 'notable') {
+    const ring1 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    ring1.setAttribute('r', r + 4);
+    ring1.setAttribute('fill', 'none');
+    ring1.setAttribute('stroke', '#3a2806');
+    ring1.setAttribute('stroke-width', '1.5');
+    g.appendChild(ring1);
+
+    const main = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    main.setAttribute('r', r);
+    main.setAttribute('fill', '#0e0a04');
+    main.setAttribute('stroke', '#3a2806');
+    main.setAttribute('stroke-width', '1.5');
+    main.setAttribute('class', 'node-main');
+    g.appendChild(main);
+
+    const sym = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    sym.setAttribute('text-anchor', 'middle');
+    sym.setAttribute('dominant-baseline', 'central');
+    sym.setAttribute('fill', '#3a2806');
+    sym.setAttribute('font-size', '10');
+    sym.setAttribute('class', 'node-symbol');
+    sym.textContent = node.data.symbol || '⬡';
+    g.appendChild(sym);
+
+  } else {
+    // small
+    const main = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    main.setAttribute('r', r);
+    main.setAttribute('fill', '#0c0904');
+    main.setAttribute('stroke', '#2a1e08');
+    main.setAttribute('stroke-width', '1.2');
+    main.setAttribute('class', 'node-main');
+    g.appendChild(main);
+  }
+
+  // Hit area
+  const hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  hit.setAttribute('r', Math.max(r + 6, 16));
+  hit.setAttribute('fill', 'transparent');
+  hit.setAttribute('class', 'hit-area');
+  g.appendChild(hit);
+
+  nodesLayer.appendChild(g);
+  nodeElements[idx] = g;
+
+  // Events
+  if (node.type !== 'center' && node.type !== 'start') {
+    g.addEventListener('click', (e) => { e.stopPropagation(); handleNodeClick(idx); });
+    g.addEventListener('mouseenter', (e) => showTooltip(idx, e));
+    g.addEventListener('mousemove', (e) => moveTooltip(e));
+    g.addEventListener('mouseleave', hideTooltip);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  UPDATE VISUALS
+// ═══════════════════════════════════════════════════
+
+let searchHighlighted = new Set();
+let classDimmed = new Set();
+
+function updateAllVisuals() {
+  updateEdges();
+  updateNodes();
+}
+
+function updateEdges() {
+  edges.forEach(({ a, b }, idx) => {
+    const el = edgeElements[idx];
+    if (!el) return;
+    const bothAlloc = nodes[a].allocated && nodes[b].allocated;
+    if (bothAlloc) {
+      el.setAttribute('stroke', '#c8922a');
+      el.setAttribute('stroke-width', '2');
+      el.setAttribute('opacity', '1');
+    } else {
+      el.setAttribute('stroke', '#2a1e06');
+      el.setAttribute('stroke-width', '1.5');
+      el.setAttribute('opacity', classDimmed.has(a) && classDimmed.has(b) ? '0.2' : '0.5');
+    }
+  });
+}
+
+function updateNodes() {
+  nodes.forEach((node, idx) => {
+    const g = nodeElements[idx];
+    if (!g) return;
+
+    if (node.type === 'center' || node.type === 'start') return;
+
+    const main = g.querySelector('.node-main');
+    const sym = g.querySelector('.node-symbol');
+    const isSearched = searchQuery && searchHighlighted.has(idx);
+    const isDimmed = classDimmed.has(idx);
+    const isAllocated = node.allocated;
+
+    // Opacity
+    if (searchQuery) {
+      g.style.opacity = isSearched ? '1' : '0.15';
+    } else if (isDimmed) {
+      g.style.opacity = '0.25';
+    } else {
+      g.style.opacity = '1';
+    }
+
+    if (isAllocated) {
+      if (main) {
+        main.setAttribute('fill', '#1a1204');
+        const strokeMap = { keystone: '#f0c040', notable: '#e8a020', small: '#c8922a' };
+        main.setAttribute('stroke', strokeMap[node.type] || '#c8922a');
+        main.setAttribute('stroke-width', node.type === 'keystone' ? '3' : '2');
+      }
+      if (sym) sym.setAttribute('fill', '#f0c040');
+
+      const filterMap = { keystone: 'glow-keystone', notable: 'glow-gold-strong', small: 'glow-gold' };
+      g.setAttribute('filter', `url(#${filterMap[node.type] || 'glow-gold'})`);
+
+      // Update outer rings for keystone/notable
+      const rings = g.querySelectorAll('circle:not(.node-main):not(.hit-area)');
+      rings.forEach(ring => {
+        ring.setAttribute('stroke', node.type === 'keystone' ? '#8b6914' : '#6b4f12');
+        ring.setAttribute('opacity', '1');
+      });
+
+    } else {
+      if (main) {
+        const fillMap = { keystone: '#0e0b04', notable: '#0e0a04', small: '#0c0904' };
+        main.setAttribute('fill', fillMap[node.type] || '#0c0904');
+        const strokeMap = { keystone: '#4a3208', notable: '#3a2806', small: '#2a1e08' };
+        main.setAttribute('stroke', strokeMap[node.type] || '#2a1e08');
+        main.setAttribute('stroke-width', '1.5');
+      }
+      if (sym) sym.setAttribute('fill', '#3a2806');
+      g.removeAttribute('filter');
+
+      if (isSearched) {
+        g.setAttribute('filter', 'url(#glow-white)');
+        if (main) main.setAttribute('stroke', '#e0e0e0');
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  ALLOCATION ANIMATION
+// ═══════════════════════════════════════════════════
+
+function animateLineAllocation(edgeIdx) {
+  const el = edgeElements[edgeIdx];
+  if (!el) return;
+  const x1 = parseFloat(el.getAttribute('x1'));
+  const y1 = parseFloat(el.getAttribute('y1'));
+  const x2 = parseFloat(el.getAttribute('x2'));
+  const y2 = parseFloat(el.getAttribute('y2'));
+  const len = Math.hypot(x2 - x1, y2 - y1);
+
+  el.setAttribute('stroke-dasharray', len);
+  el.setAttribute('stroke-dashoffset', len);
+  el.setAttribute('stroke', '#f0c040');
+  el.setAttribute('stroke-width', '2.5');
+  el.setAttribute('opacity', '1');
+
+  const start = performance.now();
+  const dur = 280;
+  function frame(now) {
+    const t = Math.min((now - start) / dur, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.setAttribute('stroke-dashoffset', len * (1 - ease));
+    if (t < 1) requestAnimationFrame(frame);
+    else {
+      el.removeAttribute('stroke-dasharray');
+      el.removeAttribute('stroke-dashoffset');
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+function flashNodeAlloc(idx) {
+  const g = nodeElements[idx];
+  if (!g) return;
+  const main = g.querySelector('.node-main');
+  if (main) {
+    main.setAttribute('fill', '#f0e060');
+    setTimeout(() => {
+      main.setAttribute('fill', '#1a1204');
+    }, 250);
+  }
+}
+
+function flashNodeInvalid(idx) {
+  const g = nodeElements[idx];
+  if (!g) return;
+  g.classList.add('node-shake');
+  const main = g.querySelector('.node-main');
+  if (main) {
+    const orig = main.getAttribute('fill');
+    main.setAttribute('fill', '#3a0808');
+    setTimeout(() => {
+      main.setAttribute('fill', orig);
+      g.classList.remove('node-shake');
+    }, 400);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  CLICK HANDLER
+// ═══════════════════════════════════════════════════
+
+function handleNodeClick(idx) {
+  const node = nodes[idx];
+  if (node.type === 'center' || node.type === 'start') return;
+
+  if (!node.allocated) {
+    // Allocate
+    if (!isConnectedToAllocated(idx)) {
+      flashNodeInvalid(idx);
+      return;
+    }
+    if (pointsSpent >= 120) {
+      flashNodeInvalid(idx);
+      return;
+    }
+
+    node.allocated = true;
+    pointsSpent++;
+    document.getElementById('pts').textContent = pointsSpent;
+
+    // Animate the connecting edges
+    adjacency[idx].forEach(ni => {
+      if (nodes[ni].allocated) {
+        const edgeIdx = edges.findIndex(e =>
+          (e.a === idx && e.b === ni) || (e.a === ni && e.b === idx)
+        );
+        if (edgeIdx !== -1) animateLineAllocation(edgeIdx);
+      }
+    });
+
+    setTimeout(() => flashNodeAlloc(idx), 200);
+
+  } else {
+    // Deallocate
+    if (wouldDisconnect(idx)) {
+      flashNodeInvalid(idx);
+      return;
+    }
+    node.allocated = false;
+    pointsSpent--;
+    document.getElementById('pts').textContent = pointsSpent;
+  }
+
+  updateAllVisuals();
+}
+
+// ═══════════════════════════════════════════════════
+//  RESET
+// ═══════════════════════════════════════════════════
+
+function resetTree() {
+  const centerNode = nodes[0];
+  // Sort nodes by distance from center, deallocate in outward order (radial wipe)
+  const sortedByDist = nodes
+    .map((n, i) => ({ idx: i, d: Math.hypot(n.x - CX, n.y - CY) }))
+    .filter(({ idx }) => idx > 0 && nodes[idx].allocated && nodes[idx].type !== 'center')
+    .sort((a, b) => a.d - b.d);
+
+  sortedByDist.forEach(({ idx }, i) => {
+    setTimeout(() => {
+      nodes[idx].allocated = false;
+      updateAllVisuals();
+    }, i * 20);
+  });
+
+  setTimeout(() => {
+    pointsSpent = 0;
+    document.getElementById('pts').textContent = 0;
+    updateAllVisuals();
+  }, sortedByDist.length * 20 + 50);
+}
+
+// ═══════════════════════════════════════════════════
+//  CLASS FILTER
+// ═══════════════════════════════════════════════════
+
+function setClassFilter(cls) {
+  classDimmed.clear();
+  if (activeClassFilter === cls) {
+    activeClassFilter = null;
+    document.querySelectorAll('.class-btn').forEach(b => b.classList.remove('active'));
+    updateAllVisuals();
+    return;
+  }
+  activeClassFilter = cls;
+  document.querySelectorAll('.class-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.class === cls);
+  });
+
+  // BFS from that class's start node — find reachable nodes
+  const startIdx = nodeMap[`start-${cls}`];
+  if (startIdx === undefined) return;
+
+  const reachable = new Set([startIdx, 0]);
+  const queue = [startIdx];
+
+  // For this filter we do full tree reachability (not just allocated)
+  while (queue.length > 0) {
+    const cur = queue.shift();
+    adjacency[cur].forEach(nb => {
+      if (!reachable.has(nb) && nodes[nb].type !== 'start') {
+        reachable.add(nb);
+        queue.push(nb);
+      }
+    });
+  }
+
+  // Dim everything not reachable from this class
+  nodes.forEach((n, i) => {
+    if (!reachable.has(i) && n.type !== 'center') classDimmed.add(i);
+  });
+
+  updateAllVisuals();
+}
+
+// ═══════════════════════════════════════════════════
+//  SEARCH
+// ═══════════════════════════════════════════════════
+
+function doSearch(q) {
+  searchQuery = q.toLowerCase().trim();
+  searchHighlighted.clear();
+
+  if (searchQuery) {
+    nodes.forEach((n, i) => {
+      const haystack = (n.data.name + ' ' + (n.data.stats || '')).toLowerCase();
+      if (haystack.includes(searchQuery)) searchHighlighted.add(i);
+    });
+  }
+
+  updateAllVisuals();
+}
+
+// ═══════════════════════════════════════════════════
+//  TOOLTIP
+// ═══════════════════════════════════════════════════
+
+const tooltip = document.getElementById('tooltip');
+
+function showTooltip(idx, e) {
+  const node = nodes[idx];
+  document.getElementById('tooltip-name').textContent = node.data.name;
+  const typeLabels = { keystone: 'Keystone Passive', notable: 'Notable Passive', small: 'Passive' };
+  document.getElementById('tooltip-type').textContent = typeLabels[node.type] || 'Passive';
+  document.getElementById('tooltip-stats').textContent = (node.data.stats || '').replace(/\\n/g, '\n');
+  const flavor = document.getElementById('tooltip-flavor');
+  if (node.data.flavor) {
+    flavor.textContent = node.data.flavor;
+    flavor.style.display = 'block';
+  } else {
+    flavor.style.display = 'none';
+  }
+  tooltip.classList.add('visible');
+  moveTooltip(e);
+}
+
+function moveTooltip(e) {
+  let tx = e.clientX + 16;
+  let ty = e.clientY + 16;
+  const tw = 250, th = 120;
+  if (tx + tw > window.innerWidth) tx = e.clientX - tw - 10;
+  if (ty + th > window.innerHeight) ty = e.clientY - th - 10;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+}
+
+function hideTooltip() {
+  tooltip.classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════
+//  ZOOM / PAN
+// ═══════════════════════════════════════════════════
+
+const treeRoot = document.getElementById('tree-root');
+
+function applyTransform() {
+  treeRoot.setAttribute('transform', `translate(${pan.x},${pan.y}) scale(${scale})`);
+  // Update vignette position (fixed)
+  document.getElementById('vignette').setAttribute('width', '100%');
+}
+
+svg.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const rect = svg.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+
+  const factor = e.deltaY < 0 ? 1.1 : 0.91;
+  const newScale = Math.min(2.5, Math.max(0.4, scale * factor));
+
+  // Zoom toward mouse position
+  pan.x = mx - (mx - pan.x) * (newScale / scale);
+  pan.y = my - (my - pan.y) * (newScale / scale);
+  scale = newScale;
+  applyTransform();
+}, { passive: false });
+
+svg.addEventListener('mousedown', (e) => {
+  if (e.target.classList.contains('hit-area') || e.target.classList.contains('tree-node')) return;
+  isDragging = true;
+  lastMouse = { x: e.clientX, y: e.clientY };
+  document.body.classList.add('panning');
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  pan.x += e.clientX - lastMouse.x;
+  pan.y += e.clientY - lastMouse.y;
+  lastMouse = { x: e.clientX, y: e.clientY };
+  applyTransform();
+});
+
+window.addEventListener('mouseup', () => {
+  isDragging = false;
+  document.body.classList.remove('panning');
+});
+
+// ═══════════════════════════════════════════════════
+//  SHIMMER BACKGROUND
+// ═══════════════════════════════════════════════════
+
+let shimmerAngle = 0;
+function animateShimmer() {
+  shimmerAngle = (shimmerAngle + 0.02) % 360;
+  document.getElementById('bg-rect').style.fill = '#0a0804';
+  // Very subtle shimmer via SVG inline style
+  requestAnimationFrame(animateShimmer);
+}
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+
+function init() {
+  buildTree();
+  buildAdjacency();
+
+  // Initial pan: center the tree
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  pan.x = vw / 2 - CX;
+  pan.y = vh / 2 - CY;
+  scale = Math.min(vw, vh) / 1350;
+  pan.x = vw / 2 - CX * scale;
+  pan.y = vh / 2 - CY * scale;
+  applyTransform();
+
+  // Render edges first, then nodes
+  edges.forEach((_, idx) => createEdgeSVG(idx));
+  nodes.forEach((_, idx) => createNodeSVG(idx));
+
+  updateAllVisuals();
+
+  // Events
+  document.getElementById('reset-btn').addEventListener('click', resetTree);
+
+  document.querySelectorAll('.class-btn').forEach(btn => {
+    btn.addEventListener('click', () => setClassFilter(btn.dataset.class));
+  });
+
+  document.getElementById('search-input').addEventListener('input', (e) => {
+    doSearch(e.target.value);
+  });
+
+  animateShimmer();
+}
+
+init();
+</script>
+</body>
+</html>
