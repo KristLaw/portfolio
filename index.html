@@ -285,12 +285,14 @@
     .project-card:nth-child(2) { grid-column: 8 / 13; min-height: 420px; }
     .project-card:nth-child(3) { grid-column: 1 / 5;  min-height: 360px; }
     .project-card:nth-child(4) { grid-column: 5 / 13; min-height: 360px; }
+    .project-card:nth-child(5) { grid-column: 1 / 13; min-height: 320px; }
 
     /* stagger */
     .project-card:nth-child(1) { transition-delay: 0s; }
     .project-card:nth-child(2) { transition-delay: 0.12s; }
     .project-card:nth-child(3) { transition-delay: 0.24s; }
     .project-card:nth-child(4) { transition-delay: 0.36s; }
+    .project-card:nth-child(5) { transition-delay: 0.48s; }
 
     /* card background photos */
     .project-card:nth-child(1) .card-bg {
@@ -305,6 +307,24 @@
     .project-card:nth-child(4) .card-bg {
       background: url('assets/images/card4.jpg') center/cover no-repeat;
     }
+    .project-card:nth-child(5) .card-bg {
+      background:
+        radial-gradient(ellipse 60% 80% at 70% 40%, rgba(197,168,50,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 20% 60%, rgba(74,222,128,0.08) 0%, transparent 55%),
+        linear-gradient(135deg, #0a1f14 0%, #1a3a2a 45%, #122a1e 100%);
+    }
+    /* finance card: wide layout with decorative isometric hint */
+    .project-card:nth-child(5) .card-body { max-width: 480px; }
+    .project-card:nth-child(5) .card-iso-deco {
+      position: absolute;
+      right: 3%;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.22;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .project-card:nth-child(5):hover .card-iso-deco { opacity: 0.38; }
 
     .card-bg {
       position: absolute;
@@ -659,7 +679,8 @@
       .project-card:nth-child(1),
       .project-card:nth-child(2),
       .project-card:nth-child(3),
-      .project-card:nth-child(4) {
+      .project-card:nth-child(4),
+      .project-card:nth-child(5) {
         grid-column: auto;
         min-height: 300px;
       }
@@ -1298,6 +1319,59 @@
             <h3 class="card-title">Year One</h3>
             <p class="card-desc">A personal documentary marking twelve months of becoming — uncut and unrehearsed.</p>
             <a href="#" class="card-btn">Watch Film</a>
+          </div>
+        </article>
+
+        <!-- Card 5 — Finance / Mission Control -->
+        <article class="project-card">
+          <div class="card-bg"></div>
+          <div class="card-grain"></div>
+          <div class="card-overlay" style="background:linear-gradient(to right, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.6) 55%, rgba(0,0,0,0.1) 100%);"></div>
+          <div class="card-corner tl"></div>
+          <div class="card-corner tr"></div>
+          <div class="card-corner bl"></div>
+          <div class="card-corner br"></div>
+          <!-- Decorative isometric office SVG -->
+          <svg class="card-iso-deco" width="480" height="260" viewBox="0 0 480 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="240,20 440,120 240,220 40,120" fill="#c5a832" opacity="0.15" stroke="#c5a832" stroke-width="1"/>
+            <g stroke="#c5a832" stroke-width="0.8" opacity="0.5">
+              <line x1="40" y1="120" x2="240" y2="20"/><line x1="240" y1="20" x2="440" y2="120"/>
+              <line x1="140" y1="70" x2="340" y2="170"/><line x1="340" y1="70" x2="140" y2="170"/>
+            </g>
+            <g fill="#c5a832" opacity="0.7">
+              <polygon points="160,110 200,90 240,110 200,130"/>
+              <polygon points="160,110 160,128 200,148 200,130"/>
+              <polygon points="240,110 240,128 200,148 200,130"/>
+              <polygon points="240,115 280,95 320,115 280,135"/>
+              <polygon points="240,115 240,133 280,153 280,135"/>
+              <polygon points="320,115 320,133 280,153 280,135"/>
+              <polygon points="170,148 210,128 250,148 210,168"/>
+              <polygon points="170,148 170,166 210,186 210,168"/>
+              <polygon points="250,148 250,166 210,186 210,168"/>
+              <polygon points="270,158 310,138 350,158 310,178"/>
+              <polygon points="270,158 270,176 310,196 310,178"/>
+              <polygon points="350,158 350,176 310,196 310,178"/>
+            </g>
+            <g>
+              <circle cx="200" cy="85" r="8" fill="#f0ede4" opacity="0.9"/>
+              <text x="200" y="89" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="700" fill="#1a3a2a">Cl</text>
+              <circle cx="200" cy="74" r="3" fill="#4ade80"/>
+              <circle cx="280" cy="90" r="8" fill="#f0ede4" opacity="0.9"/>
+              <text x="280" y="94" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="700" fill="#1a3a2a">Pa</text>
+              <circle cx="280" cy="79" r="3" fill="#4ade80"/>
+              <circle cx="210" cy="123" r="8" fill="#f0ede4" opacity="0.9"/>
+              <text x="210" y="127" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="700" fill="#1a3a2a">Ra</text>
+              <circle cx="210" cy="112" r="3" fill="#4ade80"/>
+              <circle cx="310" cy="133" r="8" fill="#f0ede4" opacity="0.9"/>
+              <text x="310" y="137" text-anchor="middle" font-family="sans-serif" font-size="8" font-weight="700" fill="#1a3a2a">Ne</text>
+              <circle cx="310" cy="122" r="3" fill="#4ade80"/>
+            </g>
+          </svg>
+          <div class="card-body">
+            <span class="card-tag" style="border-color:rgba(197,168,50,0.5);color:#c5a832;">Finance · AI Dashboard</span>
+            <h3 class="card-title">ลงทุน Diary — Mission Control</h3>
+            <p class="card-desc">An isometric team command centre for a finance AI studio — agent orchestration, live status columns, and a draggable office floor of AI agents.</p>
+            <a href="mission-control.html" class="card-btn" style="color:#c5a832;border-color:#c5a832;">Open Dashboard</a>
           </div>
         </article>
 
