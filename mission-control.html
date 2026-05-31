@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mission Control</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a3a2a;
+    --surface: #243d2f;
+    --surface2: #2e4d3a;
+    --border: #3a5c47;
+    --gold: #c5a832;
+    --gold-dark: #c5832a;
+    --gold-muted: #8b9a2a;
+    --text: #f0ede4;
+    --text-muted: #a8bfb0;
+    --green-dot: #4ade80;
+    --floor: #f0ebe0;
+    --floor2: #e8e2d4;
+    --desk: #b89a6a;
+    --desk-dark: #8a6f48;
+    --wall: #d4ccbb;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-size: 13px;
+  }
+
+  /* TOP NAV */
+  .topnav {
+    display: flex;
+    align-items: center;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    flex-shrink: 0;
+    background: var(--bg);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: -0.02em;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .logo-sub { font-size: 10px; color: var(--text-muted); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; margin-top: -2px; }
+  .nav-center { flex: 1; display: flex; justify-content: center; }
+  .toggle-pill {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px;
+    gap: 2px;
+  }
+  .toggle-btn {
+    padding: 5px 16px;
+    border-radius: 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .toggle-btn.active {
+    background: var(--surface2);
+    color: var(--text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .toggle-btn .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green-dot); }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .agent-pill {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+  }
+  .agent-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green-dot); animation: pulse 2s infinite; }
+  .reset-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    padding: 5px 10px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .timestamp { font-size: 11px; color: var(--text-muted); font-family: 'DM Mono', monospace; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74,222,128,0.4); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 4px rgba(74,222,128,0); }
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 230px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 14px 12px;
+    gap: 12px;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .project-title { font-weight: 600; font-size: 15px; letter-spacing: -0.02em; line-height: 1.2; }
+  .project-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .progress-bar {
+    margin-top: 10px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill { height: 100%; background: var(--gold); border-radius: 2px; width: 75%; }
+  .week-summary { margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+  .week-summary strong { color: var(--text); }
+
+  .banner-card {
+    background: #8a5a1a;
+    border: 1px solid #a06820;
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .banner-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #f0c060;
+    margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .banner-count {
+    background: #c5832a;
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+  }
+  .banner-item {
+    display: flex; align-items: flex-start; gap: 7px;
+    margin-bottom: 7px;
+    font-size: 12px;
+    line-height: 1.35;
+    color: #fde8c0;
+  }
+  .banner-dot { width: 6px; height: 6px; border-radius: 50%; background: #f0c060; margin-top: 4px; flex-shrink: 0; }
+  .banner-dot.hollow { background: transparent; border: 1.5px solid #f0c060; }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .focus-list { list-style: none; }
+  .focus-item {
+    display: flex; align-items: flex-start; gap: 8px;
+    margin-bottom: 7px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--text-muted);
+  }
+  .focus-num {
+    width: 18px; height: 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .team-section { margin-top: auto; }
+  .team-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .team-chip {
+    display: flex; align-items: center; gap: 5px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 8px 3px 4px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .team-chip:hover { border-color: var(--gold-muted); }
+  .chip-avatar {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .chip-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green-dot); margin-left: 2px; }
+
+  /* CONTENT AREA */
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ISOMETRIC OFFICE */
+  .office-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .office-title {
+    position: absolute;
+    top: 14px; left: 16px;
+    z-index: 10;
+  }
+  .office-title h3 { font-size: 13px; font-weight: 600; }
+  .office-title p { font-size: 10px; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; margin-top: 2px; }
+
+  .iso-scene {
+    position: relative;
+    width: 740px;
+    height: 420px;
+    transform: translateY(-10px);
+  }
+
+  /* Isometric floor */
+  .iso-floor {
+    position: absolute;
+    width: 700px;
+    height: 380px;
+    background: var(--floor);
+    transform: rotateX(60deg) rotateZ(-45deg);
+    transform-style: preserve-3d;
+    left: 50%;
+    top: 50%;
+    margin-left: -350px;
+    margin-top: -190px;
+    border-radius: 4px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+  }
+
+  /* SVG-based isometric office */
+  .iso-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+
+  /* Character bubbles */
+  .char-bubble {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+    z-index: 20;
+  }
+  .char-bubble:hover { transform: scale(1.08) translateY(-2px); }
+  .char-bubble:hover .bubble-tag { border-color: var(--gold); }
+
+  .bubble-tag {
+    background: rgba(240,237,228,0.95);
+    border: 1.5px solid rgba(255,255,255,0.5);
+    border-radius: 16px;
+    padding: 3px 8px 3px 5px;
+    display: flex; align-items: center; gap: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    transition: border-color 0.2s;
+    white-space: nowrap;
+  }
+  .bubble-avatar {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+  }
+  .bubble-status { width: 7px; height: 7px; border-radius: 50%; background: var(--green-dot); animation: pulse 2s infinite; }
+  .bubble-name { font-size: 11px; font-weight: 600; color: #1a3a2a; }
+
+  /* CTA area */
+  .cta-area {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 30;
+  }
+  .talk-btn {
+    background: var(--gold-dark);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 9px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 3px 12px rgba(197,131,42,0.4);
+  }
+  .talk-btn:hover { background: #d4902e; transform: translateY(-1px); }
+  .cmd-row { display: flex; gap: 6px; }
+  .cmd-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
+  .cmd-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .cmd-btn:hover { border-color: var(--gold-muted); color: var(--text); }
+
+  /* BOTTOM PANEL */
+  .bottom-panel {
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .status-bar {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .status-bar::-webkit-scrollbar { display: none; }
+
+  .status-col {
+    flex: 1;
+    min-width: 100px;
+    padding: 8px 14px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+  .status-col:last-child { border-right: none; }
+  .status-col:hover { background: var(--surface); }
+  .status-name { font-size: 11px; color: var(--text-muted); }
+  .status-count { font-size: 15px; font-weight: 700; color: var(--text); font-family: 'DM Mono', monospace; }
+
+  .activity-row {
+    display: flex;
+    gap: 0;
+    height: 110px;
+  }
+  .activity-panel {
+    flex: 1;
+    padding: 10px 14px;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .activity-panel:last-child { border-right: none; }
+  .panel-title { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .panel-sub { font-size: 10px; color: var(--text-muted); margin-bottom: 8px; margin-top: -4px; }
+
+  .activity-item {
+    display: flex; align-items: baseline; gap: 10px;
+    margin-bottom: 4px;
+    font-size: 11px;
+  }
+  .act-time { color: var(--text-muted); font-family: 'DM Mono', monospace; font-size: 10px; flex-shrink: 0; }
+  .act-who { font-weight: 600; color: var(--text); flex-shrink: 0; }
+  .act-what { color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .act-what b { color: var(--gold); font-weight: 500; }
+
+  .output-item {
+    display: flex; align-items: baseline; gap: 10px;
+    margin-bottom: 4px;
+    font-size: 11px;
+  }
+  .out-ago { color: var(--text-muted); font-size: 10px; flex-shrink: 0; font-family: 'DM Mono', monospace; }
+  .out-who { font-weight: 600; color: var(--text); flex-shrink: 0; }
+  .out-file { color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Avatar colors */
+  .av-claudy { background: #6b7fd4; }
+  .av-paint  { background: #e06c75; }
+  .av-minnie { background: #d4a04a; }
+  .av-newy   { background: #56b6c2; }
+  .av-reese  { background: #c678dd; }
+  .av-flower { background: #e5c07b; }
+  .av-rae    { background: #98c379; }
+  .av-ada    { background: #e06c75; }
+  .av-dale   { background: #61afef; }
+  .av-nick   { background: #56b6c2; }
+  .av-indie  { background: #c678dd; }
+  .av-chris  { background: #d19a66; }
+  .av-devil  { background: #abb2bf; }
+  .av-vera   { background: #e06c75; }
+  .av-libby  { background: #98c379; }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="logo">
+    <div class="logo-icon">🏢</div>
+    <div>
+      <div>ลงทุน Diary</div>
+      <div class="logo-sub">Mission Control</div>
+    </div>
+  </div>
+  <div class="nav-center">
+    <div class="toggle-pill">
+      <button class="toggle-btn active" onclick="setTab(this,'studio')">
+        <span class="dot"></span> Studio
+      </button>
+      <button class="toggle-btn" onclick="setTab(this,'board')">Board</button>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="agent-pill">
+      <span class="agent-dot"></span>
+      <span><strong>13 agents</strong> · 4 active</span>
+    </div>
+    <button class="reset-btn">↺ Reset layout</button>
+    <div class="timestamp" id="ts"></div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="project-card">
+      <div class="project-title">ลงทุน Diary — LTD OS</div>
+      <div class="project-sub">updated May 31, 2026 · 11:36</div>
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+      <div class="week-summary">This week — <strong>8</strong> of 6 shipped</div>
+    </div>
+
+    <div class="banner-card">
+      <div class="banner-title">
+        Banners
+        <span class="banner-count">2</span>
+      </div>
+      <div class="banner-item">
+        <span class="banner-dot"></span>
+        <span><strong>Weekly Review Due</strong> — run /weekly to summarize 2026-W22</span>
+      </div>
+      <div class="banner-item">
+        <span class="banner-dot hollow"></span>
+        <span><strong>WATCHLIST</strong> — 3 item(s) due in next 7 days</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Today's Focus</div>
+      <ul class="focus-list">
+        <li class="focus-item">
+          <span class="focus-num">1</span>
+          <span>Run autolog Haiku-fidelity verification</span>
+        </li>
+        <li class="focus-item">
+          <span class="focus-num">2</span>
+          <span>Adjudicate ZETA 7-Powers framing conflict</span>
+        </li>
+        <li class="focus-item">
+          <span class="focus-num">3</span>
+          <span>Run /weekly + prep AVGO/CRWD/RBRK earnings cluster</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="team-section">
+      <div class="section-label">Team · 14</div>
+      <div class="team-chips">
+        <div class="team-chip"><div class="chip-avatar av-claudy">Cl</div>Claudy<span class="chip-dot"></span></div>
+        <div class="team-chip"><div class="chip-avatar av-paint">Pa</div>Paint<span class="chip-dot"></span></div>
+        <div class="team-chip"><div class="chip-avatar av-newy">Ne</div>Newy<span class="chip-dot"></span></div>
+        <div class="team-chip"><div class="chip-avatar av-flower">Fl</div>Flower<span class="chip-dot"></span></div>
+        <div class="team-chip"><div class="chip-avatar av-rae">Ra</div>Rae<span class="chip-dot"></span></div>
+        <div class="team-chip"><div class="chip-avatar av-ada">Ad</div>Ada<span class="chip-dot"></span></div>
+        <div class="team-chip"><div class="chip-avatar av-dale">Da</div>Dale<span class="chip-dot"></span></div>
+        <div class="team-chip"><div class="chip-avatar av-nick">Ni</div>Nick<span class="chip-dot"></span></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <div class="office-area">
+      <div class="office-title">
+        <h3>The Studio · Isometric Office</h3>
+        <p>9 rooms · The whole team · Drag anyone, anywhere</p>
+      </div>
+
+      <!-- Isometric SVG office -->
+      <div class="iso-scene">
+        <svg class="iso-svg" viewBox="0 0 740 420" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+              <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.25"/>
+            </filter>
+          </defs>
+
+          <!-- OFFICE FLOOR (isometric diamond) -->
+          <polygon points="370,30 680,190 370,350 60,190" fill="#eee8d8" stroke="#d8d0be" stroke-width="1.5"/>
+
+          <!-- FLOOR GRID LINES -->
+          <g stroke="#ddd7c8" stroke-width="0.5" opacity="0.6">
+            <!-- horizontal-ish -->
+            <line x1="130" y1="220" x2="610" y2="220"/>
+            <line x1="100" y1="250" x2="640" y2="250"/>
+            <line x1="160" y1="190" x2="580" y2="190"/>
+            <!-- vertical-ish -->
+            <line x1="370" y1="30" x2="200" y2="310"/>
+            <line x1="430" y1="50" x2="260" y2="320"/>
+            <line x1="310" y1="50" x2="140" y2="300"/>
+            <line x1="490" y1="80" x2="320" y2="340"/>
+            <line x1="540" y1="110" x2="370" y2="350"/>
+          </g>
+
+          <!-- WALL BACK LEFT -->
+          <polygon points="60,190 370,30 370,10 60,175" fill="#d0c8b5" stroke="#bfb8a5" stroke-width="1"/>
+          <!-- WALL BACK RIGHT -->
+          <polygon points="370,30 680,190 680,175 370,10" fill="#c8c0ae" stroke="#bfb8a5" stroke-width="1"/>
+
+          <!-- DESK GROUP: Top-left cluster -->
+          <!-- Desk: Paint (top center-left) -->
+          <g transform="translate(330, 75)">
+            <polygon points="0,20 40,0 80,20 40,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,32 40,52 40,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="80,20 80,32 40,52 40,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+            <!-- monitor -->
+            <rect x="26" y="5" width="18" height="12" rx="1" fill="#3a5c47" stroke="#2a3a2a" stroke-width="0.8" transform="rotate(-25,35,11)"/>
+          </g>
+
+          <!-- Desk: Minnie (top center) -->
+          <g transform="translate(440, 90)">
+            <polygon points="0,20 40,0 80,20 40,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,32 40,52 40,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="80,20 80,32 40,52 40,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+            <!-- plant -->
+            <circle cx="66" cy="17" r="6" fill="#4a8a50" opacity="0.85"/>
+            <circle cx="69" cy="13" r="4" fill="#5a9a5a" opacity="0.8"/>
+          </g>
+
+          <!-- Desk: Rae (right) -->
+          <g transform="translate(540, 140)">
+            <polygon points="0,20 40,0 80,20 40,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,32 40,52 40,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="80,20 80,32 40,52 40,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+            <rect x="22" y="6" width="16" height="11" rx="1" fill="#3a5c47" stroke="#2a3a2a" stroke-width="0.8" transform="rotate(-20,30,12)"/>
+          </g>
+
+          <!-- Desk: Newy (left) -->
+          <g transform="translate(130, 155)">
+            <polygon points="0,20 40,0 80,20 40,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,32 40,52 40,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="80,20 80,32 40,52 40,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+          </g>
+
+          <!-- Desk: Reese (center-left) -->
+          <g transform="translate(270, 155)">
+            <polygon points="0,20 40,0 80,20 40,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,32 40,52 40,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="80,20 80,32 40,52 40,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+            <rect x="24" y="6" width="16" height="11" rx="1" fill="#3a5c47" stroke="#2a3a2a" stroke-width="0.8" transform="rotate(-22,32,11)"/>
+            <!-- paper -->
+            <rect x="10" y="16" width="12" height="8" rx="1" fill="white" opacity="0.8" transform="rotate(-10,16,20)"/>
+          </g>
+
+          <!-- Desk: Ada (right cluster) -->
+          <g transform="translate(570, 210)">
+            <polygon points="0,20 40,0 80,20 40,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,32 40,52 40,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="80,20 80,32 40,52 40,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+          </g>
+
+          <!-- Desk: Flower (center-left lower) -->
+          <g transform="translate(170, 220)">
+            <polygon points="0,20 40,0 80,20 40,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,32 40,52 40,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="80,20 80,32 40,52 40,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+            <!-- plant -->
+            <circle cx="14" cy="16" r="7" fill="#5a9a50" opacity="0.85"/>
+          </g>
+
+          <!-- Desk: Claudy (center) -->
+          <g transform="translate(320, 215)">
+            <polygon points="0,22 44,0 88,22 44,44" fill="#d4b47a" stroke="#a0824a" stroke-width="1.5"/>
+            <polygon points="0,22 0,36 44,58 44,44" fill="#b09050" stroke="#806030" stroke-width="1.2"/>
+            <polygon points="88,22 88,36 44,58 44,44" fill="#c0a060" stroke="#806030" stroke-width="1.2"/>
+            <rect x="26" y="6" width="20" height="13" rx="1.5" fill="#243d2f" stroke="#1a3a2a" stroke-width="1" transform="rotate(-22,36,13)"/>
+            <rect x="28" y="8" width="16" height="9" rx="0.5" fill="#3a6a50" transform="rotate(-22,36,13)"/>
+          </g>
+
+          <!-- Desk: Indie (far right) -->
+          <g transform="translate(570, 280)">
+            <polygon points="0,20 40,0 80,20 40,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,32 40,52 40,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="80,20 80,32 40,52 40,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+          </g>
+
+          <!-- Desk: Chris (right-center) -->
+          <g transform="translate(470, 265)">
+            <polygon points="0,20 40,0 80,20 40,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,32 40,52 40,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="80,20 80,32 40,52 40,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+            <rect x="22" y="5" width="16" height="11" rx="1" fill="#3a5c47" stroke="#2a3a2a" stroke-width="0.8" transform="rotate(-20,30,11)"/>
+          </g>
+
+          <!-- Desk: Devil (center-right) -->
+          <g transform="translate(390, 295)">
+            <polygon points="0,20 40,0 80,20 40,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,32 40,52 40,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="80,20 80,32 40,52 40,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+          </g>
+
+          <!-- Desk: Vera (right lower) -->
+          <g transform="translate(490, 320)">
+            <polygon points="0,20 40,0 80,20 40,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,32 40,52 40,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="80,20 80,32 40,52 40,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+          </g>
+
+          <!-- Desk: Dale (center-lower) -->
+          <g transform="translate(280, 305)">
+            <polygon points="0,20 40,0 80,20 40,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,32 40,52 40,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="80,20 80,32 40,52 40,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+          </g>
+
+          <!-- Desk: Nick (bottom-center) -->
+          <g transform="translate(300, 340)">
+            <polygon points="0,20 40,0 80,20 40,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,32 40,52 40,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="80,20 80,32 40,52 40,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+          </g>
+
+          <!-- Desk: Libby (far right lower) -->
+          <g transform="translate(590, 340)">
+            <polygon points="0,20 36,0 72,20 36,40" fill="#c4a46a" stroke="#a0824a" stroke-width="1.2"/>
+            <polygon points="0,20 0,31 36,51 36,40" fill="#a08048" stroke="#806030" stroke-width="1"/>
+            <polygon points="72,20 72,31 36,51 36,40" fill="#b09058" stroke="#806030" stroke-width="1"/>
+          </g>
+
+          <!-- SOFA/LOUNGE area (center-left) -->
+          <g transform="translate(100,250)">
+            <polygon points="0,14 50,0 50,18 0,32" fill="#7a9a7a" stroke="#5a7a5a" stroke-width="1" opacity="0.7"/>
+          </g>
+
+          <!-- PLANT decorations -->
+          <g transform="translate(75,190)">
+            <polygon points="0,8 14,0 28,8 14,16" fill="#4a7a50" opacity="0.8"/>
+            <circle cx="14" cy="4" r="8" fill="#5a9a5a" opacity="0.75"/>
+          </g>
+          <g transform="translate(635,195)">
+            <polygon points="0,8 12,0 24,8 12,16" fill="#4a7a50" opacity="0.8"/>
+            <circle cx="12" cy="3" r="7" fill="#5a9a5a" opacity="0.75"/>
+          </g>
+        </svg>
+
+        <!-- CHARACTER BUBBLES positioned absolutely over SVG -->
+        <div class="char-bubble" style="left:342px;top:46px" onclick="selectChar('Paint')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-paint">Pa</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Paint</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:460px;top:63px" onclick="selectChar('Minnie')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-minnie">Mi</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Minnie</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:565px;top:112px" onclick="selectChar('Rae')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-rae">Ra</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Rae</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:130px;top:128px" onclick="selectChar('Newy')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-newy">Ne</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Newy</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:278px;top:128px" onclick="selectChar('Reese')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-reese">Re</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Reese</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:596px;top:183px" onclick="selectChar('Ada')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-ada">Ad</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Ada</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:165px;top:193px" onclick="selectChar('Flower')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-flower">Fl</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Flower</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:330px;top:188px" onclick="selectChar('Claudy')">
+          <div class="bubble-tag" style="border-color: var(--gold);">
+            <div class="bubble-avatar av-claudy">Cl</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Claudy</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:600px;top:252px" onclick="selectChar('Indie')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-indie">In</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Indie</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:492px;top:238px" onclick="selectChar('Chris')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-chris">Ch</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Chris</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:403px;top:268px" onclick="selectChar('Devil')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-devil">De</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Devil</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:295px;top:278px" onclick="selectChar('Dale')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-dale">Da</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Dale</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:514px;top:292px" onclick="selectChar('Vera')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-vera">Ve</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Vera</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:320px;top:313px" onclick="selectChar('Nick')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-nick">Ni</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Nick</span>
+          </div>
+        </div>
+        <div class="char-bubble" style="left:606px;top:313px" onclick="selectChar('Libby')">
+          <div class="bubble-tag">
+            <div class="bubble-avatar av-libby">Li</div>
+            <span class="bubble-status"></span>
+            <span class="bubble-name">Libby</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-area">
+        <button class="talk-btn" id="talk-btn" onclick="talkTo()">Talk to Claudy</button>
+        <div class="cmd-label">Commands</div>
+        <div class="cmd-row">
+          <button class="cmd-btn">Review Scripts</button>
+          <button class="cmd-btn">/start</button>
+          <button class="cmd-btn">/news</button>
+          <button class="cmd-btn">/xthread</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM PANEL -->
+    <div class="bottom-panel">
+      <div class="status-bar">
+        <div class="status-col"><span class="status-name">Ready to Record</span><span class="status-count">1</span></div>
+        <div class="status-col"><span class="status-name">Awaiting Paint Review</span><span class="status-count">28</span></div>
+        <div class="status-col"><span class="status-name">In Progress</span><span class="status-count">3</span></div>
+        <div class="status-col"><span class="status-name">Team Inbox</span><span class="status-count">1</span></div>
+        <div class="status-col"><span class="status-name">Open Questions</span><span class="status-count">29</span></div>
+        <div class="status-col"><span class="status-name">Open Decisions</span><span class="status-count">2</span></div>
+        <div class="status-col"><span class="status-name">Scheduled</span><span class="status-count">30</span></div>
+      </div>
+      <div class="activity-row">
+        <div class="activity-panel">
+          <div class="panel-title">Latest Activity</div>
+          <div class="panel-sub">what the studio just did</div>
+          <div class="activity-item"><span class="act-time">10:43</span><span class="act-who">Chris</span><span class="act-what">review complete → <b>approved</b> (2 notes)</span></div>
+          <div class="activity-item"><span class="act-time">10:31</span><span class="act-who">Claudy</span><span class="act-what">drafted ZETA 7-Powers summary doc</span></div>
+          <div class="activity-item"><span class="act-time">09:58</span><span class="act-who">Paint</span><span class="act-what">pushed Haiku fidelity batch → 14/14 pass</span></div>
+          <div class="activity-item"><span class="act-time">09:22</span><span class="act-who">Newy</span><span class="act-what">scheduled AVGO earnings thread for Fri</span></div>
+        </div>
+        <div class="activity-panel">
+          <div class="panel-title">Latest output files</div>
+          <div class="panel-sub">freshest files the studio made</div>
+          <div class="output-item"><span class="out-ago">2h ago</span><span class="out-who">Rae</span><span class="out-file">Xpost Edge Ai No Center</span></div>
+          <div class="output-item"><span class="out-ago">3h ago</span><span class="out-who">Claudy</span><span class="out-file">ZETA 7-Powers Framing v2.md</span></div>
+          <div class="output-item"><span class="out-ago">5h ago</span><span class="out-who">Paint</span><span class="out-file">Haiku Fidelity Report W22.csv</span></div>
+          <div class="output-item"><span class="out-ago">6h ago</span><span class="out-who">Flower</span><span class="out-file">Weekly Digest 2026-W21.pdf</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Timestamp
+  function updateTime() {
+    const now = new Date();
+    document.getElementById('ts').textContent =
+      'Updated ' + now.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) +
+      ' ' + now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit', hour12:false});
+  }
+  updateTime();
+  setInterval(updateTime, 60000);
+
+  // Tab toggle
+  function setTab(btn, tab) {
+    document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // Select character
+  let selected = 'Claudy';
+  function selectChar(name) {
+    selected = name;
+    document.getElementById('talk-btn').textContent = 'Talk to ' + name;
+  }
+
+  function talkTo() {
+    alert('Opening chat with ' + selected + '...');
+  }
+</script>
+</body>
+</html>
